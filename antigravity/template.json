@@ -1,0 +1,29 @@
+{
+    "slots":{
+        "0":{"name":"core","type":{"events":[],"methods":[]}},
+        "1":{"name":"antigrav","type":{"events":[],"methods":[]}},
+        "2":{"name":"screen","type":{"events":[],"methods":[]}},
+        "3":{"name":"slot4","type":{"events":[],"methods":[]}},
+        "4":{"name":"slot5","type":{"events":[],"methods":[]}},
+        "5":{"name":"slot6","type":{"events":[],"methods":[]}},
+        "6":{"name":"slot7","type":{"events":[],"methods":[]}},
+        "7":{"name":"slot8","type":{"events":[],"methods":[]}},
+        "8":{"name":"slot9","type":{"events":[],"methods":[]}},
+        "9":{"name":"slot10","type":{"events":[],"methods":[]}},
+        "-1":{"name":"unit","type":{"events":[],"methods":[]}},
+        "-2":{"name":"system","type":{"events":[],"methods":[]}},
+        "-3":{"name":"library","type":{"events":[],"methods":[]}}
+    },
+    "handlers":[
+        {"code":"${file:unit.start1.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
+        {"code":"${file:unit.start2.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
+        {"code":"${code:_G.agController:updateState()}","filter":{"args":[${args: update}],"signature":"tick(timerId)","slotKey":"${slotKey:unit}"},"key":"${key}"},
+        {"code":"${file:screen.start.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:screen}"},"key":"${key}"},
+        {"code":"${code:_G.agScreen:refresh()}","filter":{"args":[],"signature":"update()","slotKey":"${slotKey:system}"},"key":"${key}"},
+        {"code":"${code:_G.agScreen:mouseDown(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseDown(x,y)","slotKey":"${slotKey:screen}"},"key":"${key}"},
+        {"code":"${code:_G.agScreen:mouseUp(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseUp(x,y)","slotKey":"${slotKey:screen}"},"key":"${key}"},
+        {"code":"${file:../../du-utils/duutils/Utilities.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"}
+    ],
+    "methods":[],
+    "events":[]
+}
