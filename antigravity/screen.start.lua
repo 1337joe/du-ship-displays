@@ -2,14 +2,19 @@
 local SVG_TEMPLATE = [[${file:screen.svg}]]
 local SVG_LOGO = [[${file:../logo.svg minify}]]
 
--- embed logo on load
-SVG_TEMPLATE = string.gsub(SVG_TEMPLATE, '<svg id="logo"/>', SVG_LOGO)
-
 -- constants and editable lua script parameters
 local MAX_SLIDER_ALTITUDE = 100000 --export: Max altitude value on the slider (m)
 local MIN_ADJUSTMENT_VALUE = 1
 local MAX_ADJUSTMENT_VALUE = 10000 --export: Max step size for altitude adjustment (m)
 
+-- one-off transforms
+-- embed logo
+SVG_TEMPLATE = string.gsub(SVG_TEMPLATE, '<svg id="logo"/>', SVG_LOGO)
+-- set max slider height, subtract 1000 to account for min height
+SVG_TEMPLATE = string.gsub(SVG_TEMPLATE, "99000", tostring(MAX_SLIDER_ALTITUDE - 1000))
+
+local ALT_SLIDER_TOP = 162
+local ALT_SLIDER_BOTTOM = 1026
 
 -- initialize object and fields
 _G.agScreen = {
@@ -87,14 +92,17 @@ function _G.agScreen:refresh()
     local currentAltitude = math.floor(self.controller.currentAltitude + 0.5)
     local agPower = math.floor(self.controller.agPower * 100 + 0.5)
     local agField = math.floor(self.controller.agField * 100 + 0.5)
+    local targetAltitudeSliderHeight = math.floor(ALT_SLIDER_BOTTOM - targetAltitude / (MAX_SLIDER_ALTITUDE - 1000 ) * (ALT_SLIDER_BOTTOM - ALT_SLIDER_TOP) + 0.5)
+    local currentAltitudeSliderHeight = math.floor(ALT_SLIDER_BOTTOM - currentAltitude / (MAX_SLIDER_ALTITUDE - 1000 ) * (ALT_SLIDER_BOTTOM - ALT_SLIDER_TOP) + 0.5)
 
     -- insert values to svg and render
     local html = SVG_TEMPLATE
     html = _G.Utilities.sanitizeFormatString(html)
-    html = string.format(html,
+    html = string.format(html, MAX_SLIDER_ALTITUDE, currentAltitudeSliderHeight, targetAltitudeSliderHeight,
         targetAltitude, baseAltitude, altitudeAdjustment, altitudeAdjustment,
         verticalVelocity, verticalUnits, currentAltitude, agField, agPower)
 
+    -- add mouse-over highlights
     if not self.mouse.pressed then
         local mouseOver, index = self:detectPress(self.mouse.x, self.mouse.y)
         if mouseOver == BUTTON_ALTITUDE_ADJUST_UP then
@@ -105,6 +113,8 @@ function _G.agScreen:refresh()
             html = string.gsub(html, "altitudeUpClass", "mouseOver")
         elseif mouseOver == BUTTON_ALTITUDE_DOWN then
             html = string.gsub(html, "altitudeDownClass", "mouseOver")
+        elseif mouseOver == BUTTON_MATCH_CURRENT_ALTITUDE then
+            html = string.gsub(html, "rightSliderClass", "mouseOver")
         end
     end
 
