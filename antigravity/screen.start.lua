@@ -1,5 +1,9 @@
 
 local SVG_TEMPLATE = [[${file:screen.svg}]]
+local SVG_LOGO = [[${file:../logo.svg minify}]]
+
+-- embed logo on load
+SVG_TEMPLATE = string.gsub(SVG_TEMPLATE, '<svg id="logo"/>', SVG_LOGO)
 
 -- constants and editable lua script parameters
 local MAX_SLIDER_ALTITUDE = 100000 --export: Max altitude value on the slider (m)
@@ -92,11 +96,11 @@ function _G.agScreen:refresh()
         verticalVelocity, verticalUnits, currentAltitude, agField, agPower)
 
     if not self.mouse.pressed then
-        local mouseOver = self:detectPress(self.mouse.x, self.mouse.y)
+        local mouseOver, index = self:detectPress(self.mouse.x, self.mouse.y)
         if mouseOver == BUTTON_ALTITUDE_ADJUST_UP then
-            html = string.gsub(html, "adjustUpClass", "mouseOver")
+            html = string.gsub(html, "adjustUpClass" .. index, "mouseOver")
         elseif mouseOver == BUTTON_ALTITUDE_ADJUST_DOWN then
-            html = string.gsub(html, "adjustDownClass", "mouseOver")
+            html = string.gsub(html, "adjustDownClass" .. index, "mouseOver")
         elseif mouseOver == BUTTON_ALTITUDE_UP then
             html = string.gsub(html, "altitudeUpClass", "mouseOver")
         elseif mouseOver == BUTTON_ALTITUDE_DOWN then
@@ -129,16 +133,18 @@ end
 --- Returns the button that intersects the provided coordinates or nil if none is found.
 function _G.agScreen:detectPress(x, y)
     local found = false
+    local index = nil
     for button, coords in pairs(self.buttonCoordinates) do
         if coords.x1 then
             if x > coords.x1 and x < coords.x2 and y > coords.y1 and y < coords.y2 then
                 found = true
             end
         else
-            for _,innerCoords in pairs(coords) do
+            for i,innerCoords in pairs(coords) do
                 if innerCoords.x1 then
                     if x > innerCoords.x1 and x < innerCoords.x2 and y > innerCoords.y1 and y < innerCoords.y2 then
                         found = true
+                        index = i
                     end
                 else
                     break
@@ -147,7 +153,7 @@ function _G.agScreen:detectPress(x, y)
         end
 
         if found then
-            return button
+            return button, index
         end
     end
     return nil
