@@ -19,6 +19,7 @@ local ALT_SLIDER_BOTTOM = 1026
 local MOUSE_OVER_CLASS = "mouseOver"
 local HIDDEN_CLASS = "hidden"
 local PANEL_CLASS_ADJUSTMENT = "adjustmentWidgets"
+local PANEL_CLASS_STATUS = "statusWidgets"
 local ELEMENT_CLASS_UNLOCKED_BUTTON = "unlockedClass"
 local ELEMENT_CLASS_UNLOCKING_LABEL = "unlockSlideClass"
 local ELEMENT_CLASS_LOCKED_BUTTON = "lockedClass"
@@ -27,6 +28,10 @@ local ELEMENT_CLASS_ALTITUDE_DOWN = "altitudeDownClass"
 local ELEMENT_CLASS_ADJUST_UP = "adjustUpClass"
 local ELEMENT_CLASS_ADJUST_DOWN = "adjustDownClass"
 local ELEMENT_CLASS_RIGHT_SLIDER = "rightSliderClass"
+local ELEMENT_CLASS_DISABLED = "disabledText"
+local ELEMENT_CLASS_POWER_IS_OFF = "powerIsOffClass"
+local ELEMENT_CLASS_POWER_IS_ON = "powerIsOnClass"
+local ELEMENT_CLASS_POWER_SLIDER = "powerSlideClass"
 
 -- initialize object and fields
 _G.agScreen = {
@@ -49,6 +54,8 @@ local BUTTON_ALTITUDE_ADJUST_DOWN = "Altitude Adjust Down"
 local BUTTON_MATCH_CURRENT_ALTITUDE = "Match Current Altitude"
 local BUTTON_LOCK = "Lock"
 local BUTTON_UNLOCK = "Unlock"
+local BUTTON_POWER_OFF = "Power Off"
+local BUTTON_POWER_ON = "Power On"
 
 -- Define button ranges, either in tables of x1,y1,x2,y2 or lists of those tables.
 _G.agScreen.buttonCoordinates = {}
@@ -92,6 +99,18 @@ _G.agScreen.buttonCoordinates[BUTTON_UNLOCK] = {
     x1 = 0.0, x2 = 0.1,
     y1 = 0.1, y2 = 0.2
 }
+_G.agScreen.buttonCoordinates[BUTTON_POWER_OFF] = {
+    x1 = 0.9, x2 = 1.0,
+    y1 = 0.1, y2 = 0.2
+}
+_G.agScreen.buttonCoordinates[BUTTON_POWER_ON] = {
+    x1 = 0.6, x2 = 0.7,
+    y1 = 0.1, y2 = 0.2
+}
+
+-- both sliders on same level, pre-compute y ranges with 5% buffer
+local sliderYMin = _G.agScreen.buttonCoordinates[BUTTON_UNLOCK].y1 - 1080 * 0.05
+local sliderYMax = _G.agScreen.buttonCoordinates[BUTTON_UNLOCK].y2 + 1080 * 0.05
 
 local function replaceClass(html, find, replace)
     -- ensure preceeded by " or space
@@ -134,22 +153,44 @@ function _G.agScreen:refresh()
 
     -- if unlocking track drag against bounds
     if self.locked and self.mouse.pressed == BUTTON_UNLOCK then
-        if not self.mouse.state or self.mouse.y < self.buttonCoordinates[BUTTON_UNLOCK].y1 or self.mouse.y > self.buttonCoordinates[BUTTON_UNLOCK].y2 then
+        if not self.mouse.state or self.mouse.y < sliderYMin or self.mouse.y > sliderYMax then
             self.mouse.pressed = nil
         elseif self.mouse.x > self.buttonCoordinates[BUTTON_LOCK].x1 then
+            self.mouse.pressed = nil
             self.locked = false
         else
             html = replaceClass(html, ELEMENT_CLASS_UNLOCKING_LABEL, "")
             html = string.gsub(html, "(id=\"locked\" x=)\"%d+", "%1\"" .. (self.mouse.x * 1920))
         end
     end
-
+    -- if powering off track against bounds
+    if self.controller.agState and self.mouse.pressed == BUTTON_POWER_OFF then
+        if not self.mouse.state or self.mouse.y < sliderYMin or self.mouse.y > sliderYMax then
+            self.mouse.pressed = nil
+        elseif self.mouse.x < self.buttonCoordinates[BUTTON_POWER_ON].x2 then
+            self.mouse.pressed = nil
+            self.controller:setAgState(false)
+        else
+            html = replaceClass(html, ELEMENT_CLASS_POWER_SLIDER, "")
+            html = string.gsub(html, "(id=\"power\" x=)\"%d+", "%1\"" .. (self.mouse.x * 1920))
+        end
+    end
+ 
     -- adjust visibility for state
+    -- controls locked
     if self.locked then
         html = replaceClass(html, PANEL_CLASS_ADJUSTMENT, HIDDEN_CLASS)
         html = replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, HIDDEN_CLASS)
     else
         html = replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, HIDDEN_CLASS)
+    end
+    -- AG power state
+    if self.controller.agState then
+        html = replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, HIDDEN_CLASS)
+    else
+        html = replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, HIDDEN_CLASS)
+        html = replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
+        html = replaceClass(html, ELEMENT_CLASS_DISABLED, "")
     end
 
     if not self.mouse.pressed then
@@ -169,6 +210,10 @@ function _G.agScreen:refresh()
             html = replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_UNLOCK then
             html = replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, MOUSE_OVER_CLASS)
+        elseif mouseOver == BUTTON_POWER_OFF then
+            html = replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, MOUSE_OVER_CLASS)
+        elseif mouseOver == BUTTON_POWER_ON then
+            html = replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, MOUSE_OVER_CLASS)
         end
     end
 
@@ -179,7 +224,6 @@ function _G.agScreen:mouseDown(x, y)
     self.mouse.x = x
     self.mouse.y = y
     self.mouse.pressed = self:detectPress(x, y)
-    system.print(string.format("Down: %f, %f: %s", x, y, self.mouse.pressed))
 end
 
 function _G.agScreen:mouseUp(x, y)
@@ -191,7 +235,6 @@ function _G.agScreen:mouseUp(x, y)
         self.controller.needRefresh = self.controller.needRefresh or modified
     end
     self.mouse.pressed = nil
-    system.print(string.format("Up: %f, %f: %s", x, y, released))
 end
 
 --- Returns the button that intersects the provided coordinates or nil if none is found.
@@ -235,6 +278,7 @@ function _G.agScreen:handleButton(buttonId)
             self.targetAltitude = adjusted
 
             self.controller:setBaseAltitude(self.targetAltitude)
+
         elseif buttonId == BUTTON_ALTITUDE_DOWN then
             local adjusted = self.targetAltitude - self.altitudeAdjustment
             if adjusted < 1000 then
@@ -244,6 +288,7 @@ function _G.agScreen:handleButton(buttonId)
             self.targetAltitude = adjusted
 
             self.controller:setBaseAltitude(self.targetAltitude)
+
         elseif buttonId == BUTTON_ALTITUDE_ADJUST_UP then
             local newAdjust = self.altitudeAdjustment * 10
             if newAdjust > MAX_ADJUSTMENT_VALUE then
@@ -251,6 +296,7 @@ function _G.agScreen:handleButton(buttonId)
             end
             modified = newAdjust ~= self.altitudeAdjustment
             self.altitudeAdjustment = newAdjust
+
         elseif buttonId == BUTTON_ALTITUDE_ADJUST_DOWN then
             local newAdjust = self.altitudeAdjustment / 10
             if newAdjust < MIN_ADJUSTMENT_VALUE then
@@ -258,14 +304,20 @@ function _G.agScreen:handleButton(buttonId)
             end
             modified = newAdjust ~= self.altitudeAdjustment
             self.altitudeAdjustment = newAdjust
+
         elseif buttonId == BUTTON_MATCH_CURRENT_ALTITUDE then
             local adjusted = math.floor(_G.agController.currentAltitude + 0.5) -- snap to nearest meter
             modified = adjusted ~= self.targetAltitude
             self.targetAltitude = adjusted
 
             self.controller:setBaseAltitude(self.targetAltitude)
+
         elseif buttonId == BUTTON_LOCK then
             self.locked = true
+            modified = true
+
+        elseif buttonId == BUTTON_POWER_ON then
+            self.controller:setAgState(true)
             modified = true
         end
     end

@@ -1,15 +1,13 @@
-
 -- validate inputs
 local slots = _G.agController.slots
 local class = slots.antigrav.getElementClass()
-assert(class == "AntiGravityGeneratorUnit", "Antigrav slot is of type: "..class)
+assert(class == "AntiGravityGeneratorUnit", "Antigrav slot is of type: " .. class)
 class = slots.screen.getElementClass()
-assert(class == "ScreenUnit", "Screen slot is of type: "..class)
+assert(class == "ScreenUnit", "Screen slot is of type: " .. class)
 class = slots.core.getElementClass()
-assert(class == "CoreUnitDynamic", "Core slot is of type: "..class)
+assert(class == "CoreUnitDynamic", "Core slot is of type: " .. class)
 
 slots.screen.activate()
-
 
 local core = _G.agController.slots.core
 local antigrav = _G.agController.slots.antigrav
@@ -26,7 +24,6 @@ function _G.agController:updateState()
     -- signal draw of screen with updated state
     self.needRefresh = true
 end
-_G.agController:updateState()
 
 function _G.agController:setBaseAltitude(target)
     self.slots.antigrav.setBaseAltitude(target)
@@ -34,9 +31,27 @@ function _G.agController:setBaseAltitude(target)
     self:updateState()
 end
 
+function _G.agController:setAgState(newState)
+    local state
+    if newState then
+        self.slots.antigrav.activate()
+    else
+        self.slots.antigrav.deactivate()
+    end
+
+    self:updateState()
+end
+
 -- verify AG is powered enough to function
-assert(_G.agController.agField > 0.5, "Anti-Gravity Generator not linked to sufficient pulsors: " ..
-    _G.agController.agField)
+local startupState = _G.agController.slots.antigrav.getState()
+_G.agController.slots.antigrav.activate()
+_G.agController:updateState()
+assert(_G.agController.agField > 0.5,
+    "Anti-Gravity Generator not linked to sufficient pulsors, field: " .. _G.agController.agField)
+if startupState == 0 then
+    _G.agController.slots.antigrav.deactivate()
+    _G.agController:updateState()
+end
 
 -- hide widgets
 unit.hide()
