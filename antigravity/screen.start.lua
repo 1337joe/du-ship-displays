@@ -143,11 +143,13 @@ function _G.agScreen:refresh()
     local agField = math.floor(self.controller.agField * 100 + 0.5)
     local targetAltitudeSliderHeight = math.floor(ALT_SLIDER_BOTTOM - targetAltitude / (MAX_SLIDER_ALTITUDE - 1000 ) * (ALT_SLIDER_BOTTOM - ALT_SLIDER_TOP) + 0.5)
     local currentAltitudeSliderHeight = math.floor(ALT_SLIDER_BOTTOM - currentAltitude / (MAX_SLIDER_ALTITUDE - 1000 ) * (ALT_SLIDER_BOTTOM - ALT_SLIDER_TOP) + 0.5)
+    local baseAltitudeSliderHeight = math.floor(ALT_SLIDER_BOTTOM - baseAltitude / (MAX_SLIDER_ALTITUDE - 1000 ) * (ALT_SLIDER_BOTTOM - ALT_SLIDER_TOP) + 0.5)
 
     -- insert values to svg and render
     local html = SVG_TEMPLATE
     html = _G.Utilities.sanitizeFormatString(html)
-    html = string.format(html, MAX_SLIDER_ALTITUDE, currentAltitudeSliderHeight, targetAltitudeSliderHeight,
+    html = string.format(html, MAX_SLIDER_ALTITUDE,
+        currentAltitudeSliderHeight, targetAltitudeSliderHeight, baseAltitudeSliderHeight,
         targetAltitude, baseAltitude, altitudeAdjustment, altitudeAdjustment,
         verticalVelocity, verticalUnits, currentAltitude, agField, agPower)
 

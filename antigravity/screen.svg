@@ -34,6 +34,10 @@
         .baseAltitude {
             fill: #ff8888 !important;
         }
+        .indicator {
+            stroke: #000000;
+            stroke-width: 3;
+        }
         .units {
             fill: #555555;
         }
@@ -43,14 +47,10 @@
         }
     </style>
     <defs>
-        <g id="rightIndicator" class="currentPanel">
-            <polygon fill="#ffffff" points="96,-50 19.2,0 96,50" />
-            <rect x="96" y="-54" width="96" height="108" fill="#ffffff" />
-        </g>
-        <g id="leftIndicator">
-            <polygon fill="#ffffff" points="-96,-50 -19.2,0 -96,50" />
-            <rect x="-192" y="-54" width="96" height="108" fill="#ffffff" />
-        </g>
+        <path id="arrowIndicator" d="M 20,0 A 100,75 0 0,0 96,-44 L 96,-25 A 100,75 0 0,0 192,-54 A 100,100 0 0,0 192,54 A 100,75 0 0,0 96,25 L 96,44 A 100,75 0 0,0 20,0 z" />
+        <use id="rightIndicator" xlink:href="#arrowIndicator" />
+        <use id="leftIndicator" xlink:href="#arrowIndicator" transform="scale(-1,1)" />
+        <path id="baseIndicator" d="M -15,0 A 20,15 0 0,1 0,10 A 20,15 0 0,1 15,0 A 20,15 0 0,1 0,-10 A 20,15 0 0,1 -15,0 z" />
         <polygon id="chevronArrow" points="-192,20 0,-108 192,20 152,54 0,-54 -152,54" />
         <g id="altitudeUp">
             <use xlink:href="#chevronArrow" />
@@ -68,12 +68,12 @@
         <path id="locked" d="m -35,0 l 0,-15 a 35,35 0 0,1 70,0 l 0,15 5,0 0,54 -80,0 0,-54 z m 50,0 l 0,-15 a 15,15 0 0,0 -30,0 l 0,15 z" fill="#004400" />
         <path id="unlocked" d="m 15,0 l 0,-15 a 35,35 0 0,1 70,0 l 0,15 -20,0 l 0,-15 a 15,15 0 0,0 -30,0 l 0,15 l 5,0 0,54 -80,0 0,-54 5,0 z" fill="#440000" />
         <g id="powerIsOff">
-			<path d="M -32.2,-23.7 A 10,10 0 0,1 -18,-9.5 A 25.5,25.5 0 1,0 18,-9.5 A 10,10 0 0,1 32.2,-23.7 A 45.5,45.5 0 1,1 -32.2,-23.7 z" fill="#440000" />
-			<path d="M -10,-8 l 0,-32 a 10,10 0 0,1 20,0 l 0,32 a 10,10 0 0,1 -20,0 z" fill="#444444" />
+            <path d="M -32.2,-23.7 A 10,10 0 0,1 -18,-9.5 A 25.5,25.5 0 1,0 18,-9.5 A 10,10 0 0,1 32.2,-23.7 A 45.5,45.5 0 1,1 -32.2,-23.7 z" fill="#440000" />
+            <path d="M -10,-8 l 0,-32 a 10,10 0 0,1 20,0 l 0,32 a 10,10 0 0,1 -20,0 z" fill="#444444" />
         </g>
         <g id="powerIsOn">
-			<path d="M -32.2,-23.7 A 10,10 0 0,1 -18,-9.5 A 25.5,25.5 0 1,0 18,-9.5 A 10,10 0 0,1 32.2,-23.7 A 45.5,45.5 0 1,1 -32.2,-23.7 z" fill="#444444" />
-			<path d="M -10,-8 l 0,-32 a 10,10 0 0,1 20,0 l 0,32 a 10,10 0 0,1 -20,0 z" fill="#004400" />
+            <path d="M -32.2,-23.7 A 10,10 0 0,1 -18,-9.5 A 25.5,25.5 0 1,0 18,-9.5 A 10,10 0 0,1 32.2,-23.7 A 45.5,45.5 0 1,1 -32.2,-23.7 z" fill="#444444" />
+            <path d="M -10,-8 l 0,-32 a 10,10 0 0,1 20,0 l 0,32 a 10,10 0 0,1 -20,0 z" fill="#004400" />
         </g>
         <linearGradient id="titleGradient">
             <stop offset="0%" stop-color="#000000" />
@@ -86,7 +86,7 @@
     <rect x="0" y="0" fill="#000000" width="1920" height="1080" />
     <g id="slider">
         <g transform="rotate(180,960,594)" clip-path="url(#sliderSwoop)">
-            <svg x="768" y="162" width="384" height="864" viewBox="0 0 384 99000" preserveAspectRatio="none" >
+            <svg x="768" y="162" width="384" height="864" viewBox="0 0 384 99000" preserveAspectRatio="none">
                 <defs>
                     <linearGradient id="lowAlt" gradientTransform="rotate(90)">
                         <stop offset="0%" stop-color="#ff0000" />
@@ -125,29 +125,30 @@
         </g>
         <text x="960" y="1068.5" text-anchor="middle" style="font-size:40px;fill:#ff0000;">1000 <tspan class="units">m</tspan></text>
         <text x="960" y="150.5" text-anchor="middle" style="font-size:40px;fill:#ffffff;stroke:#000000;">%d <tspan class="units">m</tspan></text>
-        <use xlink:href="#rightIndicator" x="960" y="%d" class="rightSliderClass" />
-        <use xlink:href="#leftIndicator" x="960" y="%d" class="leftSliderClass" />
+        <use xlink:href="#rightIndicator" x="960" y="%d" class="altitude indicator rightSliderClass" />
+        <use xlink:href="#leftIndicator" x="960" y="%d" class="current indicator leftSliderClass" />
+        <use xlink:href="#baseIndicator" x="960" y="%d" class="baseAltitude indicator" />
     </g>
     <g id="targetPanel">
         <g id="lockBar">
             <use x="672" y="162" xlink:href="#unlocked" class="unlockedClass" />
-            <text x="384" y="189" text-anchor="middle" textLength="384" class="label unlockSlideClass" >&gt;Slide&gt;</text>
+            <text x="384" y="189" text-anchor="middle" textLength="384" class="label unlockSlideClass">&gt;Slide&gt;</text>
             <use id="locked" x="96" y="162" xlink:href="#locked" class="lockedClass" />
         </g>
         <text x="384" y="648" text-anchor="middle" textLength="576" class="altitude">%d</text>
-        <text x="384" y="702" text-anchor="middle" class="label" >Target Altitude (m)</text>
-        <text x="384" y="1053" text-anchor="end" class="label" >Base Altitude:</text>
-        <text x="384" y="1053" class="minorValue baseAltitude" >%d <tspan class="units">m</tspan></text>
+        <text x="384" y="702" text-anchor="middle" class="label">Target Altitude (m)</text>
+        <text x="384" y="1053" text-anchor="end" class="label">Base Altitude:</text>
+        <text x="384" y="1053" class="minorValue baseAltitude">%d <tspan class="units">m</tspan></text>
         <g class="adjustmentWidgets">
             <g class="altitude">
                 <use xlink:href="#altitudeUp" x="384" y="324" class="altitudeUpClass" />
                 <use xlink:href="#altitudeDown" x="384" y="864" class="altitudeDownClass" />
             </g>
             <g class="adjust">
-                <text x="384" y="432" text-anchor="middle" >%s</text>
+                <text x="384" y="432" text-anchor="middle">%s</text>
                 <use x="576" y="405" xlink:href="#adjustUp" class="adjustUpClass1"/>
                 <use x="192" y="405" xlink:href="#adjustDown" class="adjustDownClass1" />
-                <text x="384" y="810" text-anchor="middle" >%s</text>
+                <text x="384" y="810" text-anchor="middle">%s</text>
                 <use x="576" y="783" xlink:href="#adjustUp" class="adjustUpClass2" />
                 <use x="192" y="783" xlink:href="#adjustDown" class="adjustDownClass2" />
             </g>
@@ -156,76 +157,28 @@
     <g id="currentPanel">
         <g id="lockBar">
             <use x="1248" y="162" xlink:href="#powerIsOff" class="powerIsOffClass" />
-            <text x="1536" y="189" text-anchor="middle" textLength="384" class="label powerSlideClass" >&lt;Slide&lt;</text>
+            <text x="1536" y="189" text-anchor="middle" textLength="384" class="label powerSlideClass">&lt;Slide&lt;</text>
             <use id="power" x="1824" y="162" xlink:href="#powerIsOn" class="powerIsOnClass" />
         </g>
-        <text x="1536" y="352" text-anchor="end" class="label" >Vertical Vel:</text>
-        <text x="1536" y="352" class="minorValue" >%s <tspan class="units">%s</tspan></text>
-        <text x="1536" y="648" text-anchor="middle" textLength="576" class="current" >%d</text>
-        <text x="1536" y="702" text-anchor="middle" class="label" >Current Altitude (m)</text>
+        <text x="1536" y="352" text-anchor="end" class="label">Vertical Vel:</text>
+        <text x="1536" y="352" class="minorValue">%s <tspan class="units">%s</tspan></text>
+        <text x="1536" y="648" text-anchor="middle" textLength="576" class="current">%d</text>
+        <text x="1536" y="702" text-anchor="middle" class="label">Current Altitude (m)</text>
         <g class="statusWidgets">
-            <text x="1632" y="891" text-anchor="end" class="label" >Field Strength:</text>
-            <text x="1632" y="891" class="minorValue" >%d <tspan class="units">Es</tspan></text>
-            <text x="1632" y="999" text-anchor="end" class="label" >Power Level:</text>
-            <text x="1632" y="999" class="minorValue" >%d <tspan class="units">%</tspan></text>
+            <text x="1632" y="891" text-anchor="end" class="label">Field Strength:</text>
+            <text x="1632" y="891" class="minorValue">%d <tspan class="units">Es</tspan></text>
+            <text x="1632" y="999" text-anchor="end" class="label">Power Level:</text>
+            <text x="1632" y="999" class="minorValue">%d <tspan class="units">%</tspan></text>
         </g>
         <g class="disabledText" style="font-size:150px;fill:#880000;">
-            <text x="1536" y="823" text-anchor="middle" textLength="768" >Anti-Gravity</text>
-            <text x="1536" y="945" text-anchor="middle" >Generator</text>
-            <text x="1536" y="1067" text-anchor="middle" >Offline</text>
+            <text x="1536" y="823" text-anchor="middle" textLength="768">Anti-Gravity</text>
+            <text x="1536" y="945" text-anchor="middle">Generator</text>
+            <text x="1536" y="1067" text-anchor="middle">Offline</text>
         </g>
     </g>
     <g id="header">
         <rect x="0" y="0" fill="url('#titleGradient')" width="1920" height="108" />
         <use xlink:href="#logo" x="4" y="4" width="178" height="100" />
         <text x="1920" y="108" text-anchor="end" style="font-size:108px;font-weight:bold;">ANTI-GRAVITY</text>
-    </g>
-    <g id="overlay grid" style="opacity=0.5;">
-        <g id="10% grid" style="stroke-width:1px;stroke:#444444;">
-            <line x1="0" y1="0" x2="1920" y2="0" />
-            <line x1="0" y1="108" x2="1920" y2="108" />
-            <line x1="0" y1="216" x2="1920" y2="216" />
-            <line x1="0" y1="324" x2="1920" y2="324" />
-            <line x1="0" y1="432" x2="1920" y2="432" />
-            <line x1="0" y1="540" x2="1920" y2="540" />
-            <line x1="0" y1="648" x2="1920" y2="648" />
-            <line x1="0" y1="756" x2="1920" y2="756" />
-            <line x1="0" y1="864" x2="1920" y2="864" />
-            <line x1="0" y1="972" x2="1920" y2="972" />
-            <line x1="0" y1="1080" x2="1920" y2="1080" />
-            <line x1="0" y1="0" x2="0" y2="1080" />
-            <line x1="192" y1="0" x2="192" y2="1080" />
-            <line x1="384" y1="0" x2="384" y2="1080" />
-            <line x1="576" y1="0" x2="576" y2="1080" />
-            <line x1="768" y1="0" x2="768" y2="1080" />
-            <line x1="960" y1="0" x2="960" y2="1080" />
-            <line x1="1152" y1="0" x2="1152" y2="1080" />
-            <line x1="1344" y1="0" x2="1344" y2="1080" />
-            <line x1="1536" y1="0" x2="1536" y2="1080" />
-            <line x1="1728" y1="0" x2="1728" y2="1080" />
-            <line x1="1920" y1="0" x2="1920" y2="1080" />
-        </g>
-        <g id="5% grid" style="stroke-width:1px;stroke:#444444;stroke-dasharray:4;opacity:0.5;">
-            <line x1="0" y1="54" x2="1920" y2="54" />
-            <line x1="0" y1="162" x2="1920" y2="162" />
-            <line x1="0" y1="270" x2="1920" y2="270" />
-            <line x1="0" y1="378" x2="1920" y2="378" />
-            <line x1="0" y1="486" x2="1920" y2="486" />
-            <line x1="0" y1="594" x2="1920" y2="594" />
-            <line x1="0" y1="702" x2="1920" y2="702" />
-            <line x1="0" y1="810" x2="1920" y2="810" />
-            <line x1="0" y1="918" x2="1920" y2="918" />
-            <line x1="0" y1="1026" x2="1920" y2="1026" />
-            <line x1="96" y1="0" x2="96" y2="1080" />
-            <line x1="288" y1="0" x2="288" y2="1080" />
-            <line x1="480" y1="0" x2="480" y2="1080" />
-            <line x1="672" y1="0" x2="672" y2="1080" />
-            <line x1="864" y1="0" x2="864" y2="1080" />
-            <line x1="1056" y1="0" x2="1056" y2="1080" />
-            <line x1="1248" y1="0" x2="1248" y2="1080" />
-            <line x1="1440" y1="0" x2="1440" y2="1080" />
-            <line x1="1632" y1="0" x2="1632" y2="1080" />
-            <line x1="1824" y1="0" x2="1824" y2="1080" />
-        </g>
     </g>
 </svg>
