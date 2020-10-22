@@ -125,8 +125,8 @@
         </g>
         <text x="960" y="1068.5" text-anchor="middle" style="font-size:40px;fill:#ff0000;">1000 <tspan class="units">m</tspan></text>
         <text x="960" y="150.5" text-anchor="middle" style="font-size:40px;fill:#ffffff;stroke:#000000;">%d <tspan class="units">m</tspan></text>
-        <use xlink:href="#rightIndicator" x="960" y="%d" class="altitude indicator rightSliderClass" />
-        <use xlink:href="#leftIndicator" x="960" y="%d" class="current indicator leftSliderClass" />
+        <use xlink:href="#rightIndicator" x="960" y="%d" class="current indicator rightSliderClass" />
+        <use xlink:href="#leftIndicator" x="960" y="%d" class="altitude indicator leftSliderClass" />
         <use xlink:href="#baseIndicator" x="960" y="%d" class="baseAltitude indicator" />
     </g>
     <g id="targetPanel">
