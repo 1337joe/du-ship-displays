@@ -4,23 +4,15 @@ local SVG_LOGO = [[${file:../logo.svg minify}]]
 
 -- constants and editable lua script parameters
 local SCREEN_HEIGHT = 1080
-local MAX_SLIDER_ALTITUDE = 100000 --export: Max altitude value on the slider (m)
+local MAX_SLIDER_ALTITUDE = 200000
 local MIN_SLIDER_ALTITUDE = 1000
 local MIN_AG_ALTITUDE = 1000 --export: Min altitude to allow setting on anti-grav (m)
 local MIN_ADJUSTMENT_VALUE = 1
 local MAX_ADJUSTMENT_VALUE = 10000 --export: Max step size for altitude adjustment (m)
 
-if MIN_SLIDER_ALTITUDE >= MAX_SLIDER_ALTITUDE then
-    local errorMessage = "Max slider altitude must be greater than" .. MIN_SLIDER_ALTITUDE
-    system.print(errorMessage)
-    assert(MIN_SLIDER_ALTITUDE < MAX_SLIDER_ALTITUDE, errorMessage)
-end
-
 -- one-off transforms
 -- embed logo
 SVG_TEMPLATE = string.gsub(SVG_TEMPLATE, '<svg id="logo"/>', SVG_LOGO)
--- set max slider height, subtract MIN_SLIDER_ALTITUDE to account for min height
-SVG_TEMPLATE = string.gsub(SVG_TEMPLATE, "99000", tostring(MAX_SLIDER_ALTITUDE - MIN_SLIDER_ALTITUDE))
 
 -- constants for svg file
 local ALT_SLIDER_TOP = 162
@@ -132,12 +124,16 @@ local function replaceClass(html, find, replace)
     return string.gsub(html, "([\"%s])" .. find, "%1" .. replace)
 end
 
+local logMin = math.log(MIN_SLIDER_ALTITUDE)
+local logMax = math.log(MAX_SLIDER_ALTITUDE)
+local scaleHeight = ALT_SLIDER_BOTTOM - ALT_SLIDER_TOP
 local function calculateSliderIndicator(altitude)
-    return math.floor(ALT_SLIDER_BOTTOM - (altitude - MIN_SLIDER_ALTITUDE) / (MAX_SLIDER_ALTITUDE - MIN_SLIDER_ALTITUDE) * (ALT_SLIDER_BOTTOM - ALT_SLIDER_TOP) + 0.5)
+    return math.floor(ALT_SLIDER_BOTTOM - scaleHeight * (math.log(altitude) - logMin) / (logMax - logMin) + 0.5)
 end
 
 local function calculateSliderAltitude(indicatorY)
-    return math.floor((ALT_SLIDER_BOTTOM - SCREEN_HEIGHT * indicatorY) / (ALT_SLIDER_BOTTOM - ALT_SLIDER_TOP) * (MAX_SLIDER_ALTITUDE - MIN_SLIDER_ALTITUDE) + MIN_SLIDER_ALTITUDE + 0.5)
+    local indicatorYpixels = indicatorY * SCREEN_HEIGHT
+    return math.floor(math.exp((ALT_SLIDER_BOTTOM - indicatorYpixels) / scaleHeight * (logMax - logMin) + logMin) + 0.5)
 end
 
 function _G.agScreen:refresh()
@@ -214,7 +210,7 @@ function _G.agScreen:refresh()
 
     -- insert values to svg and render
     html = _G.Utilities.sanitizeFormatString(html)
-    html = string.format(html, MAX_SLIDER_ALTITUDE,
+    html = string.format(html,
         currentAltitudeSliderHeight, targetAltitudeSliderHeight, baseAltitudeSliderHeight,
         targetAltitude, baseAltitude, altitudeAdjustment, altitudeAdjustment,
         verticalVelocity, verticalUnits, currentAltitude, agField, agPower)
@@ -247,9 +243,9 @@ function _G.agScreen:refresh()
             html = replaceClass(html, ELEMENT_CLASS_ALTITUDE_UP, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_DOWN then
             html = replaceClass(html, ELEMENT_CLASS_ALTITUDE_DOWN, MOUSE_OVER_CLASS)
-        elseif mouseOver == BUTTON_TARGET_ALTITUDE_SLIDER then
+        elseif not self.locked and mouseOver == BUTTON_TARGET_ALTITUDE_SLIDER then
             html = replaceClass(html, ELEMENT_CLASS_LEFT_SLIDER, MOUSE_OVER_CLASS)
-        elseif mouseOver == BUTTON_MATCH_CURRENT_ALTITUDE then
+        elseif not self.locked and mouseOver == BUTTON_MATCH_CURRENT_ALTITUDE then
             html = replaceClass(html, ELEMENT_CLASS_RIGHT_SLIDER, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_LOCK then
             html = replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, MOUSE_OVER_CLASS)
