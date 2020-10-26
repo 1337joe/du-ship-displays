@@ -31,6 +31,7 @@ local ELEMENT_CLASS_ADJUST_DOWN = "adjustDownClass"
 local ELEMENT_CLASS_LEFT_SLIDER = "leftSliderClass"
 local ELEMENT_CLASS_RIGHT_SLIDER = "rightSliderClass"
 local ELEMENT_CLASS_DISABLED = "disabledText"
+local ELEMENT_CLASS_NEED_PULSORS = "pulsorsText"
 local ELEMENT_CLASS_POWER_IS_OFF = "powerIsOffClass"
 local ELEMENT_CLASS_POWER_IS_ON = "powerIsOnClass"
 local ELEMENT_CLASS_POWER_SLIDER = "powerSlideClass"
@@ -223,13 +224,21 @@ function _G.agScreen:refresh()
     else
         html = replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, HIDDEN_CLASS)
     end
-    -- AG power state
-    if self.controller.agState then
-        html = replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, HIDDEN_CLASS)
-    else
+    -- AG power/error state
+    if not self.controller.agState then
+        -- powered off
         html = replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, HIDDEN_CLASS)
         html = replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
         html = replaceClass(html, ELEMENT_CLASS_DISABLED, "")
+    else
+        -- powered on
+        html = replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, HIDDEN_CLASS)
+
+        if self.controller.agField < 0.5 then
+            -- insufficient pulsors
+            html = replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
+            html = replaceClass(html, ELEMENT_CLASS_NEED_PULSORS, "")
+        end
     end
 
     if not self.mouse.pressed then

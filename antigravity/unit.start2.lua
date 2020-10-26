@@ -24,6 +24,7 @@ function _G.agController:updateState()
     -- signal draw of screen with updated state
     self.needRefresh = true
 end
+_G.agController:updateState()
 
 function _G.agController:setBaseAltitude(target)
     self.slots.antigrav.setBaseAltitude(target)
@@ -40,17 +41,6 @@ function _G.agController:setAgState(newState)
     end
 
     self:updateState()
-end
-
--- verify AG is powered enough to function
-local startupState = _G.agController.slots.antigrav.getState()
-_G.agController.slots.antigrav.activate()
-_G.agController:updateState()
-assert(_G.agController.agField > 0.5,
-    "Anti-Gravity Generator not linked to sufficient pulsors, field: " .. _G.agController.agField)
-if startupState == 0 then
-    _G.agController.slots.antigrav.deactivate()
-    _G.agController:updateState()
 end
 
 -- hide widgets
