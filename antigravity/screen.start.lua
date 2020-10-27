@@ -6,12 +6,11 @@ local SVG_LOGO = [[${file:../logo.svg minify}]]
 local SCREEN_HEIGHT = 1080
 local MAX_SLIDER_ALTITUDE = 200000
 local MIN_SLIDER_ALTITUDE = 1000
-local MIN_AG_ALTITUDE = 1000 --export: Min altitude to allow setting on anti-grav (m)
+local MIN_AG_ALTITUDE = 1025 --export: Min altitude to allow setting on anti-grav (m)
 local MIN_ADJUSTMENT_VALUE = 1
 local MAX_ADJUSTMENT_VALUE = 10000 --export: Max step size for altitude adjustment (m)
 
--- one-off transforms
--- embed logo
+-- one-time transforms
 SVG_TEMPLATE = string.gsub(SVG_TEMPLATE, '<svg id="logo"/>', SVG_LOGO)
 
 -- constants for svg file
@@ -267,7 +266,7 @@ function _G.agScreen:refresh()
         end
     end
 
-    _G.agController.slots.screen.setHTML(html)
+    self.screen.setHTML(html)
 end
 
 function _G.agScreen:mouseDown(x, y)

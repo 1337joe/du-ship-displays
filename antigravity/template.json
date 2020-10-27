@@ -1,8 +1,8 @@
 {
     "slots":{
-        "0":{"name":"core","type":{"events":[],"methods":[]}},
-        "1":{"name":"antigrav","type":{"events":[],"methods":[]}},
-        "2":{"name":"screen","type":{"events":[],"methods":[]}},
+        "0":{"name":"agScreen","type":{"events":[],"methods":[]}},
+        "1":{"name":"slot2","type":{"events":[],"methods":[]}},
+        "2":{"name":"slot3","type":{"events":[],"methods":[]}},
         "3":{"name":"slot4","type":{"events":[],"methods":[]}},
         "4":{"name":"slot5","type":{"events":[],"methods":[]}},
         "5":{"name":"slot6","type":{"events":[],"methods":[]}},
@@ -18,10 +18,10 @@
         {"code":"${file:unit.start1.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
         {"code":"${file:unit.start2.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
         {"code":"${code:_G.agController:updateState()}","filter":{"args":[${args: update}],"signature":"tick(timerId)","slotKey":"${slotKey:unit}"},"key":"${key}"},
-        {"code":"${file:screen.start.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:screen}"},"key":"${key}"},
+        {"code":"${file:screen.start.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
         {"code":"${code:_G.agScreen:refresh()}","filter":{"args":[],"signature":"update()","slotKey":"${slotKey:system}"},"key":"${key}"},
-        {"code":"${code:_G.agScreen:mouseDown(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseDown(x,y)","slotKey":"${slotKey:screen}"},"key":"${key}"},
-        {"code":"${code:_G.agScreen:mouseUp(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseUp(x,y)","slotKey":"${slotKey:screen}"},"key":"${key}"},
+        {"code":"${code:_G.agScreen:mouseDown(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseDown(x,y)","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
+        {"code":"${code:_G.agScreen:mouseUp(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseUp(x,y)","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
         {"code":"${file:../../du-utils/duutils/Utilities.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"}
     ],
     "methods":[],
