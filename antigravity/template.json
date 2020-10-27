@@ -15,8 +15,7 @@
         "-3":{"name":"library","type":{"events":[],"methods":[]}}
     },
     "handlers":[
-        {"code":"${file:unit.start1.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
-        {"code":"${file:unit.start2.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
+        {"code":"${file:unit.start.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
         {"code":"${code:_G.agController:updateState()}","filter":{"args":[${args: update}],"signature":"tick(timerId)","slotKey":"${slotKey:unit}"},"key":"${key}"},
         {"code":"${file:screen.start.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
         {"code":"${code:_G.agScreen:refresh()}","filter":{"args":[],"signature":"update()","slotKey":"${slotKey:system}"},"key":"${key}"},

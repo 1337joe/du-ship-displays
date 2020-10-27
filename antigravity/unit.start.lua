@@ -1,3 +1,21 @@
+-- container for shared state for anti-grav controller
+_G.agController = {}
+
+-------------------------
+-- Begin Configuration --
+-------------------------
+_G.UPDATE_FREQUENCY = 10 -- Hz
+
+-- slot definitions
+_G.agController.slots = {}
+_G.agController.slots.core = nil -- autodetect
+_G.agController.slots.antigrav = nil -- autodetect
+_G.agController.slots.screen = agScreen
+
+-----------------------
+-- End Configuration --
+-----------------------
+
 -- link missing slot inputs / validate provided slots
 local slots = _G.agController.slots
 local targetClass, class, slotName
