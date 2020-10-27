@@ -4,7 +4,7 @@ _G.agController = {}
 -------------------------
 -- Begin Configuration --
 -------------------------
-_G.UPDATE_FREQUENCY = 10 -- Hz
+_G.UPDATE_FREQUENCY = 10 -- screen update rate (Hz)
 
 -- slot definitions
 _G.agController.slots = {}

@@ -119,21 +119,27 @@ _G.agScreen.buttonCoordinates[BUTTON_POWER_ON] = {
 local sliderYMin = _G.agScreen.buttonCoordinates[BUTTON_UNLOCK].y1 - SCREEN_HEIGHT * 0.05
 local sliderYMax = _G.agScreen.buttonCoordinates[BUTTON_UNLOCK].y2 + SCREEN_HEIGHT * 0.05
 
+--- Replaces a value from within a class attribute.
 local function replaceClass(html, find, replace)
     -- ensure preceeded by " or space
     return string.gsub(html, "([\"%s])" .. find, "%1" .. replace)
 end
 
+-- pre-computed values for less computation in render thread
 local logMin = math.log(MIN_SLIDER_ALTITUDE)
 local logMax = math.log(MAX_SLIDER_ALTITUDE)
 local scaleHeight = ALT_SLIDER_BOTTOM - ALT_SLIDER_TOP
+local scaleHeightOverLogDifference = scaleHeight / (logMax - logMin)
+
+-- yPixel = sliderBottom - (sliderHeight * (log(altitude) - log(minAltitude)) / (log(maxAltitude) - log(minAltitude)))
 local function calculateSliderIndicator(altitude)
-    return math.floor(ALT_SLIDER_BOTTOM - scaleHeight * (math.log(altitude) - logMin) / (logMax - logMin) + 0.5)
+    return math.floor(ALT_SLIDER_BOTTOM - scaleHeightOverLogDifference * (math.log(altitude) - logMin) + 0.5)
 end
 
+-- altitude = e^((sliderBottom - yPixel) / sliderHeight * (log(maxAltitude) - log(minAltitude)) + log(minAltitude)
 local function calculateSliderAltitude(indicatorY)
     local indicatorYpixels = indicatorY * SCREEN_HEIGHT
-    return math.floor(math.exp((ALT_SLIDER_BOTTOM - indicatorYpixels) / scaleHeight * (logMax - logMin) + logMin) + 0.5)
+    return math.floor(math.exp((ALT_SLIDER_BOTTOM - indicatorYpixels) / scaleHeightOverLogDifference + logMin) + 0.5)
 end
 
 function _G.agScreen:refresh()
