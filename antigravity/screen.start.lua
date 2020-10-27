@@ -1,4 +1,3 @@
-
 local SVG_TEMPLATE = [[${file:screen.svg}]]
 local SVG_LOGO = [[${file:../logo.svg minify}]]
 
@@ -38,8 +37,13 @@ local ELEMENT_CLASS_POWER_SLIDER = "powerSlideClass"
 -- initialize object and fields
 _G.agScreen = {
     altitudeAdjustment = 1000,
-    mouse = {x = -1, y = -1, pressed = nil, state = false},
-    locked = false,
+    mouse = {
+        x = -1,
+        y = -1,
+        pressed = nil,
+        state = false
+    },
+    locked = false
 }
 
 function _G.agScreen:init(controller)
@@ -161,8 +165,8 @@ function _G.agScreen:refresh()
     local html = SVG_TEMPLATE
 
     -- track mouse drags
-    -- if unlocking track drag against bounds
     if self.locked and self.mouse.pressed == BUTTON_UNLOCK then
+        -- if unlocking then check mouse against bounds of slide bar
         if not self.mouse.state or self.mouse.y < sliderYMin or self.mouse.y > sliderYMax then
             self.mouse.pressed = nil
         elseif self.mouse.x > self.buttonCoordinates[BUTTON_LOCK].x1 then
@@ -172,8 +176,8 @@ function _G.agScreen:refresh()
             html = replaceClass(html, ELEMENT_CLASS_UNLOCKING_LABEL, "")
             html = string.gsub(html, "(id=\"locked\" x=)\"%d+", "%1\"" .. (self.mouse.x * 1920))
         end
-    -- if powering off track against bounds
     elseif self.controller.agState and self.mouse.pressed == BUTTON_POWER_OFF then
+        -- if powering off then check mouse against bounds of slide bar
         if not self.mouse.state or self.mouse.y < sliderYMin or self.mouse.y > sliderYMax then
             self.mouse.pressed = nil
         elseif self.mouse.x < self.buttonCoordinates[BUTTON_POWER_ON].x2 then
@@ -183,8 +187,8 @@ function _G.agScreen:refresh()
             html = replaceClass(html, ELEMENT_CLASS_POWER_SLIDER, "")
             html = string.gsub(html, "(id=\"power\" x=)\"%d+", "%1\"" .. (self.mouse.x * 1920))
         end
-    -- if dragging altitude track mouse
     elseif not self.locked and self.mouse.pressed == BUTTON_TARGET_ALTITUDE_SLIDER then
+        -- if dragging altitude track mouse
         local targetAltitud
         if not self.mouse.state then
             self.mouse.pressed = nil
@@ -216,10 +220,9 @@ function _G.agScreen:refresh()
 
     -- insert values to svg and render
     html = _G.Utilities.sanitizeFormatString(html)
-    html = string.format(html,
-        currentAltitudeSliderHeight, targetAltitudeSliderHeight, baseAltitudeSliderHeight,
-        targetAltitude, baseAltitude, altitudeAdjustment, altitudeAdjustment,
-        verticalVelocity, verticalUnits, currentAltitude, agField, agPower)
+    html = string.format(html, currentAltitudeSliderHeight, targetAltitudeSliderHeight, baseAltitudeSliderHeight,
+               targetAltitude, baseAltitude, altitudeAdjustment, altitudeAdjustment, verticalVelocity, verticalUnits,
+               currentAltitude, agField, agPower)
 
     -- adjust visibility for state
     -- controls locked
@@ -275,12 +278,14 @@ function _G.agScreen:refresh()
     self.screen.setHTML(html)
 end
 
+--- Handle a mouse down event at the provided coordinates.
 function _G.agScreen:mouseDown(x, y)
     self.mouse.x = x
     self.mouse.y = y
     self.mouse.pressed = self:detectPress(x, y)
 end
 
+--- Handle a mouse up event at the provided coordinates.
 function _G.agScreen:mouseUp(x, y)
     local released = self:detectPress(x, y)
     if not released then
@@ -302,7 +307,7 @@ function _G.agScreen:detectPress(x, y)
                 found = true
             end
         else
-            for i,innerCoords in pairs(coords) do
+            for i, innerCoords in pairs(coords) do
                 if innerCoords.x1 then
                     if x > innerCoords.x1 and x < innerCoords.x2 and y > innerCoords.y1 and y < innerCoords.y2 then
                         found = true
