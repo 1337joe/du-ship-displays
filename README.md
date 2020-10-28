@@ -39,7 +39,7 @@ Can't edit altitude:
 
 ## Building from a Template
 
-This project is designed to be used with my other du project, [https://github.com/1337joe/du-bundler](DU Bundler).
+This project is designed to be used with my other Dual Universe project: [DU Bundler](https://github.com/1337joe/du-bundler).
 
 Documentation of the bundler is at the above link, but to put it simply you need to be able to run Lua scripts and simply call `bundleTemplate.lua template.json` and it will build a json configuration based on the template. On Linux this can be piped to `xclip -selection c` to put it directly on the clipboard, while on Windows piping to `clip.exe` should do the same thing. Alternately, you can write it to a file and copy from there.
 
@@ -49,9 +49,13 @@ If you don't have a Lua runtime set up the easiest solution is to copy from the 
 
 ## Developer Dependencies
 
-lunit (for testing)
-du-mocks (for testing)
-du-bundler (for exporting to json)
+[DU Bundler](https://github.com/1337joe/du-bundler): For exporting to json.
+
+luaunit: For automated testing. Note that this is only available on luarocks for lua 5.3. If your primary lua install is 5.4 you can install against 5.3 but you'll have to modify the `runTests.sh` script to call `lua5.3` instead of `lua`.
+
+[DU Mocks](https://github.com/1337joe/du-mocks): For automated testing. Currently assumes that this is located from the project root at `../du-mocks`.
+
+luacov: For tracking code coverage when running all tests. Can be removed from `runTests.sh` if not desired.
 
 ## Support
 

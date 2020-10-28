@@ -8,10 +8,10 @@ _G.UPDATE_FREQUENCY = 10 -- screen update rate (Hz)
 
 -- slot definitions
 _G.agController.slots = {}
-_G.agController.slots.core = nil -- autodetect
-_G.agController.slots.antigrav = nil -- autodetect
-_G.agController.slots.screen = agScreen
-_G.agController.slots.databank = nil -- autodetect
+_G.agController.slots.core = core -- if not found by name will autodetect
+_G.agController.slots.antigrav = agg -- if not found by name will autodetect
+_G.agController.slots.screen = agScreen -- if not found by name will autodetect
+_G.agController.slots.databank = databank -- if not found by name will autodetect
 
 local MIN_AG_ALTITUDE = 1000 --export: Min altitude to allow setting on anti-grav (m)
 
@@ -26,7 +26,7 @@ local targetClass, class, slotName
 targetClass = "ScreenUnit"
 if not (slots.screen and type(slots.screen) == "table" and slots.screen.getElementClass) then
     slots.screen, slotName = _G.Utilities.findFirstSlot(targetClass)
-    assert(slots.screen, "Screen slot failed to map.")
+    assert(slots.screen, "Screen link not found.")
     system.print(string.format("Slot %s mapped to antigrav screen.", slotName))
 else
     class = slots.screen.getElementClass()
@@ -62,7 +62,7 @@ else
     testValid(class == targetClass, "Core Unit slot is of type: " .. class)
 end
 
-targetClass = "DatabankUnit"
+targetClass = "DataBankUnit"
 if not (slots.databank and type(slots.databank) == "table" and slots.databank.getElementClass) then
     slots.databank, slotName = _G.Utilities.findFirstSlot(targetClass)
     -- optional, don't force to be set
