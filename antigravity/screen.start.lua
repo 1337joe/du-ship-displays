@@ -5,7 +5,6 @@ local SVG_LOGO = [[${file:../logo.svg minify}]]
 local SCREEN_HEIGHT = 1080
 local MAX_SLIDER_ALTITUDE = 200000
 local MIN_SLIDER_ALTITUDE = 1000
-local MIN_AG_ALTITUDE = 1025 --export: Min altitude to allow setting on anti-grav (m)
 local MIN_ADJUSTMENT_VALUE = 1
 local MAX_ADJUSTMENT_VALUE = 10000 --export: Max step size for altitude adjustment (m)
 
@@ -34,22 +33,30 @@ local ELEMENT_CLASS_POWER_IS_OFF = "powerIsOffClass"
 local ELEMENT_CLASS_POWER_IS_ON = "powerIsOnClass"
 local ELEMENT_CLASS_POWER_SLIDER = "powerSlideClass"
 
+local ALTITUDE_ADJUST_KEY = "altitudeAdjustment.I"
+
 -- initialize object and fields
 _G.agScreen = {
-    altitudeAdjustment = 1000,
     mouse = {
         x = -1,
         y = -1,
         pressed = nil,
         state = false
     },
-    locked = false
+    locked = false,
+    needRefresh = false
 }
 
 function _G.agScreen:init(controller)
     self.controller = controller
     self.screen = controller.slots.screen
-    self.targetAltitude = math.floor(controller.baseAltitude + 0.5) -- snap to nearest meter
+    self.databank = controller.slots.databank
+
+    if self.databank and self.databank.hasKey(ALTITUDE_ADJUST_KEY) then
+        self:setAltitudeAdjust(self.databank.getIntValue(ALTITUDE_ADJUST_KEY))
+    else
+        self:setAltitudeAdjust(1000)
+    end
 end
 
 -- constant button definition labels
@@ -148,10 +155,10 @@ end
 
 function _G.agScreen:refresh()
     -- refresh conditions: needRefresh, mouse down
-    if not (self.controller.needRefresh or self.mouse.pressed) then
+    if not (self.needRefresh or self.mouse.pressed) then
         return
     end
-    self.controller.needRefresh = false
+    self.needRefresh = false
 
     -- update mouse position for tracking drags
     self.mouse.x = self.screen.getMouseX()
@@ -197,17 +204,14 @@ function _G.agScreen:refresh()
 
             if target > MAX_SLIDER_ALTITUDE then
                 target = MAX_SLIDER_ALTITUDE
-            elseif target < MIN_AG_ALTITUDE then
-                target = MIN_AG_ALTITUDE
             end
 
-            self.targetAltitude = target
-            self.controller:setBaseAltitude(self.targetAltitude)
+            self.controller:setBaseAltitude(target)
         end
     end
 
     -- extract values to show in svg
-    local targetAltitude = self.targetAltitude
+    local targetAltitude = self.controller.targetAltitude
     local baseAltitude = self.controller.baseAltitude
     local altitudeAdjustment = string.format("%d m", self.altitudeAdjustment)
     local verticalVelocity, verticalUnits = _G.Utilities.printableNumber(self.controller.verticalVelocity, "m/s")
@@ -292,7 +296,7 @@ function _G.agScreen:mouseUp(x, y)
         return
     elseif self.mouse.pressed == released then
         local modified = self:handleButton(released)
-        self.controller.needRefresh = self.controller.needRefresh or modified
+        self.needRefresh = self.needRefresh or modified
     end
     self.mouse.pressed = nil
 end
@@ -333,29 +337,21 @@ function _G.agScreen:handleButton(buttonId)
 
     if not self.locked then
         if buttonId == BUTTON_ALTITUDE_UP then
-            local adjusted = self.targetAltitude + self.altitudeAdjustment
-            modified = adjusted ~= self.targetAltitude
-            self.targetAltitude = adjusted
+            local adjusted = self.controller.targetAltitude + self.altitudeAdjustment
+            modified = adjusted ~= self.controller.targetAltitude
 
-            self.controller:setBaseAltitude(self.targetAltitude)
+            self.controller:setBaseAltitude(adjusted)
 
         elseif buttonId == BUTTON_ALTITUDE_DOWN then
-            local adjusted = self.targetAltitude - self.altitudeAdjustment
-            if adjusted < MIN_AG_ALTITUDE then
-                adjusted = MIN_AG_ALTITUDE
-            end
-            modified = adjusted ~= self.targetAltitude
-            self.targetAltitude = adjusted
+            local adjusted = self.controller.targetAltitude - self.altitudeAdjustment
+            modified = adjusted ~= self.controller.targetAltitude
 
-            self.controller:setBaseAltitude(self.targetAltitude)
+            self.controller:setBaseAltitude(adjusted)
 
         elseif buttonId == BUTTON_ALTITUDE_ADJUST_UP then
             local newAdjust = self.altitudeAdjustment * 10
-            if newAdjust > MAX_ADJUSTMENT_VALUE then
-                newAdjust = MAX_ADJUSTMENT_VALUE
-            end
             modified = newAdjust ~= self.altitudeAdjustment
-            self.altitudeAdjustment = newAdjust
+            self:setAltitudeAdjust(newAdjust)
 
         elseif buttonId == BUTTON_ALTITUDE_ADJUST_DOWN then
             local newAdjust = self.altitudeAdjustment / 10
@@ -363,14 +359,13 @@ function _G.agScreen:handleButton(buttonId)
                 newAdjust = MIN_ADJUSTMENT_VALUE
             end
             modified = newAdjust ~= self.altitudeAdjustment
-            self.altitudeAdjustment = newAdjust
+            self:setAltitudeAdjust(newAdjust)
 
         elseif buttonId == BUTTON_MATCH_CURRENT_ALTITUDE then
             local adjusted = math.floor(_G.agController.currentAltitude + 0.5) -- snap to nearest meter
-            modified = adjusted ~= self.targetAltitude
-            self.targetAltitude = adjusted
+            modified = adjusted ~= self.controller.targetAltitude
 
-            self.controller:setBaseAltitude(self.targetAltitude)
+            self.controller:setBaseAltitude(adjusted)
 
         elseif buttonId == BUTTON_LOCK then
             self.locked = true
@@ -383,4 +378,18 @@ function _G.agScreen:handleButton(buttonId)
     end
 
     return modified
+end
+
+function _G.agScreen:setAltitudeAdjust(newAdjust)
+    if newAdjust < MIN_ADJUSTMENT_VALUE then
+        newAdjust = MIN_ADJUSTMENT_VALUE
+    elseif newAdjust > MAX_ADJUSTMENT_VALUE then
+        newAdjust = MAX_ADJUSTMENT_VALUE
+    end
+
+    self.altitudeAdjustment = newAdjust
+
+    if self.databank then
+        self.databank.setIntValue(ALTITUDE_ADJUST_KEY, newAdjust)
+    end
 end

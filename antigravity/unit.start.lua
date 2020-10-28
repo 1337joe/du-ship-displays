@@ -11,6 +11,9 @@ _G.agController.slots = {}
 _G.agController.slots.core = nil -- autodetect
 _G.agController.slots.antigrav = nil -- autodetect
 _G.agController.slots.screen = agScreen
+_G.agController.slots.databank = nil -- autodetect
+
+local MIN_AG_ALTITUDE = 1000 --export: Min altitude to allow setting on anti-grav (m)
 
 -----------------------
 -- End Configuration --
@@ -78,7 +81,11 @@ unit.hide()
 
 local core = _G.agController.slots.core
 local antigrav = _G.agController.slots.antigrav
+local databank = _G.agController.slots.databank
 
+local TARGET_ALTITUDE_KEY = "targetAltitude.I"
+
+-- declare methods
 function _G.agController:updateState()
     self.verticalVelocity = core.getWorldVelocity()[3]
     self.currentAltitude = core.getAltitude()
@@ -89,12 +96,22 @@ function _G.agController:updateState()
     self.agPower = tonumber(string.match(data, "\"antiGPower\":([%d.-]+)"))
 
     -- signal draw of screen with updated state
-    self.needRefresh = true
+    _G.agScreen.needRefresh = true
 end
-_G.agController:updateState()
 
 function _G.agController:setBaseAltitude(target)
+    if target < MIN_AG_ALTITUDE then
+        target = MIN_AG_ALTITUDE
+    else
+        target = math.floor(target + 0.5) -- snap to nearest meter
+    end
+
+    self.targetAltitude = target
     self.slots.antigrav.setBaseAltitude(target)
+
+    if databank then
+        databank.setIntValue(TARGET_ALTITUDE_KEY, target)
+    end
 
     self:updateState()
 end
@@ -112,6 +129,15 @@ end
 
 -- init screen
 _G.agScreen:init(_G.agController)
+
+-- init stored values
+if databank and databank.hasKey(TARGET_ALTITUDE_KEY) == 1 then
+    _G.agController:setBaseAltitude(databank.getIntValue(TARGET_ALTITUDE_KEY))
+else
+    _G.agController:setBaseAltitude(antigrav.getBaseAltitude())
+end
+
+_G.agController:updateState()
 
 -- schedule updating
 unit.setTimer("update", 1 / _G.UPDATE_FREQUENCY)
