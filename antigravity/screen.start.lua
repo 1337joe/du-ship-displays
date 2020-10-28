@@ -36,7 +36,7 @@ local ELEMENT_CLASS_POWER_SLIDER = "powerSlideClass"
 local ALTITUDE_ADJUST_KEY = "altitudeAdjustment.I"
 
 -- initialize object and fields
-_G.agScreen = {
+_G.agScreenController = {
     mouse = {
         x = -1,
         y = -1,
@@ -47,12 +47,12 @@ _G.agScreen = {
     needRefresh = false
 }
 
-function _G.agScreen:init(controller)
+function _G.agScreenController:init(controller)
     self.controller = controller
     self.screen = controller.slots.screen
     self.databank = controller.slots.databank
 
-    if self.databank and self.databank.hasKey(ALTITUDE_ADJUST_KEY) then
+    if self.databank and self.databank.hasKey(ALTITUDE_ADJUST_KEY) == 1 then
         self:setAltitudeAdjust(self.databank.getIntValue(ALTITUDE_ADJUST_KEY))
     else
         self:setAltitudeAdjust(1000)
@@ -72,16 +72,16 @@ local BUTTON_POWER_OFF = "Power Off"
 local BUTTON_POWER_ON = "Power On"
 
 -- Define button ranges, either in tables of x1,y1,x2,y2 or lists of those tables.
-_G.agScreen.buttonCoordinates = {}
-_G.agScreen.buttonCoordinates[BUTTON_ALTITUDE_UP] = {
+_G.agScreenController.buttonCoordinates = {}
+_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_UP] = {
     x1 = 0.1, x2 = 0.3,
     y1 = 0.2, y2 = 0.4
 }
-_G.agScreen.buttonCoordinates[BUTTON_ALTITUDE_DOWN] = {
+_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_DOWN] = {
     x1 = 0.1, x2 = 0.3,
     y1 = 0.7, y2 = 0.9
 }
-_G.agScreen.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_UP] = {
+_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_UP] = {
     {
         x1 = 0.3, x2 = 0.35,
         y1 = 0.3, y2 = 0.45
@@ -91,7 +91,7 @@ _G.agScreen.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_UP] = {
         y1 = 0.65, y2 = 0.8
     }
 }
-_G.agScreen.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_DOWN] = {
+_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_DOWN] = {
     {
         x1 = 0.05, x2 = 0.1,
         y1 = 0.3, y2 = 0.45
@@ -101,34 +101,34 @@ _G.agScreen.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_DOWN] = {
         y1 = 0.65, y2 = 0.8
     }
 }
-_G.agScreen.buttonCoordinates[BUTTON_TARGET_ALTITUDE_SLIDER] = {
+_G.agScreenController.buttonCoordinates[BUTTON_TARGET_ALTITUDE_SLIDER] = {
     x1 = 0.4, x2 = 0.5,
     y1 = 0.1, y2 = 1.0
 }
-_G.agScreen.buttonCoordinates[BUTTON_MATCH_CURRENT_ALTITUDE] = {
+_G.agScreenController.buttonCoordinates[BUTTON_MATCH_CURRENT_ALTITUDE] = {
     x1 = 0.5, x2 = 0.6,
     y1 = 0.1, y2 = 1.0
 }
-_G.agScreen.buttonCoordinates[BUTTON_LOCK] = {
+_G.agScreenController.buttonCoordinates[BUTTON_LOCK] = {
     x1 = 0.3, x2 = 0.4,
     y1 = 0.1, y2 = 0.2
 }
-_G.agScreen.buttonCoordinates[BUTTON_UNLOCK] = {
+_G.agScreenController.buttonCoordinates[BUTTON_UNLOCK] = {
     x1 = 0.0, x2 = 0.1,
     y1 = 0.1, y2 = 0.2
 }
-_G.agScreen.buttonCoordinates[BUTTON_POWER_OFF] = {
+_G.agScreenController.buttonCoordinates[BUTTON_POWER_OFF] = {
     x1 = 0.9, x2 = 1.0,
     y1 = 0.1, y2 = 0.2
 }
-_G.agScreen.buttonCoordinates[BUTTON_POWER_ON] = {
+_G.agScreenController.buttonCoordinates[BUTTON_POWER_ON] = {
     x1 = 0.6, x2 = 0.7,
     y1 = 0.1, y2 = 0.2
 }
 
 -- both sliders on same level, pre-compute y ranges with 5% buffer
-local sliderYMin = _G.agScreen.buttonCoordinates[BUTTON_UNLOCK].y1 - SCREEN_HEIGHT * 0.05
-local sliderYMax = _G.agScreen.buttonCoordinates[BUTTON_UNLOCK].y2 + SCREEN_HEIGHT * 0.05
+local sliderYMin = _G.agScreenController.buttonCoordinates[BUTTON_UNLOCK].y1 - SCREEN_HEIGHT * 0.05
+local sliderYMax = _G.agScreenController.buttonCoordinates[BUTTON_UNLOCK].y2 + SCREEN_HEIGHT * 0.05
 
 --- Replaces a value from within a class attribute.
 local function replaceClass(html, find, replace)
@@ -153,7 +153,7 @@ local function calculateSliderAltitude(indicatorY)
     return math.floor(math.exp((ALT_SLIDER_BOTTOM - indicatorYpixels) / scaleHeightOverLogDifference + logMin) + 0.5)
 end
 
-function _G.agScreen:refresh()
+function _G.agScreenController:refresh()
     -- refresh conditions: needRefresh, mouse down
     if not (self.needRefresh or self.mouse.pressed) then
         return
@@ -283,14 +283,14 @@ function _G.agScreen:refresh()
 end
 
 --- Handle a mouse down event at the provided coordinates.
-function _G.agScreen:mouseDown(x, y)
+function _G.agScreenController:mouseDown(x, y)
     self.mouse.x = x
     self.mouse.y = y
     self.mouse.pressed = self:detectPress(x, y)
 end
 
 --- Handle a mouse up event at the provided coordinates.
-function _G.agScreen:mouseUp(x, y)
+function _G.agScreenController:mouseUp(x, y)
     local released = self:detectPress(x, y)
     if not released then
         return
@@ -302,7 +302,7 @@ function _G.agScreen:mouseUp(x, y)
 end
 
 --- Returns the button that intersects the provided coordinates or nil if none is found.
-function _G.agScreen:detectPress(x, y)
+function _G.agScreenController:detectPress(x, y)
     local found = false
     local index = nil
     for button, coords in pairs(self.buttonCoordinates) do
@@ -332,7 +332,7 @@ end
 
 --- Processes the input indicated by the provided button id.
 -- @treturn boolean True if the state was changed by this action.
-function _G.agScreen:handleButton(buttonId)
+function _G.agScreenController:handleButton(buttonId)
     local modified = false
 
     if not self.locked then
@@ -380,7 +380,7 @@ function _G.agScreen:handleButton(buttonId)
     return modified
 end
 
-function _G.agScreen:setAltitudeAdjust(newAdjust)
+function _G.agScreenController:setAltitudeAdjust(newAdjust)
     if newAdjust < MIN_ADJUSTMENT_VALUE then
         newAdjust = MIN_ADJUSTMENT_VALUE
     elseif newAdjust > MAX_ADJUSTMENT_VALUE then

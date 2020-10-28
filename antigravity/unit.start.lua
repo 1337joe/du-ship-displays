@@ -27,7 +27,7 @@ targetClass = "ScreenUnit"
 if not (slots.screen and type(slots.screen) == "table" and slots.screen.getElementClass) then
     slots.screen, slotName = _G.Utilities.findFirstSlot(targetClass)
     assert(slots.screen, "Screen slot failed to map.")
-    system.print(string.format("Slot %s mapped to agScreen.", slotName))
+    system.print(string.format("Slot %s mapped to antigrav screen.", slotName))
 else
     class = slots.screen.getElementClass()
     assert(class == targetClass, "Screen slot is of type: " .. class)
@@ -96,7 +96,7 @@ function _G.agController:updateState()
     self.agPower = tonumber(string.match(data, "\"antiGPower\":([%d.-]+)"))
 
     -- signal draw of screen with updated state
-    _G.agScreen.needRefresh = true
+    _G.agScreenController.needRefresh = true
 end
 
 function _G.agController:setBaseAltitude(target)
@@ -128,7 +128,7 @@ function _G.agController:setAgState(newState)
 end
 
 -- init screen
-_G.agScreen:init(_G.agController)
+_G.agScreenController:init(_G.agController)
 
 -- init stored values
 if databank and databank.hasKey(TARGET_ALTITUDE_KEY) == 1 then
