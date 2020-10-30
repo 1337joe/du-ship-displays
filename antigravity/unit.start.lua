@@ -83,7 +83,7 @@ local core = _G.agController.slots.core
 local antigrav = _G.agController.slots.antigrav
 local databank = _G.agController.slots.databank
 
-local TARGET_ALTITUDE_KEY = "targetAltitude.I"
+local TARGET_ALTITUDE_KEY = "targetAltitude"
 
 -- declare methods
 function _G.agController:updateState()
@@ -117,6 +117,10 @@ function _G.agController:setBaseAltitude(target)
 end
 
 function _G.agController:setAgState(newState)
+    if newState == self.agState then
+        return
+    end
+
     local state
     if newState then
         self.slots.antigrav.activate()
