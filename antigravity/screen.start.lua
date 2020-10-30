@@ -1,5 +1,3 @@
-local SVG_TEMPLATE = [[${file:screen.svg}]]
-local SVG_LOGO = [[${file:../logo.svg minify}]]
 
 -- constants and editable lua script parameters
 local SCREEN_HEIGHT = 1080
@@ -7,9 +5,6 @@ local MAX_SLIDER_ALTITUDE = 200000
 local MIN_SLIDER_ALTITUDE = 1000
 local MIN_ADJUSTMENT_VALUE = 1
 local MAX_ADJUSTMENT_VALUE = 10000 --export: Max step size for altitude adjustment (m)
-
--- one-time transforms
-SVG_TEMPLATE = string.gsub(SVG_TEMPLATE, '<svg id="logo"/>', SVG_LOGO)
 
 -- constants for svg file
 local ALT_SLIDER_TOP = 162
@@ -33,7 +28,7 @@ local ELEMENT_CLASS_POWER_IS_OFF = "powerIsOffClass"
 local ELEMENT_CLASS_POWER_IS_ON = "powerIsOnClass"
 local ELEMENT_CLASS_POWER_SLIDER = "powerSlideClass"
 
-local ALTITUDE_ADJUST_KEY = "altitudeAdjustment.I"
+local ALTITUDE_ADJUST_KEY = "altitudeAdjustment"
 
 -- initialize object and fields
 _G.agScreenController = {
@@ -44,8 +39,13 @@ _G.agScreenController = {
         state = false
     },
     locked = false,
-    needRefresh = false
+    needRefresh = false,
+    SVG_TEMPLATE = [[${file:screen.svg minify}]],
+    SVG_LOGO = [[${file:../logo.svg minify}]]
 }
+
+-- one-time transforms
+_G.agScreenController.SVG_TEMPLATE = string.gsub(_G.agScreenController.SVG_TEMPLATE, '<svg id="logo"/>', _G.agScreenController.SVG_LOGO)
 
 function _G.agScreenController:init(controller)
     self.controller = controller
@@ -131,7 +131,7 @@ local sliderYMin = _G.agScreenController.buttonCoordinates[BUTTON_UNLOCK].y1 - S
 local sliderYMax = _G.agScreenController.buttonCoordinates[BUTTON_UNLOCK].y2 + SCREEN_HEIGHT * 0.05
 
 --- Replaces a value from within a class attribute.
-local function replaceClass(html, find, replace)
+function _G.agScreenController.replaceClass(html, find, replace)
     -- ensure preceeded by " or space
     return string.gsub(html, "([\"%s])" .. find, "%1" .. replace)
 end
@@ -169,7 +169,7 @@ function _G.agScreenController:refresh()
         self.mouse.pressed = nil
     end
 
-    local html = SVG_TEMPLATE
+    local html = self.SVG_TEMPLATE
 
     -- track mouse drags
     if self.locked and self.mouse.pressed == BUTTON_UNLOCK then
@@ -180,7 +180,7 @@ function _G.agScreenController:refresh()
             self.mouse.pressed = nil
             self.locked = false
         else
-            html = replaceClass(html, ELEMENT_CLASS_UNLOCKING_LABEL, "")
+            html = self.replaceClass(html, ELEMENT_CLASS_UNLOCKING_LABEL, "")
             html = string.gsub(html, "(id=\"locked\" x=)\"%d+", "%1\"" .. (self.mouse.x * 1920))
         end
     elseif self.controller.agState and self.mouse.pressed == BUTTON_POWER_OFF then
@@ -191,12 +191,11 @@ function _G.agScreenController:refresh()
             self.mouse.pressed = nil
             self.controller:setAgState(false)
         else
-            html = replaceClass(html, ELEMENT_CLASS_POWER_SLIDER, "")
+            html = self.replaceClass(html, ELEMENT_CLASS_POWER_SLIDER, "")
             html = string.gsub(html, "(id=\"power\" x=)\"%d+", "%1\"" .. (self.mouse.x * 1920))
         end
     elseif not self.locked and self.mouse.pressed == BUTTON_TARGET_ALTITUDE_SLIDER then
         -- if dragging altitude track mouse
-        local targetAltitud
         if not self.mouse.state then
             self.mouse.pressed = nil
         else
@@ -231,51 +230,51 @@ function _G.agScreenController:refresh()
     -- adjust visibility for state
     -- controls locked
     if self.locked then
-        html = replaceClass(html, PANEL_CLASS_ADJUSTMENT, HIDDEN_CLASS)
-        html = replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, HIDDEN_CLASS)
+        html = self.replaceClass(html, PANEL_CLASS_ADJUSTMENT, HIDDEN_CLASS)
+        html = self.replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, HIDDEN_CLASS)
     else
-        html = replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, HIDDEN_CLASS)
+        html = self.replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, HIDDEN_CLASS)
     end
     -- AG power/error state
     if not self.controller.agState then
         -- powered off
-        html = replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, HIDDEN_CLASS)
-        html = replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
-        html = replaceClass(html, ELEMENT_CLASS_DISABLED, "")
+        html = self.replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, HIDDEN_CLASS)
+        html = self.replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
+        html = self.replaceClass(html, ELEMENT_CLASS_DISABLED, "")
     else
         -- powered on
-        html = replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, HIDDEN_CLASS)
+        html = self.replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, HIDDEN_CLASS)
 
         if self.controller.agField < 0.5 then
             -- insufficient pulsors
-            html = replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
-            html = replaceClass(html, ELEMENT_CLASS_NEED_PULSORS, "")
+            html = self.replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_NEED_PULSORS, "")
         end
     end
 
     if not self.mouse.pressed then
         -- add mouse-over highlights
-        local mouseOver, index = self:detectPress(self.mouse.x, self.mouse.y)
+        local mouseOver, index = self:detectButton(self.mouse.x, self.mouse.y)
         if mouseOver == BUTTON_ALTITUDE_ADJUST_UP then
-            html = replaceClass(html, ELEMENT_CLASS_ADJUST_UP .. index, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_ADJUST_UP .. index, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_ADJUST_DOWN then
-            html = replaceClass(html, ELEMENT_CLASS_ADJUST_DOWN .. index, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_ADJUST_DOWN .. index, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_UP then
-            html = replaceClass(html, ELEMENT_CLASS_ALTITUDE_UP, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_ALTITUDE_UP, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_DOWN then
-            html = replaceClass(html, ELEMENT_CLASS_ALTITUDE_DOWN, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_ALTITUDE_DOWN, MOUSE_OVER_CLASS)
         elseif not self.locked and mouseOver == BUTTON_TARGET_ALTITUDE_SLIDER then
-            html = replaceClass(html, ELEMENT_CLASS_LEFT_SLIDER, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_LEFT_SLIDER, MOUSE_OVER_CLASS)
         elseif not self.locked and mouseOver == BUTTON_MATCH_CURRENT_ALTITUDE then
-            html = replaceClass(html, ELEMENT_CLASS_RIGHT_SLIDER, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_RIGHT_SLIDER, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_LOCK then
-            html = replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_UNLOCK then
-            html = replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_POWER_OFF then
-            html = replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_POWER_ON then
-            html = replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, MOUSE_OVER_CLASS)
         end
     end
 
@@ -286,12 +285,12 @@ end
 function _G.agScreenController:mouseDown(x, y)
     self.mouse.x = x
     self.mouse.y = y
-    self.mouse.pressed = self:detectPress(x, y)
+    self.mouse.pressed = self:detectButton(x, y)
 end
 
 --- Handle a mouse up event at the provided coordinates.
 function _G.agScreenController:mouseUp(x, y)
-    local released = self:detectPress(x, y)
+    local released = self:detectButton(x, y)
     if not released then
         return
     elseif self.mouse.pressed == released then
@@ -302,7 +301,7 @@ function _G.agScreenController:mouseUp(x, y)
 end
 
 --- Returns the button that intersects the provided coordinates or nil if none is found.
-function _G.agScreenController:detectPress(x, y)
+function _G.agScreenController:detectButton(x, y)
     local found = false
     local index = nil
     for button, coords in pairs(self.buttonCoordinates) do
@@ -349,20 +348,13 @@ function _G.agScreenController:handleButton(buttonId)
             self.controller:setBaseAltitude(adjusted)
 
         elseif buttonId == BUTTON_ALTITUDE_ADJUST_UP then
-            local newAdjust = self.altitudeAdjustment * 10
-            modified = newAdjust ~= self.altitudeAdjustment
-            self:setAltitudeAdjust(newAdjust)
+            modified = self:setAltitudeAdjust(self.altitudeAdjustment * 10)
 
         elseif buttonId == BUTTON_ALTITUDE_ADJUST_DOWN then
-            local newAdjust = self.altitudeAdjustment / 10
-            if newAdjust < MIN_ADJUSTMENT_VALUE then
-                newAdjust = MIN_ADJUSTMENT_VALUE
-            end
-            modified = newAdjust ~= self.altitudeAdjustment
-            self:setAltitudeAdjust(newAdjust)
+            modified = self:setAltitudeAdjust(self.altitudeAdjustment / 10)
 
         elseif buttonId == BUTTON_MATCH_CURRENT_ALTITUDE then
-            local adjusted = math.floor(_G.agController.currentAltitude + 0.5) -- snap to nearest meter
+            local adjusted = math.floor(self.controller.currentAltitude + 0.5) -- snap to nearest meter
             modified = adjusted ~= self.controller.targetAltitude
 
             self.controller:setBaseAltitude(adjusted)
@@ -387,9 +379,13 @@ function _G.agScreenController:setAltitudeAdjust(newAdjust)
         newAdjust = MAX_ADJUSTMENT_VALUE
     end
 
+    if self.altitudeAdjustment == newAdjust then
+        return false
+    end
     self.altitudeAdjustment = newAdjust
 
     if self.databank then
         self.databank.setIntValue(ALTITUDE_ADJUST_KEY, newAdjust)
     end
+    return true
 end

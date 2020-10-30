@@ -8,6 +8,9 @@ local lu = require("luaunit")
 
 require("duutils.Utilities")
 
+-- load file into a function for efficient calling
+local unitStart = loadfile("antigravity/unit.start.lua")
+
 local mockCoreUnit = require("dumocks.CoreUnit")
 local mockScreenUnit = require("dumocks.ScreenUnit")
 local mockAntiGravityGeneratorUnit = require("dumocks.AntiGravityGeneratorUnit")
@@ -54,8 +57,10 @@ function _G.TestAntigravityUnit:setup()
     }
     function _G.agScreenController:init(_)
     end
+end
 
-    -- unset all globals set/used by unit.start
+--- Unset all globals set/used by unit.start.
+function _G.TestAntigravityUnit:teardown()
     _G.agController = nil
     _G.UPDATE_FREQUENCY = nil
     _G.agScreen = nil
@@ -69,7 +74,7 @@ function _G.TestAntigravityUnit:testSlotMappingAuto()
 
     _G.unit = self.unit
 
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- mappings are correct
     lu.assertIs(_G.agController.slots.screen, self.screen)
@@ -95,7 +100,7 @@ function _G.TestAntigravityUnit:testSlotMappingManual()
     _G.core = self.core
     _G.databank = self.databank
 
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- mappings are correct
     lu.assertIs(_G.agController.slots.screen, self.screen)
@@ -118,7 +123,7 @@ function _G.TestAntigravityUnit:testSlotMappingErrorScreen()
     self.unit = self.unitMock:mockGetClosure()
     _G.unit = self.unit
 
-    lu.assertErrorMsgContains("Screen link not found.", dofile, "antigravity/unit.start.lua")
+    lu.assertErrorMsgContains("Screen link not found.", unitStart)
 end
 
 --- Verify slot loader provides useful output on failure to find element.
@@ -133,7 +138,7 @@ function _G.TestAntigravityUnit:testSlotMappingErrorAgg()
     _G.unit = self.unit
 
     local errorMsgPrefix = "AntiGravity Generator link"
-    lu.assertErrorMsgContains(errorMsgPrefix, dofile, "antigravity/unit.start.lua")
+    lu.assertErrorMsgContains(errorMsgPrefix, unitStart)
 
     -- screen should also have message
     lu.assertStrContains(self.screenMock.html, errorMsgPrefix)
@@ -151,7 +156,7 @@ function _G.TestAntigravityUnit:testSlotMappingErrorCore()
     _G.unit = self.unit
 
     local errorMsgPrefix = "Core Unit link"
-    lu.assertErrorMsgContains(errorMsgPrefix, dofile, "antigravity/unit.start.lua")
+    lu.assertErrorMsgContains(errorMsgPrefix, unitStart)
 
     -- screen should also have message
     lu.assertStrContains(self.screenMock.html, errorMsgPrefix)
@@ -169,7 +174,7 @@ function _G.TestAntigravityUnit:testSlotMappingErrorDatabank()
     _G.unit = self.unit
 
     -- not an error, databank is optional but recommended
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- screen should also have message
     lu.assertStrContains(self.printOutput, "No databank found")
@@ -179,7 +184,7 @@ end
 function _G.TestAntigravityUnit:testUpdateState()
     _G.unit = self.unit
 
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- relevant mappings are correct
     lu.assertIs(_G.agController.slots.antigrav, self.agGenerator)
@@ -220,7 +225,7 @@ function _G.TestAntigravityUnit:testSetBaseAltitude()
 
     _G.unit = self.unit
 
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- relevant mappings are correct
     lu.assertIs(_G.agController.slots.antigrav, self.agGenerator)
@@ -264,7 +269,7 @@ function _G.TestAntigravityUnit:testSetBaseAltitudeNoDatabank()
     self.unit = self.unitMock:mockGetClosure()
     _G.unit = self.unit
 
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- relevant mappings are correct
     lu.assertIs(_G.agController.slots.antigrav, self.agGenerator)
@@ -292,7 +297,7 @@ function _G.TestAntigravityUnit:testDatabankEmptyPrefLoad()
     self.agGeneratorMock.targetAltitude = 1500
     self.agGeneratorMock.baseAltitude = expected
 
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- relevant mappings are correct
     lu.assertIs(_G.agController.slots.antigrav, self.agGenerator)
@@ -314,7 +319,7 @@ function _G.TestAntigravityUnit:testDatabankPopulatedPrefLoad()
     self.agGeneratorMock.targetAltitude = 1500
     self.agGeneratorMock.baseAltitude = 2500
 
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- relevant mappings are correct
     lu.assertIs(_G.agController.slots.antigrav, self.agGenerator)
@@ -341,7 +346,7 @@ function _G.TestAntigravityUnit:testDefaultPrefLoad()
     self.agGeneratorMock.targetAltitude = 1500
     self.agGeneratorMock.baseAltitude = expected
 
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- relevant mappings are correct
     lu.assertIs(_G.agController.slots.antigrav, self.agGenerator)
@@ -356,7 +361,7 @@ end
 function _G.TestAntigravityUnit:testSetAgState()
     _G.unit = self.unit
 
-    dofile("antigravity/unit.start.lua")
+    unitStart()
 
     -- relevant mappings are correct
     lu.assertIs(_G.agController.slots.antigrav, self.agGenerator)

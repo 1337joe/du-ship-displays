@@ -9,6 +9,7 @@ cd "$(dirname "$0")/.."
 # clear out old results
 rm -rf tests/results
 mkdir -p tests/results/
+mkdir -p tests/results/images
 
 for test in tests/**/Test*.lua
 do

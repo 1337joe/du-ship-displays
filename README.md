@@ -61,6 +61,7 @@ luacov: For tracking code coverage when running all tests. Can be removed from `
 If you encounter bugs or any of my instructions don't work either send me a message or file a GitHub Issue (or fork the project, fix it, and send me a pull request).
 
 Discord: 1337joe#6186
+
 In-Game: W3asel
 
 My game/coding time is limited so I can't promise a quick response.
