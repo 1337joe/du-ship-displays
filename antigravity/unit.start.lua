@@ -4,7 +4,7 @@ _G.agController = {}
 -------------------------
 -- Begin Configuration --
 -------------------------
-_G.UPDATE_FREQUENCY = 10 -- screen update rate (Hz)
+local AG_UPDATE_FREQUENCY = 10 --export: Antigravity data/screen update rate (Hz)
 
 -- slot definitions
 _G.agController.slots = {}
@@ -102,15 +102,13 @@ end
 function _G.agController:setBaseAltitude(target)
     if target < MIN_AG_ALTITUDE then
         target = MIN_AG_ALTITUDE
-    else
-        target = math.floor(target + 0.5) -- snap to nearest meter
     end
 
     self.targetAltitude = target
     self.slots.antigrav.setBaseAltitude(target)
 
     if databank then
-        databank.setIntValue(TARGET_ALTITUDE_KEY, target)
+        databank.setFloatValue(TARGET_ALTITUDE_KEY, target)
     end
 
     self:updateState()
@@ -136,7 +134,7 @@ _G.agScreenController:init(_G.agController)
 
 -- init stored values
 if databank and databank.hasKey(TARGET_ALTITUDE_KEY) == 1 then
-    _G.agController:setBaseAltitude(databank.getIntValue(TARGET_ALTITUDE_KEY))
+    _G.agController:setBaseAltitude(databank.getFloatValue(TARGET_ALTITUDE_KEY))
 else
     _G.agController:setBaseAltitude(antigrav.getBaseAltitude())
 end
@@ -144,4 +142,4 @@ end
 _G.agController:updateState()
 
 -- schedule updating
-unit.setTimer("update", 1 / _G.UPDATE_FREQUENCY)
+unit.setTimer("updateAg", 1 / AG_UPDATE_FREQUENCY)

@@ -211,7 +211,7 @@ function _G.agScreenController:refresh()
 
     -- extract values to show in svg
     local targetAltitude = self.controller.targetAltitude
-    local baseAltitude = self.controller.baseAltitude
+    local baseAltitude = math.floor(self.controller.baseAltitude)
     local altitudeAdjustment = string.format("%d m", self.altitudeAdjustment)
     local verticalVelocity, verticalUnits = _G.Utilities.printableNumber(self.controller.verticalVelocity, "m/s")
     local currentAltitude = math.floor(self.controller.currentAltitude + 0.5)
@@ -354,7 +354,7 @@ function _G.agScreenController:handleButton(buttonId)
             modified = self:setAltitudeAdjust(self.altitudeAdjustment / 10)
 
         elseif buttonId == BUTTON_MATCH_CURRENT_ALTITUDE then
-            local adjusted = math.floor(self.controller.currentAltitude + 0.5) -- snap to nearest meter
+            local adjusted = self.controller.currentAltitude
             modified = adjusted ~= self.controller.targetAltitude
 
             self.controller:setBaseAltitude(adjusted)

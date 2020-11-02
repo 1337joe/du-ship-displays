@@ -6,6 +6,15 @@ Info and control screens for Dual Universe ships.
 
 ![basic](https://du.w3asel.com/du-ship-displays/images/antigravity-basic.svg "Basic Anti-Gravity Display")
 
+Features:
+
+* All anti-gravity measurements and controls on one screen.
+* Logarithmic altitude scale for more control at lower altitudes.
+* Set target altitude with a slider or step at any power of 10 from 1 to 10,000 meters.
+* Set target altitude to current altitude in one click.
+* Lock controls to prevent accidental clicks.
+* Power on and unlock protected by a drag-to-activate mechanism to prevent accidental disabling.
+
 ### Requirements:
 
 * Anti-Gravity Generator (of appropriate size for ship core and with the appropriate number of pulsors linked to it)
@@ -64,4 +73,4 @@ Discord: 1337joe#6186
 
 In-Game: W3asel
 
-My game/coding time is limited so I can't promise a quick response.
+My game/coding time is often limited so I can't promise a quick response.

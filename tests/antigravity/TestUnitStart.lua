@@ -251,8 +251,8 @@ function _G.TestAntigravityUnit:testSetBaseAltitude()
     lu.assertEquals(self.agGeneratorMock.targetAltitude, expected)
     lu.assertEquals(self.databankMock.data[TARGET_ALTITUDE_KEY], expected)
 
-    -- rounded
-    expected = 2556
+    -- handles floats
+    expected = 2555.5
     _G.agController:setBaseAltitude(2555.5)
     lu.assertEquals(_G.agController.targetAltitude, expected)
     lu.assertEquals(self.agGeneratorMock.targetAltitude, expected)
@@ -314,7 +314,7 @@ function _G.TestAntigravityUnit:testDatabankPopulatedPrefLoad()
     _G.unit = self.unit
 
     -- stored, base, and target non-default and different
-    local expected = 3000
+    local expected = 3000.5
     self.databankMock.data[TARGET_ALTITUDE_KEY] = expected
     self.agGeneratorMock.targetAltitude = 1500
     self.agGeneratorMock.baseAltitude = 2500
