@@ -24,7 +24,9 @@ Features:
 
 ### Install/Use Instructions:
 
-1. Either build a json configuration (see Building from a Template below) or copy the one [here](https://du.w3asel.com/du-ship-displays/templates/antigravity-basic.json) and paste it as a Lua configuration into the programming board.
+[Pre-built lua config](https://du.w3asel.com/du-ship-displays/templates/antigravity-basic.json)
+
+1. Either build a json configuration (see Building from a Template below) or copy the one above and paste it as a Lua configuration into the programming board.
 2. Link the screen to the agScreen slot.
 3. Add links to the Anti-Gravity Generator, the Dynamic Core Unit, and the Databank if you have one. Order doesn't matter unless you edit the unit start handler to specify what slot is what instead of allowing it to autodetect them.
 4. Activate the programming board, either directly or with a signal.
