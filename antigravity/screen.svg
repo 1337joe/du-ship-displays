@@ -5,34 +5,35 @@
         }
         text {
             text-transform: none;
-            font-family: helvetica;
+            font-family: arial;
             font-weight: normal;
         }
         .widgetAnchor {
             fill: #ffffff;
         }
         .altitude {
-            font-size: 150px;
-            fill: #8888ff;
-        }
-        .current {
-            font-size: 150px;
-            fill: #88ff88;
+            fill: #538be3;
         }
         .adjust {
-            fill: #000088;
-            font-size: 75px;
+            fill: #065de8;
+        }
+        .current {
+            fill: #ffbe4d;
         }
         .label {
             font-size: 60px;
             fill: #777777;
+        }
+        .majorValue {
+            font-size: 150px;
+            letter-spacing: 20px;
         }
         .minorValue {
             font-size: 75px;
             fill: #aaaaaa;
         }
         .baseAltitude {
-            fill: #ff8888 !important;
+            fill: #b67400 !important;
         }
         .indicator {
             stroke: #000000;
@@ -46,7 +47,7 @@
             font-size: 150px;
         }
         .mouseOver {
-            stroke: #888888 !important;
+            stroke: #ffa200 !important;
             stroke-width: 10px;
         }
         #slider text {
@@ -71,11 +72,11 @@
         <g id="altitudeDown">
             <use transform="scale(1,-1)" xlink:href="#altitudeUp" />
         </g>
-        <g id="adjustUp">
-            <use transform="rotate(90) scale(0.42,0.44) translate(0,-108)" xlink:href="#chevronArrow" />
-        </g>
         <g id="adjustDown">
-            <use transform="scale(-1,1)" xlink:href="#adjustUp" />
+            <use transform="rotate(90) scale(0.28,0.28) translate(0,-108)" xlink:href="#chevronArrow" />
+        </g>
+        <g id="adjustUp">
+            <use transform="scale(-1,1)" xlink:href="#adjustDown" />
         </g>
         <svg id="logo"/>
         <path id="locked" d="m -35,0 l 0,-15 a 35,35 0 0,1 70,0 l 0,15 5,0 0,54 -80,0 0,-54 z m 50,0 l 0,-15 a 15,15 0 0,0 -30,0 l 0,15 z" fill="#004400" />
@@ -90,7 +91,7 @@
         </g>
         <linearGradient id="titleGradient">
             <stop offset="0%" stop-color="#000000" />
-            <stop offset="100%" stop-color="#ff0000" />
+            <stop offset="100%" stop-color="#065de8" /> <!-- pulsor bright: 0aebff, pulsor dark: 065de8-->
         </linearGradient>
         <clipPath id="sliderSwoop">
             <path d="M 920,1026 Q 920,526 768,162 L 1152,162 Q 1000,526 1000,1026 Z" />
@@ -145,22 +146,18 @@
             <text x="384" y="189" text-anchor="middle" textLength="384" class="label unlockSlideClass">&gt;Slide&gt;</text>
             <use id="locked" x="96" y="162" xlink:href="#locked" class="lockedClass" />
         </g>
-        <text x="384" y="648" text-anchor="middle" textLength="576" class="altitude">%d</text>
+        <text x="384" y="648" text-anchor="middle" class="altitude majorValue">%s</text>
         <text x="384" y="702" text-anchor="middle" class="label">Target Altitude (m)</text>
         <text x="384" y="1053" text-anchor="end" class="label">Base Altitude:</text>
         <text x="384" y="1053" class="minorValue baseAltitude">%d <tspan class="units">m</tspan></text>
         <g class="adjustmentWidgets">
-            <g class="altitude">
-                <use xlink:href="#altitudeUp" x="384" y="324" class="altitudeUpClass" />
-                <use xlink:href="#altitudeDown" x="384" y="864" class="altitudeDownClass" />
+            <g class="adjust">
+                <use xlink:href="#altitudeUp" x="384" y="378" class="altitudeUpClass" />
+                <use xlink:href="#altitudeDown" x="384" y="810" class="altitudeDownClass" />
             </g>
             <g class="adjust">
-                <text x="384" y="432" text-anchor="middle">%s</text>
-                <use x="576" y="405" xlink:href="#adjustUp" class="adjustUpClass1"/>
-                <use x="192" y="405" xlink:href="#adjustDown" class="adjustDownClass1" />
-                <text x="384" y="810" text-anchor="middle">%s</text>
-                <use x="576" y="783" xlink:href="#adjustUp" class="adjustUpClass2" />
-                <use x="192" y="783" xlink:href="#adjustDown" class="adjustDownClass2" />
+                <use x="672" y="594" xlink:href="#adjustDown" class="adjustDownClass"/>
+                <use x="96" y="594" xlink:href="#adjustUp" class="adjustUpClass" />
             </g>
         </g>
     </g>
@@ -172,7 +169,7 @@
         </g>
         <text x="1536" y="352" text-anchor="end" class="label">Vertical Vel:</text>
         <text x="1536" y="352" class="minorValue">%s <tspan class="units">%s</tspan></text>
-        <text x="1536" y="648" text-anchor="middle" textLength="576" class="current">%d</text>
+        <text x="1536" y="648" text-anchor="middle" class="current majorValue">%d</text>
         <text x="1536" y="702" text-anchor="middle" class="label">Current Altitude (m)</text>
         <g class="statusWidgets">
             <text x="1632" y="891" text-anchor="end" class="label">Field Strength:</text>

@@ -74,32 +74,20 @@ local BUTTON_POWER_ON = "Power On"
 -- Define button ranges, either in tables of x1,y1,x2,y2 or lists of those tables.
 _G.agScreenController.buttonCoordinates = {}
 _G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_UP] = {
-    x1 = 0.1, x2 = 0.3,
-    y1 = 0.2, y2 = 0.4
+    x1 = 0.05, x2 = 0.35,
+    y1 = 0.2, y2 = 0.45
 }
 _G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_DOWN] = {
-    x1 = 0.1, x2 = 0.3,
-    y1 = 0.7, y2 = 0.9
-}
-_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_UP] = {
-    {
-        x1 = 0.3, x2 = 0.35,
-        y1 = 0.3, y2 = 0.45
-    },
-    {
-        x1 = 0.3, x2 = 0.35,
-        y1 = 0.65, y2 = 0.8
-    }
+    x1 = 0.05, x2 = 0.35,
+    y1 = 0.65, y2 = 0.9
 }
 _G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_DOWN] = {
-    {
-        x1 = 0.05, x2 = 0.1,
-        y1 = 0.3, y2 = 0.45
-    },
-    {
-        x1 = 0.05, x2 = 0.1,
-        y1 = 0.65, y2 = 0.8
-    }
+    x1 = 0.35, x2 = 0.4,
+    y1 = 0.5, y2 = 0.6
+}
+_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_UP] = {
+    x1 = 0.0, x2 = 0.05,
+    y1 = 0.5, y2 = 0.6
 }
 _G.agScreenController.buttonCoordinates[BUTTON_TARGET_ALTITUDE_SLIDER] = {
     x1 = 0.4, x2 = 0.5,
@@ -211,8 +199,28 @@ function _G.agScreenController:refresh()
 
     -- extract values to show in svg
     local targetAltitude = self.controller.targetAltitude
+
+    local targetAltitudeString
+    if self.locked then
+        targetAltitudeString = math.floor(targetAltitude)
+    else
+        targetAltitudeString = ""
+        local targetAltitudeRemainder = targetAltitude
+        local adjustmentRemainder = self.altitudeAdjustment
+        while targetAltitudeRemainder > 0 or adjustmentRemainder > 0 do
+            local nextDigit = math.floor(targetAltitudeRemainder % 10)
+            if adjustmentRemainder == 1 then
+                targetAltitudeString = string.format('<tspan class="adjust">%d</tspan>%s',
+                    nextDigit, targetAltitudeString)
+            else
+                targetAltitudeString = nextDigit .. targetAltitudeString
+            end
+            targetAltitudeRemainder = math.floor(targetAltitudeRemainder / 10)
+            adjustmentRemainder = math.floor(adjustmentRemainder / 10)
+        end
+    end
+
     local baseAltitude = math.floor(self.controller.baseAltitude)
-    local altitudeAdjustment = string.format("%d m", self.altitudeAdjustment)
     local verticalVelocity, verticalUnits = _G.Utilities.printableNumber(self.controller.verticalVelocity, "m/s")
     local currentAltitude = math.floor(self.controller.currentAltitude + 0.5)
     local agPower = math.floor(self.controller.agPower * 100 + 0.5)
@@ -224,7 +232,7 @@ function _G.agScreenController:refresh()
     -- insert values to svg and render
     html = _G.Utilities.sanitizeFormatString(html)
     html = string.format(html, currentAltitudeSliderHeight, targetAltitudeSliderHeight, baseAltitudeSliderHeight,
-               targetAltitude, baseAltitude, altitudeAdjustment, altitudeAdjustment, verticalVelocity, verticalUnits,
+        targetAltitudeString, baseAltitude, verticalVelocity, verticalUnits,
                currentAltitude, agField, agPower)
 
     -- adjust visibility for state
@@ -254,11 +262,11 @@ function _G.agScreenController:refresh()
 
     if not self.mouse.pressed then
         -- add mouse-over highlights
-        local mouseOver, index = self:detectButton(self.mouse.x, self.mouse.y)
+        local mouseOver, _ = self:detectButton(self.mouse.x, self.mouse.y)
         if mouseOver == BUTTON_ALTITUDE_ADJUST_UP then
-            html = self.replaceClass(html, ELEMENT_CLASS_ADJUST_UP .. index, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_ADJUST_UP, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_ADJUST_DOWN then
-            html = self.replaceClass(html, ELEMENT_CLASS_ADJUST_DOWN .. index, MOUSE_OVER_CLASS)
+            html = self.replaceClass(html, ELEMENT_CLASS_ADJUST_DOWN, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_UP then
             html = self.replaceClass(html, ELEMENT_CLASS_ALTITUDE_UP, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_DOWN then
