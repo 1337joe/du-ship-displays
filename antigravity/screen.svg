@@ -169,7 +169,7 @@
         </g>
         <text x="1536" y="352" text-anchor="end" class="label">Vertical Vel:</text>
         <text x="1536" y="352" class="minorValue">%s <tspan class="units">%s</tspan></text>
-        <text x="1536" y="648" text-anchor="middle" class="current majorValue">%d</text>
+        <text x="1536" y="648" text-anchor="middle" class="current majorValue">%s</text>
         <text x="1536" y="702" text-anchor="middle" class="label">Current Altitude (m)</text>
         <g class="statusWidgets">
             <text x="1632" y="891" text-anchor="end" class="label">Field Strength:</text>

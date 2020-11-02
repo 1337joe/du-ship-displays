@@ -5,6 +5,8 @@ local MAX_SLIDER_ALTITUDE = 200000
 local MIN_SLIDER_ALTITUDE = 1000
 local MIN_ADJUSTMENT_VALUE = 1
 local MAX_ADJUSTMENT_VALUE = 10000 --export: Max step size for altitude adjustment (m)
+local USE_KMPH = true --export: True for km/h, false for m/s
+local MPS_TO_MPH = 3600
 
 -- constants for svg file
 local ALT_SLIDER_TOP = 162
@@ -142,8 +144,8 @@ local function calculateSliderAltitude(indicatorY)
 end
 
 function _G.agScreenController:refresh()
-    -- refresh conditions: needRefresh, mouse down
-    if not (self.needRefresh or self.mouse.pressed) then
+    -- refresh conditions: needRefresh
+    if not (self.needRefresh) then
         return
     end
     self.needRefresh = false
@@ -221,12 +223,32 @@ function _G.agScreenController:refresh()
     end
 
     local baseAltitude = math.floor(self.controller.baseAltitude)
-    local verticalVelocity, verticalUnits = _G.Utilities.printableNumber(self.controller.verticalVelocity, "m/s")
+
+    local verticalVelocity, verticalUnits
+    if USE_KMPH then
+        local mph = self.controller.verticalVelocity * MPS_TO_MPH
+        local lessThan = mph < 1000
+        if lessThan then
+            mph = 1000
+        end
+        verticalVelocity, verticalUnits = _G.Utilities.printableNumber(mph, "m/h")
+        if lessThan then
+            verticalVelocity = "<1.0"
+        end
+    else
+        verticalVelocity, verticalUnits = _G.Utilities.printableNumber(self.controller.verticalVelocity, "m/s")
+    end
     local currentAltitude = math.floor(self.controller.currentAltitude + 0.5)
     local agPower = math.floor(self.controller.agPower * 100 + 0.5)
     local agField = math.floor(self.controller.agField * 100 + 0.5)
     local targetAltitudeSliderHeight = calculateSliderIndicator(targetAltitude)
-    local currentAltitudeSliderHeight = calculateSliderIndicator(currentAltitude)
+    local currentAltitudeSliderHeight
+    if currentAltitude == 0 then
+        currentAltitude = "N/A"
+        currentAltitudeSliderHeight = -1000
+    else
+        currentAltitudeSliderHeight = calculateSliderIndicator(currentAltitude)
+    end
     local baseAltitudeSliderHeight = calculateSliderIndicator(baseAltitude)
 
     -- insert values to svg and render

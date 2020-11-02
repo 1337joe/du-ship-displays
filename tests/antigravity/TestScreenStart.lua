@@ -228,4 +228,30 @@ function _G.TestAntigravityScreen:testDisplay()
     end
 end
 
+
+--- Verify a 0 altitude will not crash the display rendering.
+function _G.TestAntigravityScreen:testDisplayZeroAlt()
+    screenStart()
+    _G.agScreenController.SVG_TEMPLATE = BASE_SVG
+
+    _G.agScreenController:init(self.agController)
+
+    lu.assertIs(_G.agScreenController.screen, self.screen)
+
+    -- set state in controller
+    self.agController.verticalVelocity = 1.2
+    self.agController.currentAltitude = 0
+    self.agController.targetAltitude = 200000
+    self.agController.agState = true
+    self.agController.baseAltitude = 23708
+    self.agController.agField = 1.2000000178814
+    self.agController.agPower = 0.27
+
+    _G.agScreenController.needRefresh = true
+    _G.agScreenController:refresh()
+
+    local actual = self.screenMock.html
+    lu.assertFalse(actual:len() == 0)
+end
+
 os.exit(lu.LuaUnit.run())
