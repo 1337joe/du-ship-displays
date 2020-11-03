@@ -6,11 +6,11 @@ Info and control screens for Dual Universe ships.
 
 ![basic](https://du.w3asel.com/du-ship-displays/images/antigravity-basic.svg "Basic Anti-Gravity Display")
 
-Features:
+### Features:
 
 * All anti-gravity measurements and controls on one screen.
 * Logarithmic altitude scale for more control at lower altitudes.
-* Set target altitude with a slider or step at any power of 10 from 1 to 10,000 meters.
+* Set target altitude by dragging the arrow on the left side of the altitude scale or with the up and down arrows. Left/right arrows select the digit to change to step at anywhere from 1 to 10,000 m increments.
 * Set target altitude to current altitude in one click.
 * Lock controls to prevent accidental clicks.
 * Power on and unlock protected by a drag-to-activate mechanism to prevent accidental disabling.
@@ -39,8 +39,9 @@ Features:
 * Make sure it's activated: if the power button on the top right section has a red ring instead of a green bar click on it to turn on the Anti-Gravity Generator element.
 * Make sure you have enough pulsors placed and that they are linked to the Anti-Gravity Generator.
 * Make sure you're at no less than 1,000m altitude.
-* Bring the base altitude down to your current altitude, then raise it back up once the anti-gravity effect kicks in.
+* Make sure the current base altitude is within 500m of ship altitude. It may take some time to get there.
 * The ship isn't under active control: either sit in the controller seat or activate a remote controller.
+* In some cases it may be necessary to unlink the pulsors from the Anti-Gravity Generator and re-link them if nothing else works.
 
 #### Can't edit altitude:
 
