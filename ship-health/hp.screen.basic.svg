@@ -1,0 +1,204 @@
+<svg viewBox="0 0 1920 1080" style="width:100%; height:100%" class="bootstrap" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
+    <style>
+        text {
+            text-transform: none;
+            font-family: arial;
+            font-weight: normal;
+        }
+		.header text {
+			font-size:108px;
+			font-weight:bold;
+		}
+        .hidden {
+            display: none;
+        }
+		.broken {
+			fill: #ff1300 !important;
+			stop-color: #ff1300;
+		}
+		.damaged {
+			fill: #ffd700 !important;
+			stop-color: #ffd700;
+		}
+		.healthy, .titleColorClass { <!-- TODO remove titleColorClass when hooked to script -->
+			fill: #00c322 !important;
+			stop-color: #00c322;
+		}
+		#sidebar, #tabs{
+			text-anchor: middle;
+		}
+        .majorLabel {
+            font-size: 100px;
+            fill: #777777;
+        }
+        .label {
+            font-size: 60px;
+            fill: #777777;
+        }
+        .majorValue {
+            font-size: 125px;
+			fill: #ffffff;
+        }
+        .minorValue {
+            font-size: 75px;
+            fill: #aaaaaa;
+        }
+		#filters use {
+			stroke: #777777;
+			stroke-width: 5px;
+		}
+		#filters text {
+			font-size: 75px;
+			fill: #777777;
+			stroke-width: 2px;
+			stroke: #000000;
+		}
+		#filters .selected use, #tabs .selected use {
+			stroke: #ffffff;
+		}
+		#filters .selected text, #tabs .selected text {
+			fill: #ffffff;
+		}
+		#tabs text {
+            font-size: 60px;
+            fill: #777777;
+		}
+		#tabs use {
+			stroke: #777777;
+			stroke-width: 5px;
+		}
+		#tabs rect {
+			stroke: #ffffff;
+			stroke-width: 5px;
+		}
+        .indicator {
+            stroke: #000000;
+            stroke-width: 3;
+        }
+        .units {
+            fill: #555555;
+        }
+        .mouseOver {
+            stroke: #5dd572 !important;
+            stroke-width: 10px;
+        }
+		#filters .mouseOver use {
+            stroke: #5dd572 !important;
+            stroke-width: 10px;
+		}
+    </style>
+    <defs>
+        <svg id="logo"/>
+		<svg id="shipTop"/>
+		<svg id="shipSide"/>
+		<svg id="shipFront"/>
+		<rect id="filterButton" x="-182" y="-44" width="364" height="88" rx="20" />
+		<path id="tabSweep" d="m -130,7 c 50,0 20,-59 70,-59 l 120,0 c 50,0 20,59 70,59" />
+        <linearGradient id="titleGradient">
+            <stop offset="0%" stop-color="#000000" />
+            <stop offset="100%" class="titleColorClass" />
+        </linearGradient>
+    </defs>
+    <rect x="0" y="0" fill="#000000" width="1920" height="1080" />
+	<g id="sidebar">
+		<text x="384" y="216" class="majorValue">%s</text>
+		<text x="384" y="324" class="majorLabel">Overall Health</text>
+		<text x="384" y="405" text-anchor="end" class="label">Element:</text>
+		<text x="384" y="405" text-anchor="start" class="minorValue elementHealthClass">%s <tspan class="units">%</tspan></text>
+		<text x="384" y="486" text-anchor="end" class="label">Voxel:</text>
+		<text x="384" y="486" text-anchor="start" class="minorValue voxelHealthClass">%s <tspan class="units">%</tspan></text>
+		<text x="384" y="648" class="majorLabel">Filters</text>
+		<g id="filters">
+			<g class="flightFilterClass selected">
+				<use xlink:href="#filterButton" x="192" y="702" />
+				<text x="192" y="725">Flight</text>
+			</g>
+			<g class="propulsionFilterClass">
+				<use xlink:href="#filterButton" x="192" y="810" />
+				<text x="192" y="833">Propulsion</text>
+			</g>
+			<g class="industryFilterClass">
+				<use xlink:href="#filterButton" x="192" y="918" />
+				<text x="192" y="941">Industry</text>
+			</g>
+		</g>
+	</g>
+	<g id="display">
+		<g id="tabs">
+			<g class="selected">
+				<use xlink:href="#tabSweep" x="960" y="182" />
+				<text x="960" y="182">Table</text>
+			</g>
+			<g>
+				<use xlink:href="#tabSweep" x="1216" y="182" />
+				<text x="1216" y="182">Top</text>
+			</g>
+			<g>
+				<use xlink:href="#tabSweep" x="1472" y="182" />
+				<text x="1472" y="182">Side</text>
+			</g>
+			<g>
+				<use xlink:href="#tabSweep" x="1728" y="182" />
+				<text x="1728" y="182">Front</text>
+			</g>
+			<rect x="768" y="189" width="1152" height="891" />
+		</g>
+		<svg x="771" y="192" viewbox="0 0 1146 885">
+			<rect width="1146" height="885" fill="blue" />
+		</svg>
+		<text x="1146" y="100" text-anchor="end">Slice</text>
+	</g>
+    <g class="header">
+        <rect x="0" y="0" fill="url('#titleGradient')" width="1920" height="108" />
+        <use xlink:href="#logo" x="4" y="4" width="178" height="100" />
+        <text x="1920" y="108" text-anchor="end">SHIP HEALTH</text>
+    </g>
+    <g id="overlay grid" style="opacity=0.5;">
+        <g id="10% grid" style="stroke-width:1px;stroke:#444444;">
+            <line x1="0" y1="0" x2="1920" y2="0" />
+            <line x1="0" y1="108" x2="1920" y2="108" />
+            <line x1="0" y1="216" x2="1920" y2="216" />
+            <line x1="0" y1="324" x2="1920" y2="324" />
+            <line x1="0" y1="432" x2="1920" y2="432" />
+            <line x1="0" y1="540" x2="1920" y2="540" />
+            <line x1="0" y1="648" x2="1920" y2="648" />
+            <line x1="0" y1="756" x2="1920" y2="756" />
+            <line x1="0" y1="864" x2="1920" y2="864" />
+            <line x1="0" y1="972" x2="1920" y2="972" />
+            <line x1="0" y1="1080" x2="1920" y2="1080" />
+            <line x1="0" y1="0" x2="0" y2="1080" />
+            <line x1="192" y1="0" x2="192" y2="1080" />
+            <line x1="384" y1="0" x2="384" y2="1080" />
+            <line x1="576" y1="0" x2="576" y2="1080" />
+            <line x1="768" y1="0" x2="768" y2="1080" />
+            <line x1="960" y1="0" x2="960" y2="1080" />
+            <line x1="1152" y1="0" x2="1152" y2="1080" />
+            <line x1="1344" y1="0" x2="1344" y2="1080" />
+            <line x1="1536" y1="0" x2="1536" y2="1080" />
+            <line x1="1728" y1="0" x2="1728" y2="1080" />
+            <line x1="1920" y1="0" x2="1920" y2="1080" />
+        </g>
+        <g id="5% grid" style="stroke-width:1px;stroke:#444444;stroke-dasharray:4;opacity:0.5;">
+            <line x1="0" y1="54" x2="1920" y2="54" />
+            <line x1="0" y1="162" x2="1920" y2="162" />
+            <line x1="0" y1="270" x2="1920" y2="270" />
+            <line x1="0" y1="378" x2="1920" y2="378" />
+            <line x1="0" y1="486" x2="1920" y2="486" />
+            <line x1="0" y1="594" x2="1920" y2="594" />
+            <line x1="0" y1="702" x2="1920" y2="702" />
+            <line x1="0" y1="810" x2="1920" y2="810" />
+            <line x1="0" y1="918" x2="1920" y2="918" />
+            <line x1="0" y1="1026" x2="1920" y2="1026" />
+            <line x1="96" y1="0" x2="96" y2="1080" />
+            <line x1="288" y1="0" x2="288" y2="1080" />
+            <line x1="480" y1="0" x2="480" y2="1080" />
+            <line x1="672" y1="0" x2="672" y2="1080" />
+            <line x1="864" y1="0" x2="864" y2="1080" />
+            <line x1="1056" y1="0" x2="1056" y2="1080" />
+            <line x1="1248" y1="0" x2="1248" y2="1080" />
+            <line x1="1440" y1="0" x2="1440" y2="1080" />
+            <line x1="1632" y1="0" x2="1632" y2="1080" />
+            <line x1="1824" y1="0" x2="1824" y2="1080" />
+        </g>
+    </g>
+</svg>
