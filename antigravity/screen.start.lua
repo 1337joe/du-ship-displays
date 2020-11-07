@@ -275,7 +275,7 @@ function _G.agScreenController:refresh()
         -- powered on
         html = self.replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, HIDDEN_CLASS)
 
-        if self.controller.agField < 0.5 then
+        if agField <= 50 then -- use rounded number from display
             -- insufficient pulsors
             html = self.replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
             html = self.replaceClass(html, ELEMENT_CLASS_NEED_PULSORS, "")

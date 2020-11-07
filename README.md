@@ -4,15 +4,15 @@ Info and control screens for Dual Universe ships.
 
 ## Antigravity
 
-![basic](https://du.w3asel.com/du-ship-displays/images/antigravity-basic.svg "Basic Anti-Gravity Display")
+[![basic](https://du.w3asel.com/du-ship-displays/images/antigravity-basic.svg "Basic Anti-Gravity Display")](https://du.w3asel.com/du-ship-displays/templates/antigravity-basic.json)
 
-### Features:
+### Features/Controls:
 
 * All anti-gravity measurements and controls on one screen.
-* Logarithmic altitude scale for more control at lower altitudes.
 * Set target altitude by dragging the arrow on the left side of the altitude scale or with the up and down arrows. Left/right arrows select the digit to change to step at anywhere from 1 to 10,000 m increments.
-* Set target altitude to current altitude in one click.
-* Lock controls to prevent accidental clicks.
+  * The altitude scale is logarithmic for more control at lower altitudes.
+* Snap target altitude to current altitude in one click on the current altitude slider.
+* Lock controls to prevent accidental clicks by clicking on the lock icon.
 * Power on and unlock protected by a drag-to-activate mechanism to prevent accidental disabling.
 
 ### Requirements:
@@ -75,6 +75,8 @@ luacov: For tracking code coverage when running all tests. Can be removed from `
 ## Support
 
 If you encounter bugs or any of my instructions don't work either send me a message or file a GitHub Issue (or fork the project, fix it, and send me a pull request).
+
+Discord channel: [du-ship-displays on DU Open Source Initiative](https://discord.gg/uhXRgw86k7)
 
 Discord: 1337joe#6186
 

@@ -1,15 +1,16 @@
 <svg viewBox="0 0 1920 1080" style="width:100%; height:100%" class="bootstrap" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
     <style>
-        .hidden, .unlockSlideClass, .disabledText, .powerSlideClass, .pulsorsText {
-            display: none;
-        }
         text {
             text-transform: none;
             font-family: arial;
             font-weight: normal;
         }
-        .widgetAnchor {
-            fill: #ffffff;
+        .header text {
+            font-size:108px;
+            font-weight:bold;
+        }
+        .hidden, .unlockSlideClass, .disabledText, .powerSlideClass, .pulsorsText {
+            display: none;
         }
         .altitude {
             fill: #538be3;
@@ -91,7 +92,7 @@
         </g>
         <linearGradient id="titleGradient">
             <stop offset="0%" stop-color="#000000" />
-            <stop offset="100%" stop-color="#065de8" /> <!-- pulsor bright: 0aebff, pulsor dark: 065de8-->
+            <stop offset="100%" stop-color="#065de8" />
         </linearGradient>
         <clipPath id="sliderSwoop">
             <path d="M 920,1026 Q 920,526 768,162 L 1152,162 Q 1000,526 1000,1026 Z" />
@@ -187,9 +188,9 @@
             <text x="1536" y="945" text-anchor="middle">Pulsors</text>
         </g>
      </g>
-    <g id="header">
+    <g class="header">
         <rect x="0" y="0" fill="url('#titleGradient')" width="1920" height="108" />
         <use xlink:href="#logo" x="4" y="4" width="178" height="100" />
-        <text x="1920" y="108" text-anchor="end" style="font-size:108px;font-weight:bold;">ANTI-GRAVITY</text>
+        <text x="1920" y="108" text-anchor="end">ANTI-GRAVITY</text>
     </g>
 </svg>
