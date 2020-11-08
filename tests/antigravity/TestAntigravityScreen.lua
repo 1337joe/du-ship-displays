@@ -11,9 +11,9 @@ require("duutils.Utilities")
 local SVG_OUTPUT_FILE = "tests/results/images/antigravity-basic.svg"
 
 -- load file into a function for efficient calling
-local screenStart = loadfile("antigravity/screen.start.lua")
+local screenStart = loadfile("antigravity/ag.screen.start.lua")
 -- load base SVG
-local inputHandle = io.open("antigravity/screen.svg", "rb")
+local inputHandle = io.open("antigravity/ag.screen.svg", "rb")
 local BASE_SVG = io.input(inputHandle):read("*all")
 inputHandle:close()
 
