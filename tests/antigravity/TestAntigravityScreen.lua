@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
---- Tests for antigravity screen.start.
+--- Tests for antigravity screen.start1.
 package.path = package.path .. ";./resources/du-utils/?.lua" -- add du-utils project
 package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
 
@@ -12,12 +12,7 @@ require("common.ScreenUtils")
 local SVG_OUTPUT_FILE = "tests/results/images/antigravity-basic.svg"
 
 -- load file into a function for efficient calling
-local screenStart = loadfile("antigravity/ag.screen.start.lua")
--- load base SVG
-local inputHandle = io.open("antigravity/ag.screen.svg", "rb")
-local BASE_SVG = io.input(inputHandle):read("*all")
-inputHandle:close()
-
+local screenStart1 = loadfile("./antigravity/ag.screen.start1.lua")
 
 local mockScreenUnit = require("dumocks.ScreenUnit")
 local mockDatabankUnit = require("dumocks.DatabankUnit")
@@ -59,7 +54,7 @@ end
 
 --- Verify init stores references and loads settings from populated databank.
 function _G.TestAntigravityScreen:testInit()
-    screenStart()
+    screenStart1()
 
     local expected = 1234
     self.databankMock.data[ALTITUDE_ADJUST_KEY] = expected
@@ -74,7 +69,7 @@ end
 
 --- Verify init stores references and defaults settings due to unpopulated databank.
 function _G.TestAntigravityScreen:testInitEmptyDatabank()
-    screenStart()
+    screenStart1()
 
     local expected = 1000
 
@@ -90,7 +85,7 @@ end
 function _G.TestAntigravityScreen:testInitNoDatabank()
     self.agController.slots.databank = nil
 
-    screenStart()
+    screenStart1()
 
     local expected = 1000
 
@@ -106,7 +101,7 @@ end
 function _G.TestAntigravityScreen:testSetAltitudeAdjust()
     self.agController.slots.databank = nil
 
-    screenStart()
+    screenStart1()
 
     _G.agScreenController:init(self.agController)
 
@@ -129,7 +124,7 @@ end
 
 --- Verify altitude adjust works with a databank.
 function _G.TestAntigravityScreen:testSetAltitudeAdjust()
-    screenStart()
+    screenStart1()
 
     _G.agScreenController:init(self.agController)
 
@@ -164,64 +159,89 @@ function _G.TestAntigravityScreen:testSetAltitudeAdjust()
     lu.assertNotEquals(_G.agScreenController.altitudeAdjustment, expected)
 end
 
---- Verify refresh generates an SVG and save it as a sample image.
-function _G.TestAntigravityScreen:testDisplay()
-    screenStart()
-    _G.agScreenController.SVG_TEMPLATE = BASE_SVG
+--- Verify mouseDown updates state properly.
+function _G.TestAntigravityScreen:testMouseDown()
+    screenStart1()
 
     _G.agScreenController:init(self.agController)
 
     lu.assertIs(_G.agScreenController.screen, self.screen)
 
-    -- set state in controller
-    self.agController.verticalVelocity = 5.842261
-    self.agController.currentAltitude = 1283.1961686802
-    self.agController.targetAltitude = 1250
-    self.agController.agState = true
-    self.agController.baseAltitude = 1277.0
-    self.agController.agField = 1.2000000178814
-    self.agController.agPower = 0.35299472945713
+    -- init button definition to single button covering bottom right corner of screen
+    local BUTTON_1 = "Button 1"
+    local buttonCoordinates = {}
+    buttonCoordinates[BUTTON_1] = {x1 = 0.5, x2 = 1.0, y1 = 0.5, y2 = 1.0}
+    _G.agScreenController.buttonCoordinates = buttonCoordinates
 
-    _G.agScreenController.needRefresh = true
-    _G.agScreenController:refresh()
+    local expectedX, expectedY, expectedButton
 
-    local actual = self.screenMock.html
-    lu.assertFalse(actual:len() == 0)
+    -- miss button
+    expectedX = 0.25
+    expectedY = 0.25
+    expectedButton = nil
+    _G.agScreenController:mouseDown(expectedX, expectedY)
+    lu.assertEquals(_G.agScreenController.mouse.x, expectedX)
+    lu.assertEquals(_G.agScreenController.mouse.y, expectedY)
+    lu.assertEquals(_G.agScreenController.mouse.pressed, expectedButton)
 
-    -- save as file
-    local outputHandle, errorMsg = io.open(SVG_OUTPUT_FILE, "w")
-    if errorMsg then
-        error(errorMsg)
-    else
-        io.output(outputHandle):write(actual)
-        outputHandle:close()
-    end
+    -- hit button
+    expectedX = 0.75
+    expectedY = 0.75
+    expectedButton = BUTTON_1
+    _G.agScreenController:mouseDown(expectedX, expectedY)
+    lu.assertEquals(_G.agScreenController.mouse.x, expectedX)
+    lu.assertEquals(_G.agScreenController.mouse.y, expectedY)
+    lu.assertEquals(_G.agScreenController.mouse.pressed, expectedButton)
 end
 
 
---- Verify a 0 altitude will not crash the display rendering.
-function _G.TestAntigravityScreen:testDisplayZeroAlt()
-    screenStart()
-    _G.agScreenController.SVG_TEMPLATE = BASE_SVG
+--- Verify mouseUp updates state and calls handler properly.
+function _G.TestAntigravityScreen:testMouseUp()
+    screenStart1()
 
     _G.agScreenController:init(self.agController)
 
     lu.assertIs(_G.agScreenController.screen, self.screen)
 
-    -- set state in controller
-    self.agController.verticalVelocity = 1.2
-    self.agController.currentAltitude = 0
-    self.agController.targetAltitude = 200000
-    self.agController.agState = true
-    self.agController.baseAltitude = 23708
-    self.agController.agField = 1.2000000178814
-    self.agController.agPower = 0.27
+    -- init button definition to single button covering bottom right corner of screen
+    local BUTTON_1 = "Button 1"
+    local buttonCoordinates = {}
+    buttonCoordinates[BUTTON_1] = {x1 = 0.5, x2 = 1.0, y1 = 0.5, y2 = 1.0}
+    _G.agScreenController.buttonCoordinates = buttonCoordinates
 
-    _G.agScreenController.needRefresh = true
-    _G.agScreenController:refresh()
+    -- implement simple handler to verify call
+    local actualButton = nil
+    _G.agScreenController.handleButton = function(self, button)
+        actualButton = button
+    end
 
-    local actual = self.screenMock.html
-    lu.assertFalse(actual:len() == 0)
+    -- release off button, button was not pressed
+    actualButton = nil
+    _G.agScreenController.mouse.pressed = nil
+    _G.agScreenController:mouseUp(0.25, 0.25)
+    lu.assertNil(_G.agScreenController.mouse.pressed)
+    lu.assertNil(actualButton)
+
+    -- release off button, button was pressed
+    actualButton = nil
+    _G.agScreenController.mouse.pressed = BUTTON_1
+    _G.agScreenController:mouseUp(0.25, 0.25)
+    lu.assertNil(_G.agScreenController.mouse.pressed)
+    lu.assertNil(actualButton)
+    
+    -- release on button, button was not pressed
+    actualButton = nil
+    _G.agScreenController.mouse.pressed = nil
+    _G.agScreenController:mouseUp(0.75, 0.75)
+    lu.assertNil(_G.agScreenController.mouse.pressed)
+    lu.assertNil(actualButton)
+
+    -- release on button, button was pressed - calls handler
+    actualButton = nil
+    _G.agScreenController.mouse.pressed = BUTTON_1
+    _G.agScreenController:mouseUp(0.75, 0.75)
+    lu.assertNil(_G.agScreenController.mouse.pressed)
+    lu.assertEquals(actualButton, BUTTON_1)
 end
 
 os.exit(lu.LuaUnit.run())

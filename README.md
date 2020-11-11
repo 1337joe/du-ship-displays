@@ -2,9 +2,11 @@
 
 Info and control screens for Dual Universe ships.
 
+Only the basic screens are linked here. For full galleries of available screens view my [project web page](https://du.w3asel.com/du-ship-displays).
+
 ## Antigravity
 
-[![basic](https://du.w3asel.com/du-ship-displays/images/antigravity-basic.svg "Basic Anti-Gravity Display")](https://du.w3asel.com/du-ship-displays/templates/antigravity-basic.json)
+[<img src="https://du.w3asel.com/du-ship-displays/images/antigravity-basic.svg" width="50%" alt="Basic Anti-Gravity Display">](https://du.w3asel.com/du-ship-displays/templates/antigravity-basic.json)
 
 ### Features/Controls:
 

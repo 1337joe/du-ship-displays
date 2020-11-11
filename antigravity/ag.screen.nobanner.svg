@@ -1,0 +1,182 @@
+<svg viewBox="0 0 1920 1080" style="width:100%; height:100%" class="bootstrap" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
+    <style>
+        text {
+            text-transform: none;
+            font-family: arial;
+            font-weight: normal;
+        }
+        .hidden, .unlockSlideClass, .disabledText, .powerSlideClass, .pulsorsText {
+            display: none;
+        }
+        .altitude {
+            fill: #538be3;
+        }
+        .adjust {
+            fill: #065de8;
+        }
+        .current {
+            fill: #ffbe4d;
+        }
+        .label {
+            font-size: 60px;
+            fill: #777777;
+        }
+        .majorValue {
+            font-size: 150px;
+            letter-spacing: 20px;
+        }
+        .minorValue {
+            font-size: 75px;
+            fill: #aaaaaa;
+        }
+        .baseAltitude {
+            fill: #b67400 !important;
+        }
+        .indicator {
+            stroke: #000000;
+            stroke-width: 3;
+        }
+        .units {
+            fill: #555555;
+        }
+        .error {
+            fill: #880000;
+            font-size: 150px;
+        }
+        .mouseOver {
+            stroke: #ffa200 !important;
+            stroke-width: 10px;
+        }
+        #slider text {
+            text-anchor: middle;
+            font-size: 25px;
+            fill: #ffffff;
+        }
+        #slider line {
+            stroke-width: 4;
+            stroke: #333333;
+        }
+    </style>
+    <defs>
+        <path id="arrowIndicator" d="M 20,0 A 100,75 0 0,0 96,-44 L 96,-25 A 100,75 0 0,0 192,-54 A 100,100 0 0,0 192,54 A 100,75 0 0,0 96,25 L 96,44 A 100,75 0 0,0 20,0 z" />
+        <use id="rightIndicator" xlink:href="#arrowIndicator" />
+        <use id="leftIndicator" xlink:href="#arrowIndicator" transform="scale(-1,1)" />
+        <path id="baseIndicator" d="M -15,0 A 20,15 0 0,1 0,10 A 20,15 0 0,1 15,0 A 20,15 0 0,1 0,-10 A 20,15 0 0,1 -15,0 z" />
+        <polygon id="chevronArrow" points="-192,20 0,-108 192,20 152,54 0,-54 -152,54" />
+        <g id="altitudeUp">
+            <use xlink:href="#chevronArrow" />
+        </g>
+        <g id="altitudeDown">
+            <use transform="scale(1,-1)" xlink:href="#altitudeUp" />
+        </g>
+        <g id="adjustDown">
+            <use transform="rotate(90) scale(0.28,0.28) translate(0,-108)" xlink:href="#chevronArrow" />
+        </g>
+        <g id="adjustUp">
+            <use transform="scale(-1,1)" xlink:href="#adjustDown" />
+        </g>
+        <path id="locked" d="m -35,0 l 0,-15 a 35,35 0 0,1 70,0 l 0,15 5,0 0,54 -80,0 0,-54 z m 50,0 l 0,-15 a 15,15 0 0,0 -30,0 l 0,15 z" fill="#004400" />
+        <path id="unlocked" d="m 15,0 l 0,-15 a 35,35 0 0,1 70,0 l 0,15 -20,0 l 0,-15 a 15,15 0 0,0 -30,0 l 0,15 l 5,0 0,54 -80,0 0,-54 5,0 z" fill="#440000" />
+        <g id="powerIsOff">
+            <path d="M -32.2,-23.7 A 10,10 0 0,1 -18,-9.5 A 25.5,25.5 0 1,0 18,-9.5 A 10,10 0 0,1 32.2,-23.7 A 45.5,45.5 0 1,1 -32.2,-23.7 z" fill="#440000" />
+            <path d="M -10,-8 l 0,-32 a 10,10 0 0,1 20,0 l 0,32 a 10,10 0 0,1 -20,0 z" fill="#444444" />
+        </g>
+        <g id="powerIsOn">
+            <path d="M -32.2,-23.7 A 10,10 0 0,1 -18,-9.5 A 25.5,25.5 0 1,0 18,-9.5 A 10,10 0 0,1 32.2,-23.7 A 45.5,45.5 0 1,1 -32.2,-23.7 z" fill="#444444" />
+            <path d="M -10,-8 l 0,-32 a 10,10 0 0,1 20,0 l 0,32 a 10,10 0 0,1 -20,0 z" fill="#004400" />
+        </g>
+        <clipPath id="sliderSwoop">
+            <path d="M 920,1026 Q 920,526 768,54 L 1152,54 Q 1000,526 1000,1026 Z" />
+        </clipPath>
+        <linearGradient id="altitudeGradient" gradientTransform="rotate(90)">
+            <stop offset="0%" stop-color="#000000" />
+            <stop offset="70%" stop-color="#87ceeb" />
+            <stop offset="92.4%" stop-color="#ffff00" />
+            <stop offset="100%" stop-color="#ff0000" />
+        </linearGradient>
+    </defs>
+    <rect x="0" y="0" fill="#000000" width="1920" height="1080" />
+    <g id="slider">
+        <g clip-path="url(#sliderSwoop)">
+            <rect x="768" y="54" width="384" height="972" fill="url(#altitudeGradient)" />
+            <line x1="940" y1="899" x2="980" y2="899" />
+            <line x1="940" y1="824" x2="980" y2="824" />
+            <line x1="940" y1="772" x2="980" y2="772" />
+            <line x1="918" y1="731" x2="928" y2="731" />
+            <line x1="992" y1="731" x2="1002" y2="731" />
+            <text x="960" y="738">5,000</text>
+            <line x1="940" y1="697" x2="980" y2="697" />
+            <line x1="940" y1="669" x2="980" y2="669" />
+            <line x1="940" y1="645" x2="980" y2="645" />
+            <line x1="940" y1="623" x2="980" y2="623" />
+            <line x1="768" y1="604" x2="925" y2="604" />
+            <line x1="995" y1="604" x2="1152" y2="604" />
+            <text x="960" y="611">10,000</text>
+            <line x1="768" y1="476" x2="1152" y2="476" />
+            <line x1="768" y1="402" x2="1152" y2="402" />
+            <line x1="768" y1="349" x2="1152" y2="349" />
+            <line x1="768" y1="308" x2="925" y2="308" />
+            <line x1="995" y1="308" x2="1152" y2="308" />
+            <text x="960" y="315">50,000</text>
+            <line x1="768" y1="275" x2="1152" y2="275" />
+            <line x1="768" y1="247" x2="1152" y2="247" />
+            <line x1="768" y1="222" x2="1152" y2="222" />
+            <line x1="768" y1="200" x2="1152" y2="200" />
+            <line x1="768" y1="181" x2="920" y2="181" />
+            <line x1="1000" y1="181" x2="1152" y2="181" />
+            <text x="960" y="188">100,000</text>
+        </g>
+        <text x="960" y="1068.5" style="font-size:40px;fill:#ff0000;">1000 <tspan class="units">m</tspan></text>
+        <text x="960" y="42.5" style="font-size:40px;stroke:#000000;">200000 <tspan class="units">m</tspan></text>
+        <use xlink:href="#rightIndicator" x="960" y="%d" class="current indicator rightSliderClass" />
+        <use xlink:href="#leftIndicator" x="960" y="%d" class="altitude indicator leftSliderClass" />
+        <use xlink:href="#baseIndicator" x="960" y="%d" class="baseAltitude indicator" />
+    </g>
+    <g id="targetPanel">
+        <g id="lockBar">
+            <use x="672" y="54" xlink:href="#unlocked" class="unlockedClass" />
+            <text x="384" y="81" text-anchor="middle" textLength="384" class="label unlockSlideClass">&gt;Slide&gt;</text>
+            <use id="locked" x="96" y="54" xlink:href="#locked" class="lockedClass" />
+        </g>
+        <text x="384" y="594" text-anchor="middle" class="altitude majorValue">%s</text>
+        <text x="384" y="648" text-anchor="middle" class="label">Target Altitude (m)</text>
+        <text x="384" y="1053" text-anchor="end" class="label">Base Altitude:</text>
+        <text x="384" y="1053" class="minorValue baseAltitude">%d <tspan class="units">m</tspan></text>
+        <g class="adjustmentWidgets">
+            <g class="adjust">
+                <use xlink:href="#altitudeUp" x="384" y="270" class="altitudeUpClass" />
+                <use xlink:href="#altitudeDown" x="384" y="810" class="altitudeDownClass" />
+            </g>
+            <g class="adjust">
+                <use x="672" y="540" xlink:href="#adjustDown" class="adjustDownClass"/>
+                <use x="96" y="540" xlink:href="#adjustUp" class="adjustUpClass" />
+            </g>
+        </g>
+    </g>
+    <g id="currentPanel">
+        <g id="powerBar">
+            <use x="1248" y="54" xlink:href="#powerIsOff" class="powerIsOffClass" />
+            <text x="1536" y="81" text-anchor="middle" textLength="384" class="label powerSlideClass">&lt;Slide&lt;</text>
+            <use id="power" x="1824" y="54" xlink:href="#powerIsOn" class="powerIsOnClass" />
+        </g>
+        <text x="1536" y="298" text-anchor="end" class="label">Vertical Vel:</text>
+        <text x="1536" y="298" class="minorValue">%s <tspan class="units">%s</tspan></text>
+        <text x="1536" y="594" text-anchor="middle" class="current majorValue">%s</text>
+        <text x="1536" y="648" text-anchor="middle" class="label">Current Altitude (m)</text>
+        <g class="statusWidgets">
+            <text x="1632" y="891" text-anchor="end" class="label">Field Strength:</text>
+            <text x="1632" y="891" class="minorValue">%d <tspan class="units">Es</tspan></text>
+            <text x="1632" y="999" text-anchor="end" class="label">Power Level:</text>
+            <text x="1632" y="999" class="minorValue">%d <tspan class="units">%</tspan></text>
+        </g>
+        <g class="disabledText error">
+            <text x="1536" y="823" text-anchor="middle" textLength="768">Anti-Gravity</text>
+            <text x="1536" y="945" text-anchor="middle">Generator</text>
+            <text x="1536" y="1067" text-anchor="middle">Offline</text>
+        </g>
+        <g class="pulsorsText error">
+            <text x="1536" y="823" text-anchor="middle" textLength="768">Insufficient</text>
+            <text x="1536" y="945" text-anchor="middle">Pulsors</text>
+        </g>
+    </g>
+</svg>

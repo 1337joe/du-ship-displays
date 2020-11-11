@@ -1,14 +1,9 @@
+--- Run second, define agScreenController SVG-specific functionality: SVG image, rendering, buttons, etc
 
--- constants and editable lua script parameters
+-- constants for svg file
 local SCREEN_HEIGHT = 1080
 local MAX_SLIDER_ALTITUDE = 200000
 local MIN_SLIDER_ALTITUDE = 1000
-local MIN_ADJUSTMENT_VALUE = 1
-local MAX_ADJUSTMENT_VALUE = 10000 --export: Max step size for altitude adjustment (m)
-local USE_KMPH = true --export: True for km/h, false for m/s
-local MPS_TO_MPH = 3600
-
--- constants for svg file
 local ALT_SLIDER_TOP = 162
 local ALT_SLIDER_BOTTOM = 1026
 local MOUSE_OVER_CLASS = "mouseOver"
@@ -32,34 +27,12 @@ local ELEMENT_CLASS_POWER_SLIDER = "powerSlideClass"
 
 local ALTITUDE_ADJUST_KEY = "altitudeAdjustment"
 
--- initialize object and fields
-_G.agScreenController = {
-    mouse = {
-        x = -1,
-        y = -1,
-        pressed = nil,
-        state = false
-    },
-    locked = false,
-    needRefresh = false,
-    SVG_TEMPLATE = [[${file:ag.screen.svg minify}]],
-    SVG_LOGO = [[${file:../logo.svg minify}]]
-}
+-- add SVG-specific fields
+_G.agScreenController.SVG_TEMPLATE = [[${file:ag.screen.basic.svg minify}]]
+_G.agScreenController.SVG_LOGO = [[${file:../logo.svg minify}]]
 
 -- one-time transforms
 _G.agScreenController.SVG_TEMPLATE = string.gsub(_G.agScreenController.SVG_TEMPLATE, '<svg id="logo"/>', _G.agScreenController.SVG_LOGO)
-
-function _G.agScreenController:init(controller)
-    self.controller = controller
-    self.screen = controller.slots.screen
-    self.databank = controller.slots.databank
-
-    if self.databank and self.databank.hasKey(ALTITUDE_ADJUST_KEY) == 1 then
-        self:setAltitudeAdjust(self.databank.getIntValue(ALTITUDE_ADJUST_KEY))
-    else
-        self:setAltitudeAdjust(1000)
-    end
-end
 
 -- constant button definition labels
 local BUTTON_ALTITUDE_UP = "Altitude Up"
@@ -74,51 +47,53 @@ local BUTTON_POWER_OFF = "Power Off"
 local BUTTON_POWER_ON = "Power On"
 
 -- Define button ranges, either in tables of x1,y1,x2,y2 or lists of those tables.
-_G.agScreenController.buttonCoordinates = {}
-_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_UP] = {
+local buttonCoordinates = {}
+buttonCoordinates[BUTTON_ALTITUDE_UP] = {
     x1 = 0.05, x2 = 0.35,
     y1 = 0.2, y2 = 0.45
 }
-_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_DOWN] = {
+buttonCoordinates[BUTTON_ALTITUDE_DOWN] = {
     x1 = 0.05, x2 = 0.35,
     y1 = 0.65, y2 = 0.9
 }
-_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_DOWN] = {
+buttonCoordinates[BUTTON_ALTITUDE_ADJUST_DOWN] = {
     x1 = 0.35, x2 = 0.4,
     y1 = 0.5, y2 = 0.6
 }
-_G.agScreenController.buttonCoordinates[BUTTON_ALTITUDE_ADJUST_UP] = {
+buttonCoordinates[BUTTON_ALTITUDE_ADJUST_UP] = {
     x1 = 0.0, x2 = 0.05,
     y1 = 0.5, y2 = 0.6
 }
-_G.agScreenController.buttonCoordinates[BUTTON_TARGET_ALTITUDE_SLIDER] = {
+buttonCoordinates[BUTTON_TARGET_ALTITUDE_SLIDER] = {
     x1 = 0.4, x2 = 0.5,
     y1 = 0.1, y2 = 1.0
 }
-_G.agScreenController.buttonCoordinates[BUTTON_MATCH_CURRENT_ALTITUDE] = {
+buttonCoordinates[BUTTON_MATCH_CURRENT_ALTITUDE] = {
     x1 = 0.5, x2 = 0.6,
     y1 = 0.1, y2 = 1.0
 }
-_G.agScreenController.buttonCoordinates[BUTTON_LOCK] = {
+buttonCoordinates[BUTTON_LOCK] = {
     x1 = 0.3, x2 = 0.4,
     y1 = 0.1, y2 = 0.2
 }
-_G.agScreenController.buttonCoordinates[BUTTON_UNLOCK] = {
+buttonCoordinates[BUTTON_UNLOCK] = {
     x1 = 0.0, x2 = 0.1,
     y1 = 0.1, y2 = 0.2
 }
-_G.agScreenController.buttonCoordinates[BUTTON_POWER_OFF] = {
+buttonCoordinates[BUTTON_POWER_OFF] = {
     x1 = 0.9, x2 = 1.0,
     y1 = 0.1, y2 = 0.2
 }
-_G.agScreenController.buttonCoordinates[BUTTON_POWER_ON] = {
+buttonCoordinates[BUTTON_POWER_ON] = {
     x1 = 0.6, x2 = 0.7,
     y1 = 0.1, y2 = 0.2
 }
+-- save to controller for press/release event handling
+_G.agScreenController.buttonCoordinates = buttonCoordinates
 
 -- both sliders on same level, pre-compute y ranges with 5% buffer
-local sliderYMin = _G.agScreenController.buttonCoordinates[BUTTON_UNLOCK].y1 - SCREEN_HEIGHT * 0.05
-local sliderYMax = _G.agScreenController.buttonCoordinates[BUTTON_UNLOCK].y2 + SCREEN_HEIGHT * 0.05
+local sliderYMin = buttonCoordinates[BUTTON_UNLOCK].y1 - SCREEN_HEIGHT * 0.05
+local sliderYMax = buttonCoordinates[BUTTON_UNLOCK].y2 + SCREEN_HEIGHT * 0.05
 
 -- pre-computed values for less computation in render thread
 local logMin = math.log(MIN_SLIDER_ALTITUDE)
@@ -217,21 +192,7 @@ function _G.agScreenController:refresh()
     end
 
     local baseAltitude = math.floor(self.controller.baseAltitude)
-
-    local verticalVelocity, verticalUnits
-    if USE_KMPH then
-        local mph = self.controller.verticalVelocity * MPS_TO_MPH
-        local lessThan = mph < 1000
-        if lessThan then
-            mph = 1000
-        end
-        verticalVelocity, verticalUnits = _G.Utilities.printableNumber(mph, "m/h")
-        if lessThan then
-            verticalVelocity = "<1.0"
-        end
-    else
-        verticalVelocity, verticalUnits = _G.Utilities.printableNumber(self.controller.verticalVelocity, "m/s")
-    end
+    local verticalVelocity, verticalUnits = self:getVerticalVelocity()
     local currentAltitude = math.floor(self.controller.currentAltitude + 0.5)
     local agPower = math.floor(self.controller.agPower * 100 + 0.5)
     local agField = math.floor(self.controller.agField * 100 + 0.5)
@@ -305,25 +266,6 @@ function _G.agScreenController:refresh()
     self.screen.setHTML(html)
 end
 
---- Handle a mouse down event at the provided coordinates.
-function _G.agScreenController:mouseDown(x, y)
-    self.mouse.x = x
-    self.mouse.y = y
-    self.mouse.pressed = _G.ScreenUtils.detectButton(self.buttonCoordinates, x, y)
-end
-
---- Handle a mouse up event at the provided coordinates.
-function _G.agScreenController:mouseUp(x, y)
-    local released = _G.ScreenUtils.detectButton(self.buttonCoordinates, x, y)
-    if not released then
-        return
-    elseif self.mouse.pressed == released then
-        local modified = self:handleButton(released)
-        self.needRefresh = self.needRefresh or modified
-    end
-    self.mouse.pressed = nil
-end
-
 --- Processes the input indicated by the provided button id.
 -- @treturn boolean True if the state was changed by this action.
 function _G.agScreenController:handleButton(buttonId)
@@ -365,22 +307,4 @@ function _G.agScreenController:handleButton(buttonId)
     end
 
     return modified
-end
-
-function _G.agScreenController:setAltitudeAdjust(newAdjust)
-    if newAdjust < MIN_ADJUSTMENT_VALUE then
-        newAdjust = MIN_ADJUSTMENT_VALUE
-    elseif newAdjust > MAX_ADJUSTMENT_VALUE then
-        newAdjust = MAX_ADJUSTMENT_VALUE
-    end
-
-    if self.altitudeAdjustment == newAdjust then
-        return false
-    end
-    self.altitudeAdjustment = newAdjust
-
-    if self.databank then
-        self.databank.setIntValue(ALTITUDE_ADJUST_KEY, newAdjust)
-    end
-    return true
 end

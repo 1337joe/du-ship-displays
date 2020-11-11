@@ -9,7 +9,7 @@ local lu = require("luaunit")
 require("duutils.Utilities")
 
 -- load file into a function for efficient calling
-local unitStart = loadfile("antigravity/ag.unit.start.lua")
+local unitStart = loadfile("./antigravity/ag.unit.start.lua")
 
 local mockCoreUnit = require("dumocks.CoreUnit")
 local mockScreenUnit = require("dumocks.ScreenUnit")
