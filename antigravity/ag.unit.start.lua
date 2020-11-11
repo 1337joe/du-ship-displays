@@ -94,6 +94,10 @@ local TARGET_ALTITUDE_KEY = "targetAltitude"
 
 -- declare methods
 function _G.agController:updateState()
+    if databank then
+        self.targetAltitude = databank.getFloatValue(TARGET_ALTITUDE_KEY)
+    end
+
     self.verticalVelocity = core.getWorldVelocity()[3]
     self.currentAltitude = core.getAltitude()
     self.agState = antigrav.getState() == 1

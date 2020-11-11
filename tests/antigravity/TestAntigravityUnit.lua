@@ -189,8 +189,11 @@ function _G.TestAntigravityUnit:testUpdateState()
     -- relevant mappings are correct
     lu.assertIs(_G.agController.slots.antigrav, self.agGenerator)
     lu.assertIs(_G.agController.slots.core, self.core)
+    lu.assertIs(_G.agController.slots.databank, self.databank)
 
     -- update all values
+    local targetAltitude = 1750.5
+
     local worldVelocity = {-0.444427, -0.755448, 5.842261}
     local currentAltitude = 1283.1961686802
 
@@ -198,6 +201,8 @@ function _G.TestAntigravityUnit:testUpdateState()
     local baseAltitude = 1277.0
     local agField = 1.2000000178814
     local agPower = 0.35299472945713
+
+    self.databankMock.data[TARGET_ALTITUDE_KEY] = targetAltitude
 
     self.coreMock.worldVelocity = worldVelocity
     self.coreMock.altitude = currentAltitude
@@ -210,6 +215,7 @@ function _G.TestAntigravityUnit:testUpdateState()
 
     _G.agController:updateState()
 
+    lu.assertEquals(_G.agController.targetAltitude, targetAltitude)
     lu.assertEquals(_G.agController.verticalVelocity, worldVelocity[3])
     lu.assertEquals(_G.agController.currentAltitude, currentAltitude)
     lu.assertEquals(_G.agController.agState, agState)
