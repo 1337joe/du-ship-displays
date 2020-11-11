@@ -120,12 +120,6 @@ _G.agScreenController.buttonCoordinates[BUTTON_POWER_ON] = {
 local sliderYMin = _G.agScreenController.buttonCoordinates[BUTTON_UNLOCK].y1 - SCREEN_HEIGHT * 0.05
 local sliderYMax = _G.agScreenController.buttonCoordinates[BUTTON_UNLOCK].y2 + SCREEN_HEIGHT * 0.05
 
---- Replaces a value from within a class attribute.
-function _G.agScreenController.replaceClass(html, find, replace)
-    -- ensure preceeded by " or space
-    return string.gsub(html, "([\"%s])" .. find, "%1" .. replace)
-end
-
 -- pre-computed values for less computation in render thread
 local logMin = math.log(MIN_SLIDER_ALTITUDE)
 local logMax = math.log(MAX_SLIDER_ALTITUDE)
@@ -170,7 +164,7 @@ function _G.agScreenController:refresh()
             self.mouse.pressed = nil
             self.locked = false
         else
-            html = self.replaceClass(html, ELEMENT_CLASS_UNLOCKING_LABEL, "")
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_UNLOCKING_LABEL, "")
             html = string.gsub(html, "(id=\"locked\" x=)\"%d+", "%1\"" .. (self.mouse.x * 1920))
         end
     elseif self.controller.agState and self.mouse.pressed == BUTTON_POWER_OFF then
@@ -181,7 +175,7 @@ function _G.agScreenController:refresh()
             self.mouse.pressed = nil
             self.controller:setAgState(false)
         else
-            html = self.replaceClass(html, ELEMENT_CLASS_POWER_SLIDER, "")
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_POWER_SLIDER, "")
             html = string.gsub(html, "(id=\"power\" x=)\"%d+", "%1\"" .. (self.mouse.x * 1920))
         end
     elseif not self.locked and self.mouse.pressed == BUTTON_TARGET_ALTITUDE_SLIDER then
@@ -260,51 +254,51 @@ function _G.agScreenController:refresh()
     -- adjust visibility for state
     -- controls locked
     if self.locked then
-        html = self.replaceClass(html, PANEL_CLASS_ADJUSTMENT, HIDDEN_CLASS)
-        html = self.replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, HIDDEN_CLASS)
+        html = _G.ScreenUtils.replaceClass(html, PANEL_CLASS_ADJUSTMENT, HIDDEN_CLASS)
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, HIDDEN_CLASS)
     else
-        html = self.replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, HIDDEN_CLASS)
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, HIDDEN_CLASS)
     end
     -- AG power/error state
     if not self.controller.agState then
         -- powered off
-        html = self.replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, HIDDEN_CLASS)
-        html = self.replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
-        html = self.replaceClass(html, ELEMENT_CLASS_DISABLED, "")
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, HIDDEN_CLASS)
+        html = _G.ScreenUtils.replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_DISABLED, "")
     else
         -- powered on
-        html = self.replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, HIDDEN_CLASS)
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, HIDDEN_CLASS)
 
         if agField <= 50 then -- use rounded number from display
             -- insufficient pulsors
-            html = self.replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
-            html = self.replaceClass(html, ELEMENT_CLASS_NEED_PULSORS, "")
+            html = _G.ScreenUtils.replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_NEED_PULSORS, "")
         end
     end
 
     if not self.mouse.pressed then
         -- add mouse-over highlights
-        local mouseOver, _ = self:detectButton(self.mouse.x, self.mouse.y)
+        local mouseOver, _ = _G.ScreenUtils.detectButton(self.buttonCoordinates, self.mouse.x, self.mouse.y)
         if mouseOver == BUTTON_ALTITUDE_ADJUST_UP then
-            html = self.replaceClass(html, ELEMENT_CLASS_ADJUST_UP, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_ADJUST_UP, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_ADJUST_DOWN then
-            html = self.replaceClass(html, ELEMENT_CLASS_ADJUST_DOWN, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_ADJUST_DOWN, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_UP then
-            html = self.replaceClass(html, ELEMENT_CLASS_ALTITUDE_UP, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_ALTITUDE_UP, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_ALTITUDE_DOWN then
-            html = self.replaceClass(html, ELEMENT_CLASS_ALTITUDE_DOWN, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_ALTITUDE_DOWN, MOUSE_OVER_CLASS)
         elseif not self.locked and mouseOver == BUTTON_TARGET_ALTITUDE_SLIDER then
-            html = self.replaceClass(html, ELEMENT_CLASS_LEFT_SLIDER, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_LEFT_SLIDER, MOUSE_OVER_CLASS)
         elseif not self.locked and mouseOver == BUTTON_MATCH_CURRENT_ALTITUDE then
-            html = self.replaceClass(html, ELEMENT_CLASS_RIGHT_SLIDER, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_RIGHT_SLIDER, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_LOCK then
-            html = self.replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_UNLOCKED_BUTTON, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_UNLOCK then
-            html = self.replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_LOCKED_BUTTON, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_POWER_OFF then
-            html = self.replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_POWER_IS_ON, MOUSE_OVER_CLASS)
         elseif mouseOver == BUTTON_POWER_ON then
-            html = self.replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, MOUSE_OVER_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_POWER_IS_OFF, MOUSE_OVER_CLASS)
         end
     end
 
@@ -315,12 +309,12 @@ end
 function _G.agScreenController:mouseDown(x, y)
     self.mouse.x = x
     self.mouse.y = y
-    self.mouse.pressed = self:detectButton(x, y)
+    self.mouse.pressed = _G.ScreenUtils.detectButton(self.buttonCoordinates, x, y)
 end
 
 --- Handle a mouse up event at the provided coordinates.
 function _G.agScreenController:mouseUp(x, y)
-    local released = self:detectButton(x, y)
+    local released = _G.ScreenUtils.detectButton(self.buttonCoordinates, x, y)
     if not released then
         return
     elseif self.mouse.pressed == released then
@@ -328,35 +322,6 @@ function _G.agScreenController:mouseUp(x, y)
         self.needRefresh = self.needRefresh or modified
     end
     self.mouse.pressed = nil
-end
-
---- Returns the button that intersects the provided coordinates or nil if none is found.
-function _G.agScreenController:detectButton(x, y)
-    local found = false
-    local index = nil
-    for button, coords in pairs(self.buttonCoordinates) do
-        if coords.x1 then
-            if x > coords.x1 and x < coords.x2 and y > coords.y1 and y < coords.y2 then
-                found = true
-            end
-        else
-            for i, innerCoords in pairs(coords) do
-                if innerCoords.x1 then
-                    if x > innerCoords.x1 and x < innerCoords.x2 and y > innerCoords.y1 and y < innerCoords.y2 then
-                        found = true
-                        index = i
-                    end
-                else
-                    break
-                end
-            end
-        end
-
-        if found then
-            return button, index
-        end
-    end
-    return nil
 end
 
 --- Processes the input indicated by the provided button id.

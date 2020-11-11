@@ -7,6 +7,7 @@ package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
 local lu = require("luaunit")
 
 require("duutils.Utilities")
+require("common.ScreenUtils")
 
 local SVG_OUTPUT_FILE = "tests/results/images/antigravity-basic.svg"
 
@@ -99,37 +100,6 @@ function _G.TestAntigravityScreen:testInitNoDatabank()
     lu.assertNil(_G.agScreenController.databank)
 
     lu.assertEquals(_G.agScreenController.altitudeAdjustment, expected)
-end
-
---- Verify replace class only replaces where appropriate.
-function _G.TestAntigravityScreen.testReplaceClass()
-    screenStart()
-
-    local html, oldClass, newClass, expected, actual
-
-    -- doesn't replace in css definitions
-    html = [[ .hidden, .unlockSlideClass, .disabledText, .powerSlideClass, .pulsorsText { display: none; }]]
-    expected = html
-    oldClass = "unlockSlideClass"
-    newClass = ""
-    actual = _G.agScreenController.replaceClass(html, oldClass, newClass)
-    lu.assertEquals(actual, expected)
-
-    -- replaces if first in attribute
-    html = [[class="unlockSlideClass"]]
-    expected = [[class=""]]
-    oldClass = "unlockSlideClass"
-    newClass = ""
-    actual = _G.agScreenController.replaceClass(html, oldClass, newClass)
-    lu.assertEquals(actual, expected)
-
-    -- replaces if not first in attribute
-    html = [[class="label unlockSlideClass"]]
-    expected = [[class="label "]]
-    oldClass = "unlockSlideClass"
-    newClass = ""
-    actual = _G.agScreenController.replaceClass(html, oldClass, newClass)
-    lu.assertEquals(actual, expected)
 end
 
 --- Verify altitude adjust works without a databank.
