@@ -138,8 +138,8 @@ local function calculateSliderAltitude(indicatorY)
 end
 
 function _G.agScreenController:refresh()
-    -- refresh conditions: needRefresh
-    if not (self.needRefresh) then
+    -- refresh conditions: needRefresh, mouse down
+    if not (self.needRefresh or self.mouse.pressed) then
         return
     end
     self.needRefresh = false
