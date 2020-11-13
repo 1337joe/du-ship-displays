@@ -17,7 +17,7 @@ local mockAntiGravityGeneratorUnit = require("dumocks.AntiGravityGeneratorUnit")
 local mockDatabankUnit = require("dumocks.DatabankUnit")
 local mockControlUnit = require("dumocks.ControlUnit")
 
-local TARGET_ALTITUDE_KEY = "targetAltitude"
+local TARGET_ALTITUDE_KEY = "AntigravTargetAltitude"
 
 _G.TestAntigravityUnit = {}
 
