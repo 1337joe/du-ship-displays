@@ -5,7 +5,7 @@
             font-family: arial;
             font-weight: normal;
         }
-        .hidden, .unlockSlideClass, .disabledText, .powerSlideClass, .pulsorsText {
+        .hidden, .unlockSlideClass, .disabledText, .powerSlideClass, .pulsorsText, .noPowerWarning {
             display: none;
         }
         .altitude {
@@ -175,8 +175,11 @@
             <text x="1536" y="1067" text-anchor="middle">Offline</text>
         </g>
         <g class="pulsorsText error">
-            <text x="1536" y="823" text-anchor="middle" textLength="768">Insufficient</text>
+            <text x="1536" y="823" text-anchor="middle">Insufficient</text>
             <text x="1536" y="945" text-anchor="middle">Pulsors</text>
+        </g>
+        <g class="noPowerWarning error">
+            <text x="1536" y="1060" text-anchor="middle" font-size="40px">Current Altitude too far from Base Altitude</text>
         </g>
     </g>
 </svg>

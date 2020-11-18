@@ -21,6 +21,7 @@ local ELEMENT_CLASS_LEFT_SLIDER = "leftSliderClass"
 local ELEMENT_CLASS_RIGHT_SLIDER = "rightSliderClass"
 local ELEMENT_CLASS_DISABLED = "disabledText"
 local ELEMENT_CLASS_NEED_PULSORS = "pulsorsText"
+local ELEMENT_CLASS_NO_POWER_WARNING = "noPowerWarning"
 local ELEMENT_CLASS_POWER_IS_OFF = "powerIsOffClass"
 local ELEMENT_CLASS_POWER_IS_ON = "powerIsOnClass"
 local ELEMENT_CLASS_POWER_SLIDER = "powerSlideClass"
@@ -230,6 +231,8 @@ function _G.agScreenController:refresh()
             -- insufficient pulsors
             html = _G.ScreenUtils.replaceClass(html, PANEL_CLASS_STATUS, HIDDEN_CLASS)
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_NEED_PULSORS, "")
+        elseif agPower <= 0 then -- use rounded number from display
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLASS_NO_POWER_WARNING, "")
         end
     end
 
