@@ -20,6 +20,7 @@
         {"code":"${file:ag.screen.start1.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
         {"code":"${file:ag.screen.start2.basic.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
         {"code":"${code:_G.agScreenController:refresh()}","filter":{"args":[],"signature":"update()","slotKey":"${slotKey:system}"},"key":"${key}"},
+        {"code":"${code:_G.agController:flushTargetAltitude()}","filter":{"args":[],"signature":"flush()","slotKey":"${slotKey:system}"},"key":"${key}"},
         {"code":"${code:_G.agScreenController:mouseDown(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseDown(x,y)","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
         {"code":"${code:_G.agScreenController:mouseUp(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseUp(x,y)","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
         {"code":"${file:../resources/du-utils/duutils/Utilities.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"},

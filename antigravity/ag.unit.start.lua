@@ -133,11 +133,22 @@ function _G.agController:setAgState(newState)
     local state
     if newState then
         self.slots.antigrav.activate()
+
+        -- update target in case baseAltitude was flushed to current while off
+        antigrav.setBaseAltitude(self.targetAltitude)
     else
         self.slots.antigrav.deactivate()
     end
 
     self:updateState()
+end
+
+--- Call from flush to quickly move baseAltitude to current altitude when powered off.
+function _G.agController:flushTargetAltitude()
+    -- only activate if AGG turned off and over 0.5s natural drift from current altitude
+    if antigrav.getState() == 0 and math.abs(antigrav.getBaseAltitude() - self.targetAltitude) > 2 then
+        antigrav.setBaseAltitude(self.targetAltitude)
+    end
 end
 
 -- init screen

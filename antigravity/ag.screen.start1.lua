@@ -2,8 +2,8 @@
 
 -- constants and editable lua script parameters
 local MIN_ADJUSTMENT_VALUE = 1
-local MAX_ADJUSTMENT_VALUE = 10000 -- export: Max step size for altitude adjustment (m)
-local USE_KMPH = true -- export: True for km/h, false for m/s
+local MAX_ADJUSTMENT_VALUE = 10000 --export: Max step size for altitude adjustment (m)
+local USE_KMPH = true --export: True for km/h, false for m/s
 local MPS_TO_MPH = 3600
 
 local ALTITUDE_ADJUST_KEY = "altitudeAdjustment"
