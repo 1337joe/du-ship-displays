@@ -16,6 +16,7 @@ Only the basic screens are linked here. For full galleries of available screens 
 * Snap target altitude to current altitude in one click on the current altitude slider.
 * Lock controls to prevent accidental clicks by clicking on the lock icon.
 * Power on and unlock protected by a drag-to-activate mechanism to prevent accidental disabling.
+* Turn off Anti-Gravity Generator to have base altitude quickly adjust to target for fast resets.
 
 ### Requirements:
 
