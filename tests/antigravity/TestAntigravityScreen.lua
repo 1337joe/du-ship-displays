@@ -1,12 +1,11 @@
 #!/usr/bin/env lua
 
 --- Tests for antigravity screen.start1.
-package.path = package.path .. ";./resources/du-utils/?.lua" -- add du-utils project
 package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
 
 local lu = require("luaunit")
 
-require("duutils.Utilities")
+require("common.Utilities")
 require("common.ScreenUtils")
 
 local SVG_OUTPUT_FILE = "tests/results/images/antigravity-basic.svg"

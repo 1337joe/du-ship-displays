@@ -1,12 +1,11 @@
 #!/usr/bin/env lua
 
 --- Tests for antigravity screen.start2.basic
-package.path = package.path .. ";./resources/du-utils/?.lua" -- add du-utils project
 package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
 
 local lu = require("luaunit")
 
-require("duutils.Utilities")
+require("common.Utilities")
 require("common.ScreenUtils")
 
 local SVG_OUTPUT_FILE = "tests/results/images/antigravity-basic.svg"
@@ -14,6 +13,7 @@ local SVG_OUTPUT_FILE = "tests/results/images/antigravity-basic.svg"
 -- load file into a function for efficient calling
 local screenStart1 = loadfile("./antigravity/ag.screen.start1.lua")
 local screenStart2 = loadfile("./antigravity/ag.screen.start2.basic.lua")
+local screenStart3 = loadfile("./antigravity/ag.screen.start3.basic.banner.lua")
 -- load base SVG
 local inputHandle = io.open("antigravity/ag.screen.basic.svg", "rb")
 local BASE_SVG = io.input(inputHandle):read("*all")
@@ -23,9 +23,9 @@ inputHandle:close()
 local mockScreenUnit = require("dumocks.ScreenUnit")
 local mockDatabankUnit = require("dumocks.DatabankUnit")
 
-_G.TestAntigravityScreenBasic = {}
+_G.TestAntigravityScreenBasicBanner = {}
 
-function _G.TestAntigravityScreenBasic:setup()
+function _G.TestAntigravityScreenBasicBanner:setup()
 
     self.screenMock = mockScreenUnit:new(nil, 2)
     self.screen = self.screenMock:mockGetClosure()
@@ -52,14 +52,15 @@ function _G.TestAntigravityScreenBasic:setup()
 end
 
 --- Unset all globals set/used by screen.start.
-function _G.TestAntigravityScreenBasic:teardown()
+function _G.TestAntigravityScreenBasicBanner:teardown()
     _G.agScreenController = nil
 end
 
 --- Verify refresh generates an SVG and save it as a sample image.
-function _G.TestAntigravityScreenBasic:testDisplay()
+function _G.TestAntigravityScreenBasicBanner:testDisplay()
     screenStart1()
     screenStart2()
+    screenStart3()
     _G.agScreenController.SVG_TEMPLATE = BASE_SVG
 
     _G.agScreenController:init(self.agController)
@@ -91,11 +92,11 @@ function _G.TestAntigravityScreenBasic:testDisplay()
     end
 end
 
-
 --- Verify a 0 altitude will not crash the display rendering.
-function _G.TestAntigravityScreenBasic:testDisplayZeroAlt()
+function _G.TestAntigravityScreenBasicBanner:testDisplayZeroAlt()
     screenStart1()
     screenStart2()
+    screenStart3()
     _G.agScreenController.SVG_TEMPLATE = BASE_SVG
 
     _G.agScreenController:init(self.agController)
@@ -105,6 +106,33 @@ function _G.TestAntigravityScreenBasic:testDisplayZeroAlt()
     -- set state in controller
     self.agController.verticalVelocity = 1.2
     self.agController.currentAltitude = 0
+    self.agController.targetAltitude = 200000
+    self.agController.agState = true
+    self.agController.baseAltitude = 23708
+    self.agController.agField = 1.2000000178814
+    self.agController.agPower = 0.27
+
+    _G.agScreenController.needRefresh = true
+    _G.agScreenController:refresh()
+
+    local actual = self.screenMock.html
+    lu.assertFalse(actual:len() == 0)
+end
+
+--- Verify a negative altitude will not crash the display rendering.
+function _G.TestAntigravityScreenBasicBanner:testDisplayNegativeAlt()
+    screenStart1()
+    screenStart2()
+    screenStart3()
+    _G.agScreenController.SVG_TEMPLATE = BASE_SVG
+
+    _G.agScreenController:init(self.agController)
+
+    lu.assertIs(_G.agScreenController.screen, self.screen)
+
+    -- set state in controller
+    self.agController.verticalVelocity = 1.2
+    self.agController.currentAltitude = -100
     self.agController.targetAltitude = 200000
     self.agController.agState = true
     self.agController.baseAltitude = 23708

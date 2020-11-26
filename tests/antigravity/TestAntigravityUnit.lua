@@ -1,12 +1,11 @@
 #!/usr/bin/env lua
 
 --- Tests for antigravity unit.start.
-package.path = package.path .. ";./resources/du-utils/?.lua" -- add du-utils project
 package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
 
 local lu = require("luaunit")
 
-require("duutils.Utilities")
+require("common.Utilities")
 
 -- load file into a function for efficient calling
 local unitStart = loadfile("./antigravity/ag.unit.start.lua")
