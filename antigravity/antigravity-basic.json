@@ -25,7 +25,9 @@
         {"code":"${code:_G.agScreenController:mouseDown(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseDown(x,y)","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
         {"code":"${code:_G.agScreenController:mouseUp(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseUp(x,y)","slotKey":"${slotKey:agScreen}"},"key":"${key}"},
         {"code":"${file:../common/Utilities.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"},
-        {"code":"${file:../common/ScreenUtils.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"}
+        {"code":"${file:../common/ScreenUtils.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"},
+        {"code":"${file:../common/atlas.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"},
+        {"code":"${file:../common/planetref.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"}
     ],
     "methods":[],
     "events":[]

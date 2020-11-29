@@ -75,6 +75,8 @@ luaunit: For automated testing. Note that this is only available on luarocks for
 
 luacov: For tracking code coverage when running all tests. Can be removed from `runTests.sh` if not desired.
 
+Dual Universe/Game/data/lua: For automated testing, link or copy your C:\ProgramData\Dual Universe\Game\data\lua directory to ../game-data-lua relative to within the root directory of the project.
+
 ## Support
 
 If you encounter bugs or any of my instructions don't work either send me a message or file a GitHub Issue (or fork the project, fix it, and send me a pull request).

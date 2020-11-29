@@ -92,14 +92,34 @@ local databank = _G.agController.slots.databank
 
 local TARGET_ALTITUDE_KEY = "AntigravTargetAltitude"
 
+local vec3 = require("cpml.vec3")
+local galaxyReference = PlanetaryReference(_G.atlas)
+local galaxy0 = galaxyReference[0]
+local piHalf = math.pi / 2
+
 -- declare methods
 function _G.agController:updateState()
     if databank then
         self.targetAltitude = databank.getFloatValue(TARGET_ALTITUDE_KEY)
     end
 
-    self.verticalVelocity = core.getWorldVelocity()[3]
+    local vel = vec3.new(core.getWorldVelocity())
+    self.verticalVelocity = vel.z
     self.currentAltitude = core.getAltitude()
+
+    -- calculate altitude from position
+    if self.currentAltitude == 0 and core.g() > 0 then
+        local vert = vec3.new(core.getWorldVertical())
+        self.verticalVelocity = vel:project_on(vert):len()
+
+        if vel:angle_between(vert) < piHalf then
+            self.verticalVelocity = -1 * self.verticalVelocity
+        end
+
+        local coreWorldPos = core.getConstructWorldPos()
+        self.currentAltitude = galaxy0:closestBody(coreWorldPos):getAltitude(coreWorldPos)
+    end
+
     self.agState = antigrav.getState() == 1
     local data = antigrav.getData()
     self.baseAltitude = antigrav.getBaseAltitude()

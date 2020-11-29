@@ -73,9 +73,9 @@ function _G.agScreenController:getVerticalVelocity()
     local verticalVelocity, verticalUnits
     if self.USE_KMPH then
         local mph = self.controller.verticalVelocity * MPS_TO_MPH
-        local lessThan = mph < 1000
+        local lessThan = math.abs(mph) < 1000
         if lessThan then
-            mph = 1000
+            mph = 1000 * math.abs(mph) / mph
         end
         verticalVelocity, verticalUnits = _G.Utilities.printableNumber(mph, "m/h")
         if lessThan then

@@ -2,10 +2,13 @@
 
 --- Tests for antigravity unit.start.
 package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
+package.path = "../game-data-lua/?.lua;" .. package.path -- add link to Dual Universe/Game/data/lua/ directory
 
 local lu = require("luaunit")
 
 require("common.Utilities")
+require("common.atlas")
+require("common.planetref")
 
 -- load file into a function for efficient calling
 local unitStart = loadfile("./antigravity/ag.unit.start.lua")
@@ -205,6 +208,7 @@ function _G.TestAntigravityUnit:testUpdateState()
 
     self.coreMock.worldVelocity = worldVelocity
     self.coreMock.altitude = currentAltitude
+    self.coreMock.constructWorldPos = {}
 
     self.agGeneratorMock.state = agState
     self.agGeneratorMock.baseAltitude = baseAltitude
@@ -222,6 +226,39 @@ function _G.TestAntigravityUnit:testUpdateState()
     lu.assertEquals(_G.agController.agField, agField)
     lu.assertEquals(_G.agController.agPower, agPower)
     lu.assertTrue(_G.agScreenController.needRefresh)
+end
+
+--- Verify altitude calculations above planet influence (where core.getAltitude stops working) but within gravity well.
+function _G.TestAntigravityUnit:testUpdateStateHighAltitude()
+    _G.unit = self.unit
+
+    unitStart()
+
+    -- relevant mappings are correct
+    lu.assertIs(_G.agController.slots.antigrav, self.agGenerator)
+    lu.assertIs(_G.agController.slots.core, self.core)
+    lu.assertIs(_G.agController.slots.databank, self.databank)
+
+    -- update all values
+    local worldPos = {-1305824.8291, 517394.3687, -152730.5247}
+    local worldVelocity = {-7.5671, -66.1325, -49.0924}
+    local worldVertical = {-0.5779, 0.2683, -0.7708}
+    local currentAltitude = 0
+    local planetInfluence = 0
+
+    self.databankMock.data[TARGET_ALTITUDE_KEY] = targetAltitude
+
+    self.coreMock.constructWorldPos = worldPos
+    self.coreMock.worldVertical = worldVertical
+    self.coreMock.worldVelocity = worldVelocity
+    self.coreMock.altitude = currentAltitude
+    self.unitMock.planetInfluence = planetInfluence
+    self.coreMock.gValue = 2.3274
+
+    _G.agController:updateState()
+
+    lu.assertAlmostEquals(_G.agController.verticalVelocity, -24.471975, 0.1)
+    lu.assertAlmostEquals(_G.agController.currentAltitude, 87966, 0.1)
 end
 
 --- Verify setBaseAltitude rounds and respects minimum altitude.
