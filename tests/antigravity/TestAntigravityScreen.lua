@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
+--- Tests for antigravity screen.start1 - functionality tests, not display
 
---- Tests for antigravity screen.start1.
 package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
 
 local lu = require("luaunit")
