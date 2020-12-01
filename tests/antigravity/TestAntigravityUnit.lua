@@ -299,17 +299,19 @@ function _G.TestAntigravityUnit:testUpdateStateFlight()
     lu.assertTrue(_G.agController.verticalVelocity > 0)
     lu.assertAlmostEquals(_G.agController.currentAltitude, 70094.49, 1)
 
-    -- far space (hud reports g < 0.1), moving down
-    self.coreMock.worldVelocity = {-13.051023, -80.307808, 0.403820}
+    -- far space (g < 0.1), moving down
+    self.coreMock.worldVelocity = {-87.481560, -39.660667, 33.877953}
     self.coreMock.altitude = 0.000000
-    self.coreMock.gValue = 0.110856
-    self.coreMock.worldVertical = {-0.292766, -0.868827, -0.399285}
-    self.coreMock.constructWorldPos = {-973754.332599, 1195902.905950, 61336.608063}
+    self.coreMock.gValue = 0.010681
+    self.coreMock.worldVertical = {0.862569, 0.351494, -0.363905}
+    self.coreMock.constructWorldPos = {2260235.337751, -99279961.240220, -700690.506668}
 
     _G.agController:updateState()
 
-    lu.assertTrue(_G.agController.verticalVelocity < 0)
-    lu.assertAlmostEquals(_G.agController.currentAltitude, 757334.06, 1)
+    -- nan check, not equal to self
+    lu.assertTrue(_G.agController.verticalVelocity ~= _G.agController.verticalVelocity)
+    lu.assertTrue(_G.agController.currentAltitude ~= _G.agController.currentAltitude)
+    
 end
 
 --- Verify setBaseAltitude rounds and respects minimum altitude.

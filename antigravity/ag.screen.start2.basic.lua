@@ -136,11 +136,13 @@ function _G.agScreenController:refresh()
     local agField = math.floor(self.controller.agField * 100 + 0.5)
     local targetAltitudeSliderHeight = _G.agScreenController.calculateSliderIndicator(targetAltitude)
     local currentAltitudeSliderHeight
-    if currentAltitude < 0 then
-        -- breaks log scale
-        currentAltitudeSliderHeight = -1000
-    elseif currentAltitude == 0 then
+    if currentAltitude ~= currentAltitude then -- test for nan
         currentAltitude = "N/A"
+        currentAltitudeSliderHeight = -1000
+        verticalVelocity = "N/A"
+        verticalUnits = ""
+    elseif currentAltitude <= 0 then
+        -- breaks log scale
         currentAltitudeSliderHeight = -1000
     else
         currentAltitudeSliderHeight = _G.agScreenController.calculateSliderIndicator(currentAltitude)

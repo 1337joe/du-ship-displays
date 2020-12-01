@@ -20,7 +20,8 @@ _G.agController.slots.antigrav = agg -- if not found by name will autodetect
 _G.agController.slots.screen = agScreen -- if not found by name will autodetect
 _G.agController.slots.databank = databank -- if not found by name will autodetect
 
-local MIN_AG_ALTITUDE = 1000 --export: Min altitude to allow setting on anti-grav (m)
+local MIN_AG_ALTITUDE = 1000 --export: Min altitude to allow setting on anti-grav (m), raise this if you don't want a non-default lower limit.
+local MIN_AG_G = 0.1 --export: Below this value of g no altitude or vertical velocity will be reported.
 
 -----------------------
 -- End Configuration --
@@ -102,22 +103,27 @@ function _G.agController:updateState()
         self.targetAltitude = databank.getFloatValue(TARGET_ALTITUDE_KEY)
     end
 
-    -- compute vertical velocity by projecting world velocity onto world vertical vector
-    local vel = vec3.new(core.getWorldVelocity())
-    local vert = vec3.new(core.getWorldVertical())
-    self.verticalVelocity = vel:project_on(vert):len()
+    if core.g() < MIN_AG_G then
+        self.verticalVelocity = 0 / 0 -- nan
+        self.currentAltitude = 0 / 0 -- nan
+    else
+        -- compute vertical velocity by projecting world velocity onto world vertical vector
+        local vel = vec3.new(core.getWorldVelocity())
+        local vert = vec3.new(core.getWorldVertical())
+        self.verticalVelocity = vel:project_on(vert):len()
 
-    -- add sign
-    if vel:angle_between(vert) < piHalf then
-        self.verticalVelocity = -1 * self.verticalVelocity
-    end
+        -- add sign
+        if vel:angle_between(vert) < piHalf then
+            self.verticalVelocity = -1 * self.verticalVelocity
+        end
 
-    self.currentAltitude = core.getAltitude()
--- TODO get data for deep space to test with
-    -- calculate altitude from position if not reported by core
-    if self.currentAltitude == 0 and core.g() > 0 then
-        local coreWorldPos = core.getConstructWorldPos()
-        self.currentAltitude = planetReference0:closestBody(coreWorldPos):getAltitude(coreWorldPos)
+        self.currentAltitude = core.getAltitude()
+
+        -- calculate altitude from position if not reported by core
+        if self.currentAltitude == 0 then
+            local coreWorldPos = core.getConstructWorldPos()
+            self.currentAltitude = planetReference0:closestBody(coreWorldPos):getAltitude(coreWorldPos)
+        end
     end
 
     self.agState = antigrav.getState() == 1

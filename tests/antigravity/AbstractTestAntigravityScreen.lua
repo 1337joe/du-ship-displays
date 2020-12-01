@@ -31,7 +31,7 @@ function TestAntigravityScreen:new()
             self.agController.agPower = 0.35299472945713
         end,
         function(self)
-            self.displayConfigurationName = "0 altitude"
+            self.displayConfigurationName = "0 altitude/vel"
             self.agController.verticalVelocity = 0
             self.agController.currentAltitude = 0
             self.agController.targetAltitude = 200000
@@ -41,8 +41,18 @@ function TestAntigravityScreen:new()
             self.agController.agPower = 0.27
         end,
         function(self)
+            self.displayConfigurationName = "nan altitude/vel"
+            self.agController.verticalVelocity = 0 / 0
+            self.agController.currentAltitude = 0 / 0
+            self.agController.targetAltitude = 200000
+            self.agController.agState = true
+            self.agController.baseAltitude = 23708
+            self.agController.agField = 1.2000000178814
+            self.agController.agPower = 0.27
+        end,
+        function(self)
             self.displayConfigurationName = "negative altitude"
-            self.agController.verticalVelocity = 1.2
+            self.agController.verticalVelocity = -1.2
             self.agController.currentAltitude = -100
             self.agController.targetAltitude = 200000
             self.agController.agState = true

@@ -1,5 +1,7 @@
 # Antigravity
 
+* ???
+  * Added minimum g parameter to turn off altitude/vertical velocity data when too far from a planet.
 * 2020-11-29
   * Added fix for negative altitude display
   * Fix for current altitude displaying 0 when too far from planet but still within gravity well
