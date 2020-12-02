@@ -106,32 +106,46 @@ local planetReference0 = PlanetaryReference(_G.atlas)[0]
 local piHalf = math.pi / 2
 
 -- declare methods
+--- Compute vertical velocity by projecting world velocity onto world vertical vector
+local function calculateVertVel(core)
+    local verticalVelocity
+
+    -- compute vertical velocity by projecting world velocity onto world vertical vector
+    local vel = vec3.new(core.getWorldVelocity())
+    local vert = vec3.new(core.getWorldVertical())
+    local verticalVelocity = vel:project_on(vert):len()
+
+    -- add sign
+    if vel:angle_between(vert) < piHalf then
+        verticalVelocity = -1 * verticalVelocity
+    end
+
+    return verticalVelocity
+end
+
 function _G.agController:updateState()
     if databank then
         self.targetAltitude = databank.getFloatValue(TARGET_ALTITUDE_KEY)
     end
 
-    if core.g() < MIN_AG_G then
-        self.verticalVelocity = 0 / 0 -- nan
-        self.currentAltitude = 0 / 0 -- nan
+    self.currentAltitude = core.getAltitude()
+
+    if self.currentAltitude == 0 then
+        local coreWorldPos = core.getConstructWorldPos()
+        local closestBody = planetReference0:closestBody(coreWorldPos)
+
+        -- core.g() is thrown off by the activity of the antigravity generator
+        if closestBody:getGravity(coreWorldPos):len() < MIN_AG_G then
+            self.verticalVelocity = 0 / 0 -- nan
+            self.currentAltitude = 0 / 0 -- nan
+        else
+            -- calculate altitude from position
+            self.currentAltitude = closestBody:getAltitude(coreWorldPos)
+
+            self.verticalVelocity = calculateVertVel(core)
+        end
     else
-        -- compute vertical velocity by projecting world velocity onto world vertical vector
-        local vel = vec3.new(core.getWorldVelocity())
-        local vert = vec3.new(core.getWorldVertical())
-        self.verticalVelocity = vel:project_on(vert):len()
-
-        -- add sign
-        if vel:angle_between(vert) < piHalf then
-            self.verticalVelocity = -1 * self.verticalVelocity
-        end
-
-        self.currentAltitude = core.getAltitude()
-
-        -- calculate altitude from position if not reported by core
-        if self.currentAltitude == 0 then
-            local coreWorldPos = core.getConstructWorldPos()
-            self.currentAltitude = planetReference0:closestBody(coreWorldPos):getAltitude(coreWorldPos)
-        end
+        self.verticalVelocity = calculateVertVel(core)
     end
 
     self.agState = antigrav.getState() == 1

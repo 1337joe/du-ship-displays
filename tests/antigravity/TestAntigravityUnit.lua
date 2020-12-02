@@ -227,10 +227,12 @@ function _G.TestAntigravityUnit:testUpdateStateFlight()
     -- relevant mappings are correct
     lu.assertIs(_G.agController.slots.core, self.core)
 
+    -- gValue is commented out because agg distorts it, but left in to show expected calculated result
+    
     -- underwater, parked
+    -- self.coreMock.gValue = 9.807479
     self.coreMock.worldVelocity = {-0.012110, 0.010807, 0.000693}
     self.coreMock.altitude = -20.920222
-    self.coreMock.gValue = 9.807479
     self.coreMock.worldVertical = {0.409438, 0.911008, -0.049251}
     self.coreMock.constructWorldPos = {-1438971.755137, 486695.731718, -280968.612056}
 
@@ -240,9 +242,9 @@ function _G.TestAntigravityUnit:testUpdateStateFlight()
     lu.assertAlmostEquals(_G.agController.currentAltitude, -20.92, 1)
 
     -- underwater, moving straight up
+    -- self.coreMock.gValue = 9.807643
     self.coreMock.worldVelocity = {-5.454992, -12.116544, 0.656135}
     self.coreMock.altitude = -19.516626
-    self.coreMock.gValue = 9.807643
     self.coreMock.worldVertical = {0.409433, 0.911010, -0.049249}
     self.coreMock.constructWorldPos = {-1438971.896043, 486694.249222, -280968.706895}
 
@@ -252,9 +254,9 @@ function _G.TestAntigravityUnit:testUpdateStateFlight()
     lu.assertAlmostEquals(_G.agController.currentAltitude, -19.52, 1)
 
     -- atmo, moving up
+    -- self.coreMock.gValue = 9.397845
     self.coreMock.worldVelocity = {109.752930, -147.477219, 37.130440}
     self.coreMock.altitude = 1808.802935
-    self.coreMock.gValue = 9.397845
     self.coreMock.worldVertical = {0.371743, 0.926504, -0.058285}
     self.coreMock.constructWorldPos = {-1436511.977069, 483709.645575, -280109.044122}
 
@@ -264,9 +266,9 @@ function _G.TestAntigravityUnit:testUpdateStateFlight()
     lu.assertAlmostEquals(_G.agController.currentAltitude, 1808.80, 1)
 
     -- atmo, moving down
+    -- self.coreMock.gValue = 9.438065
     self.coreMock.worldVelocity = {197.800613, 71.364143, 2.466721}
     self.coreMock.altitude = 1628.717478
-    self.coreMock.gValue = 9.438065
     self.coreMock.worldVertical = {0.344287, 0.936704, -0.063651}
     self.coreMock.constructWorldPos = {-1434110.053024, 483008.986417, -279663.074442}
 
@@ -276,9 +278,9 @@ function _G.TestAntigravityUnit:testUpdateStateFlight()
     lu.assertAlmostEquals(_G.agController.currentAltitude, 1628.71, 1)
 
     -- near space (within planet influence), moving up
+    -- self.coreMock.gValue = 8.540230
     self.coreMock.worldVelocity = {143.945374, 13.137656, 159.881790}
     self.coreMock.altitude = 5985.715003
-    self.coreMock.gValue = 8.540230
     self.coreMock.worldVertical = {0.012509, 0.962592, -0.270667}
     self.coreMock.constructWorldPos = {-1405952.891129, 476613.360567, -260881.213486}
 
@@ -288,9 +290,9 @@ function _G.TestAntigravityUnit:testUpdateStateFlight()
     lu.assertAlmostEquals(_G.agController.currentAltitude, 5985.72, 1)
 
     -- middle space (hud stops showing altitude but core still gives it), moving up
+    -- self.coreMock.gValue = 2.896656
     self.coreMock.worldVelocity = {664.247437, 1240.123413, 461.507721}
     self.coreMock.altitude = 70094.493816
-    self.coreMock.gValue = 2.896656
     self.coreMock.worldVertical = {-0.648452, -0.278465, -0.708497}
     self.coreMock.constructWorldPos = {-1305284.859003, 605398.637673, -176339.349603}
 
@@ -300,9 +302,9 @@ function _G.TestAntigravityUnit:testUpdateStateFlight()
     lu.assertAlmostEquals(_G.agController.currentAltitude, 70094.49, 1)
 
     -- far space (g < 0.1), moving down
+    -- self.coreMock.gValue = 0.010681
     self.coreMock.worldVelocity = {-87.481560, -39.660667, 33.877953}
     self.coreMock.altitude = 0.000000
-    self.coreMock.gValue = 0.010681
     self.coreMock.worldVertical = {0.862569, 0.351494, -0.363905}
     self.coreMock.constructWorldPos = {2260235.337751, -99279961.240220, -700690.506668}
 

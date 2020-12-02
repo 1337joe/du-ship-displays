@@ -1,11 +1,11 @@
 # General
 
-* ???
+* 2020-12-02
   * Preferences stored to databank (if available), set useParameterSettings true to override from exported parameters.
 
 # Antigravity
 
-* ???
+* 2020-12-02
   * Added minimum g parameter to turn off altitude/vertical velocity data when too far from a planet.
 * 2020-11-29
   * Added fix for negative altitude display
