@@ -2,8 +2,12 @@
 
 -- constants and editable lua script parameters
 local MIN_ADJUSTMENT_VALUE = 1
-local MAX_ADJUSTMENT_VALUE = 10000 --export: Max step size for altitude adjustment (m)
-local USE_KMPH = true --export: True for km/h, false for m/s
+
+local agMaxAdjustmentValue = 10000 --export: Max step size for altitude adjustment (m)
+local MAX_ADJUSTMENT_PREF_KEY = "AG.screen:MAX_ADJUSTMENT_VALUE"
+
+local agUseKMpH = true --export: True for km/h, false for m/s
+local USE_KMPH_PREF_KEY = "AG.screen:USE_KMPH"
 local MPS_TO_MPH = 3600
 
 local ALTITUDE_ADJUST_KEY = "altitudeAdjustment"
@@ -18,13 +22,15 @@ _G.agScreenController = {
     },
     locked = false,
     needRefresh = false,
-    USE_KMPH = USE_KMPH
 }
 
 function _G.agScreenController:init(controller)
     self.controller = controller
     self.screen = controller.slots.screen
     self.databank = controller.slots.databank
+
+    self.MAX_ADJUSTMENT_VALUE = _G.Utilities.getPreference(self.databank, MAX_ADJUSTMENT_PREF_KEY, agMaxAdjustmentValue, true)
+    self.USE_KMPH = _G.Utilities.getPreference(self.databank, USE_KMPH_PREF_KEY, agUseKMpH)
 
     if self.databank and self.databank.hasKey(ALTITUDE_ADJUST_KEY) == 1 then
         self:setAltitudeAdjust(self.databank.getIntValue(ALTITUDE_ADJUST_KEY))
@@ -53,8 +59,8 @@ end
 function _G.agScreenController:setAltitudeAdjust(newAdjust)
     if newAdjust < MIN_ADJUSTMENT_VALUE then
         newAdjust = MIN_ADJUSTMENT_VALUE
-    elseif newAdjust > MAX_ADJUSTMENT_VALUE then
-        newAdjust = MAX_ADJUSTMENT_VALUE
+    elseif newAdjust > self.MAX_ADJUSTMENT_VALUE then
+        newAdjust = self.MAX_ADJUSTMENT_VALUE
     end
 
     if self.altitudeAdjustment == newAdjust then

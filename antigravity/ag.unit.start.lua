@@ -11,7 +11,7 @@ _G.agController = {}
 -------------------------
 -- Begin Configuration --
 -------------------------
-local AG_UPDATE_FREQUENCY = 10 --export: Antigravity data/screen update rate (Hz)
+local agUpdateFrequency = 10 --export: Antigravity data/screen update rate (Hz)
 
 -- slot definitions
 _G.agController.slots = {}
@@ -20,8 +20,8 @@ _G.agController.slots.antigrav = agg -- if not found by name will autodetect
 _G.agController.slots.screen = agScreen -- if not found by name will autodetect
 _G.agController.slots.databank = databank -- if not found by name will autodetect
 
-local MIN_AG_ALTITUDE = 1000 --export: Min altitude to allow setting on anti-grav (m), raise this if you don't want a non-default lower limit.
-local MIN_AG_G = 0.1 --export: Below this value of g no altitude or vertical velocity will be reported.
+local agMinAltitude = 1000 --export: Min altitude to allow setting on anti-grav (m), raise this if you don't want a non-default lower limit.
+local agMinG = 0.1 --export: Below this value of g no altitude or vertical velocity will be reported.
 
 -----------------------
 -- End Configuration --
@@ -90,6 +90,14 @@ unit.hide()
 local core = _G.agController.slots.core
 local antigrav = _G.agController.slots.antigrav
 local databank = _G.agController.slots.databank
+
+-- load preferences, either from databank or exported parameters
+local AG_UPDATE_FREQUENCY_KEY = "AG.unit:UPDATE_FREQUENCY"
+local AG_UPDATE_FREQUENCY = _G.Utilities.getPreference(databank, AG_UPDATE_FREQUENCY_KEY, agUpdateFrequency)
+local MIN_AG_ALTITUDE_KEY = "AG.unit:MIN_AG_ALTITUDE"
+local MIN_AG_ALTITUDE = _G.Utilities.getPreference(databank, MIN_AG_ALTITUDE_KEY, agMinAltitude)
+local MIN_AG_G_KEY = "AG.unit:MIN_AG_G"
+local MIN_AG_G = _G.Utilities.getPreference(databank, MIN_AG_G_KEY, agMinG)
 
 local TARGET_ALTITUDE_KEY = "AntigravTargetAltitude"
 

@@ -156,6 +156,13 @@ function _G.TestAntigravityScreen:testSetAltitudeAdjust()
     modified = _G.agScreenController:setAltitudeAdjust(expected)
     lu.assertTrue(modified)
     lu.assertNotEquals(_G.agScreenController.altitudeAdjustment, expected)
+
+    -- raised maximum
+    expected = 1000000
+    _G.agScreenController.MAX_ADJUSTMENT_VALUE = expected
+    modified = _G.agScreenController:setAltitudeAdjust(expected)
+    lu.assertTrue(modified)
+    lu.assertEquals(_G.agScreenController.altitudeAdjustment, expected)
 end
 
 --- Verify mouseDown updates state properly.

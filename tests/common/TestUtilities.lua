@@ -348,4 +348,76 @@ function _G.TestUtilities.testFindFirstSlot()
     lu.assertEquals(actualSlot, "screen1")
 end
 
+--- Verify get preference handles overrides properly.
+function _G.TestUtilities.testGetPreference()
+    local databankMock = mockDatabankUnit:new(nil, 1)
+    local databank = databankMock:mockGetClosure()
+
+    local pref, key, result, expected
+
+    -- no databank, uses proveded default regardless
+    key = "key"
+    pref = 1
+    _G.Utilities.USE_PARAMETER_SETTINGS = true
+    result = _G.Utilities.getPreference(nil, key, pref)
+    lu.assertEquals(result, pref)
+
+    key = "key"
+    pref = "string"
+    _G.Utilities.USE_PARAMETER_SETTINGS = false
+    result = _G.Utilities.getPreference(nil, key, pref)
+    lu.assertEquals(result, pref)
+
+    -- databank but prefer provided
+    _G.Utilities.USE_PARAMETER_SETTINGS = true
+
+    key = "key"
+    databank.setIntValue(key, 2)
+    pref = 1
+    result = _G.Utilities.getPreference(databank, key, pref)
+    lu.assertEquals(result, pref)
+    lu.assertEquals(databank.getIntValue(key), pref)
+
+    key = "key"
+    databank.setIntValue(key, 1)
+    pref = true
+    result = _G.Utilities.getPreference(databank, key, pref)
+    lu.assertEquals(result, pref)
+    lu.assertEquals(databank.getIntValue(key) == 1, pref)
+
+    key = "key"
+    databank.setStringValue(key, "other value")
+    pref = "string"
+    result = _G.Utilities.getPreference(databank, key, pref)
+    lu.assertEquals(result, pref)
+    lu.assertEquals(databank.getStringValue(key), pref)
+
+    -- prefer databank
+    _G.Utilities.USE_PARAMETER_SETTINGS = false
+
+    key = "key"
+    expected = 2
+    databank.setIntValue(key, expected)
+    pref = 1
+    result = _G.Utilities.getPreference(databank, key, pref)
+    lu.assertEquals(result, expected)
+    lu.assertEquals(databank.getIntValue(key), expected)
+
+    key = "key"
+    expected = false
+    databank.setIntValue(key, 0)
+    pref = true
+    result = _G.Utilities.getPreference(databank, key, pref)
+    lu.assertEquals(result, expected)
+    lu.assertEquals(databank.getIntValue(key) == 0, pref)
+
+    key = "key"
+    expected = "other value"
+    databank.setStringValue(key, expected)
+    pref = "string"
+    result = _G.Utilities.getPreference(databank, key, pref)
+    lu.assertEquals(result, expected)
+    lu.assertEquals(databankMock.data[key], expected)
+end
+
 os.exit(lu.LuaUnit.run())

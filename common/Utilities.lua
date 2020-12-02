@@ -69,4 +69,49 @@ function _G.Utilities.findFirstSlot(slotClass, exclude)
     return nil, nil
 end
 
+local useParameterSettings = false --export: Toggle this on to override stored preferences with parameter-set values, otherwise will load from databank if available.
+-- can't export value from table, but would rather use it from the utilities object
+_G.Utilities.USE_PARAMETER_SETTINGS = useParameterSettings
+
+--- Returns the preferred preference value, storing that in the databank for future use if available. Type will be inferred from the default value provided.
+-- @param databank The databank to use for preferences.
+-- @tparam string key The databank preference key to look up/store to.
+-- @param defaultValue The value to use if the databank doesn't contain key.
+-- @return The preference value to use.
+function _G.Utilities.getPreference(databank, key, defaultValue)
+    local isBool = type(defaultValue) == "boolean"
+    local isNumber = type(defaultValue) == "number"
+    local prefValue
+
+    if databank then
+        if databank.hasKey(key) == 1 and not _G.Utilities.USE_PARAMETER_SETTINGS then
+            if isBool then
+                prefValue = databank.getIntValue(key) == 1
+            elseif isNumber then
+                prefValue = databank.getFloatValue(key)
+            else
+                prefValue = databank.getStringValue(key)
+            end
+        else
+            prefValue = defaultValue
+        end
+
+        if isBool then
+            local storeValue = 0
+            if prefValue then
+                storeValue = 1
+            end
+            databank.setIntValue(key, storeValue)
+        elseif isNumber then
+            databank.setFloatValue(key, tonumber(prefValue))
+        else
+            databank.setStringValue(key, prefValue)
+        end
+    else
+        prefValue = defaultValue
+    end
+
+    return prefValue
+end
+
 return _G.Utilities

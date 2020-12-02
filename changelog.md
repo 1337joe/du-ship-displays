@@ -1,3 +1,8 @@
+# General
+
+* ???
+  * Preferences stored to databank (if available), set useParameterSettings true to override from exported parameters.
+
 # Antigravity
 
 * ???
