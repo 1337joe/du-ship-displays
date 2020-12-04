@@ -5,6 +5,7 @@ package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
 
 local lu = require("luaunit")
 
+local mockCoreUnit = require("dumocks.CoreUnit")
 local mockScreenUnit = require("dumocks.ScreenUnit")
 local mockDatabankUnit = require("dumocks.DatabankUnit")
 local mockControlUnit = require("dumocks.ControlUnit")
@@ -346,6 +347,142 @@ function _G.TestUtilities.testFindFirstSlot()
     actual, actualSlot = _G.Utilities.findFirstSlot(screen1.getElementClass(), {screen2});
     lu.assertIs(actual, screen1)
     lu.assertEquals(actualSlot, "screen1")
+end
+
+--- Verify variations on loadSlot function properly with error reporting.
+function _G.TestUtilities.testLoadSlot()
+    -- create and link a few mocks to a control unit
+    local screenMock = mockScreenUnit:new(nil, 2)
+    local screen = screenMock:mockGetClosure()
+
+    local coreMock = mockCoreUnit:new(nil, 1)
+    local core = coreMock:mockGetClosure()
+
+    local databankMock = mockDatabankUnit:new(nil, 4)
+    local databank = databankMock:mockGetClosure()
+
+    local unitMock = mockControlUnit:new(nil, 5, "programming board")
+
+    unitMock.linkedElements["screenSlot"] = screen
+    unitMock.linkedElements["coreSlot"] = core
+    unitMock.linkedElements["dbSlot"] = databank
+
+    local populatedUnit = unitMock:mockGetClosure()
+    local emptyUnit = mockControlUnit:new(nil, 5, "programming board"):mockGetClosure()
+
+    local printOutput
+    _G.system = {
+        print = function(output)
+            printOutput = printOutput .. output .. "\n"
+        end
+    }
+
+    local provided, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage
+    local actual, errorMsg
+
+    moduleName = "antigrav"
+
+    ----------
+    -- test for screen - no error screen provided
+    ----------
+    targetClass = "ScreenUnit"
+    errorScreen = nil
+    mappedSlotName = "screen"
+    optional = nil
+    optionalMessage = nil
+    _G.unit = populatedUnit
+
+    -- provided correct link, no output
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(screen, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, screen)
+    lu.assertEquals(printOutput, "")
+
+    -- provided nil, automapping prints mapping result
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, screen)
+    lu.assertStrContains(printOutput, "Slot screenSlot mapped to antigrav screen.")
+
+    -- provided nil, automap not found
+    _G.unit = emptyUnit
+    errorMsg = "antigrav: screen link not found"
+    printOutput = ""
+    lu.assertErrorMsgContains(errorMsg, _G.Utilities.loadSlot, nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+
+    ----------
+    -- test for core - error screen provided
+    ----------
+    targetClass = "CoreUnitDynamic"
+    errorScreen = screen
+    mappedSlotName = "core"
+    optional = nil
+    optionalMessage = nil
+    _G.unit = populatedUnit
+
+    -- provided correct link, no output
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(core, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, core)
+    lu.assertEquals(printOutput, "")
+
+    -- provided nil, automapping prints mapping result
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, core)
+    lu.assertStrContains(printOutput, "Slot coreSlot mapped to antigrav core.")
+
+    -- provided nil, automap not found
+    _G.unit = emptyUnit
+    errorMsg = "antigrav: core link not found"
+    printOutput = ""
+    lu.assertErrorMsgContains(errorMsg, _G.Utilities.loadSlot, nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    -- screen should also have message
+    lu.assertStrContains(screenMock.html, errorMsg)
+
+        ----------
+    -- test for databank - optional with error screen provided
+    ----------
+    targetClass = "DataBankUnit"
+    errorScreen = screen
+    mappedSlotName = "databank"
+    optional = true
+    optionalMessage = "No databank found, controller state will not persist between sessions."
+    _G.unit = populatedUnit
+
+    -- provided correct link, no output
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(databank, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, databank)
+    lu.assertEquals(printOutput, "")
+
+    -- provided nil, automapping prints mapping result
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, databank)
+    lu.assertStrContains(printOutput, "Slot dbSlot mapped to antigrav databank.")
+
+    -- provided nil, automap not found
+    _G.unit = emptyUnit
+    errorMsg = "antigrav: No databank found"
+    printOutput = ""
+    -- no error, but check for warning message
+    _G.Utilities.loadSlot(nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertStrContains(printOutput, errorMsg)
+
+    -- provided nil, automap not found, empty optionalMessage so no warning displayed
+    _G.unit = emptyUnit
+    optionalMessage = nil
+    printOutput = ""
+    _G.Utilities.loadSlot(nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertEquals(printOutput, "")
+
+    -- provided nil, automap not found, empty optionalMessage so no warning displayed
+    _G.unit = emptyUnit
+    optionalMessage = ""
+    printOutput = ""
+    _G.Utilities.loadSlot(nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertEquals(printOutput, "")
 end
 
 --- Verify get preference handles overrides properly.

@@ -29,60 +29,13 @@ local agMinG = 0.1 --export: Below this value of g no altitude or vertical veloc
 
 -- link missing slot inputs / validate provided slots
 local slots = _G.agController.slots
-local targetClass, class, slotName
-
-targetClass = "ScreenUnit"
-if not (slots.screen and type(slots.screen) == "table" and slots.screen.getElementClass) then
-    slots.screen, slotName = _G.Utilities.findFirstSlot(targetClass)
-    assert(slots.screen, "Screen link not found.")
-    system.print(string.format("Slot %s mapped to antigrav screen.", slotName))
-else
-    class = slots.screen.getElementClass()
-    assert(class == targetClass, "Screen slot is of type: " .. class)
-end
-
--- once screen is mapped use it for displaying errors
+local module = "antigrav"
+slots.screen = _G.Utilities.loadSlot(slots.screen, "ScreenUnit", nil, module, "screen")
 slots.screen.activate()
-local function testValid(valid, message)
-    if not valid then
-        slots.screen.setCenteredText(message)
-        error(message)
-    end
-end
-
-targetClass = "AntiGravityGeneratorUnit"
-if not (slots.antigrav and type(slots.antigrav) == "table" and slots.antigrav.getElementClass) then
-    slots.antigrav, slotName = _G.Utilities.findFirstSlot(targetClass)
-    testValid(slots.antigrav, "AntiGravity Generator link not found.")
-    system.print(string.format("Slot %s mapped to antigrav.", slotName))
-else
-    class = slots.antigrav.getElementClass()
-    testValid(class == targetClass, "AntiGravity Generator slot is of type: " .. class)
-end
-
-targetClass = "CoreUnitDynamic"
-if not (slots.core and type(slots.core) == "table" and slots.core.getElementClass) then
-    slots.core, slotName = _G.Utilities.findFirstSlot(targetClass)
-    testValid(slots.core, "Core Unit link not found.")
-    system.print(string.format("Slot %s mapped to core.", slotName))
-else
-    class = slots.core.getElementClass()
-    testValid(class == targetClass, "Core Unit slot is of type: " .. class)
-end
-
-targetClass = "DataBankUnit"
-if not (slots.databank and type(slots.databank) == "table" and slots.databank.getElementClass) then
-    slots.databank, slotName = _G.Utilities.findFirstSlot(targetClass)
-    -- optional, don't force to be set
-    if slots.databank then
-        system.print(string.format("Slot %s mapped to databank.", slotName))
-    else
-        system.print("No databank found, controller state will not persist between sessions.")
-    end
-else
-    class = slots.databank.getElementClass()
-    testValid(class == targetClass, "Databank slot is of type: " .. class)
-end
+slots.antigrav = _G.Utilities.loadSlot(slots.antigrav, "AntiGravityGeneratorUnit", slots.screen, module, "antigrav")
+slots.core = _G.Utilities.loadSlot(slots.core, "CoreUnitDynamic", slots.screen, module, "core")
+slots.databank = _G.Utilities.loadSlot(slots.databank, "DataBankUnit", slots.screen, module, "databank", true,
+                     "No databank found, controller state will not persist between sessions.")
 
 -- hide widgets
 unit.hide()

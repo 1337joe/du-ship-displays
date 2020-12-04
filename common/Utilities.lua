@@ -69,6 +69,49 @@ function _G.Utilities.findFirstSlot(slotClass, exclude)
     return nil, nil
 end
 
+-- Verifies the valid argument, if not true then it prints the provided message to the optional screen and to the programming board error log, halting execution.
+-- @param valid The condition to test, typically a boolean.
+-- @tparam string message The message to display on failure.
+-- @tparam ScreenUnit/ScreenSignUnit screen The optional screen for displaying the message on in case of failure.
+local function assertValid(valid, message, screen)
+    if not valid then
+        if screen and screen.setCenteredText and type(screen.setCenteredText) == "function" then
+            screen.setCenteredText(message)
+        end
+        error(message)
+    end
+end
+
+--- Attempts to verify the provided slot against the expected type, finding missing slot inputs in unit.
+-- @tparam Element provided A named slot that should fill the need for this type. May be nil.
+-- @tparam string targetClass The ElementClass to look for/validate against.
+-- @tparam ScreenUnit/ScreenSignUnit errorScreen A screen to display error messages to on failure.
+-- @tparam string moduleName The name of the module, to help disambiguate problems when multiple modules are run on the same controller.
+-- @tparam string mappedSlotName The internal name of the slot to indicate exactly what mapping failed.
+-- @tparam boolean optional True if this element is optional and should not produce an error on failure to map.
+-- @tparam string optionalMessage A message to print to the console on failure to map an optional element.
+function _G.Utilities.loadSlot(provided, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    local slotName
+
+    local typedSlot = provided
+    if not (typedSlot and type(typedSlot) == "table" and typedSlot.getElementClass) then
+        typedSlot, slotName = _G.Utilities.findFirstSlot(targetClass)
+        if not optional then
+            assertValid(typedSlot, string.format("%s: %s link not found.", moduleName, mappedSlotName), errorScreen)
+        end
+
+        if typedSlot then
+            system.print(string.format("Slot %s mapped to %s %s.", slotName, moduleName, mappedSlotName))
+        elseif optionalMessage and string.len(optionalMessage) > 0 then
+            system.print(string.format("%s: %s", moduleName, optionalMessage))
+        end
+    else
+        local class = typedSlot.getElementClass()
+        assertValid(class == targetClass, string.format("%s %s slot is of type: %s", moduleName, mappedSlotName, class), errorScreen)
+    end
+    return typedSlot
+end
+
 local useParameterSettings = false --export: Toggle this on to override stored preferences with parameter-set values, otherwise will load from databank if available.
 -- can't export value from table, but would rather use it from the utilities object
 _G.Utilities.USE_PARAMETER_SETTINGS = useParameterSettings
