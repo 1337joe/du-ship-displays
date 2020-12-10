@@ -18,7 +18,7 @@
         {"code":"${file:hp.unit.start.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
         {"code":"${code:_G.hpController:finishInitialize()}","filter":{"args":[${args: initHp}],"signature":"tick(timerId)","slotKey":"${slotKey:unit}"},"key":"${key}"},
         {"code":"${code:_G.hpController:updateState()}","filter":{"args":[${args: updateHp}],"signature":"tick(timerId)","slotKey":"${slotKey:unit}"},"key":"${key}"},
-        {"code":"${file:screen.start.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:hpScreen}"},"key":"${key}"},
+        {"code":"${file:hp.screen.start1.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:hpScreen}"},"key":"${key}"},
         {"code":"${code:_G.hpScreenController:refresh()}","filter":{"args":[],"signature":"update()","slotKey":"${slotKey:system}"},"key":"${key}"},
         {"code":"${code:_G.hpScreenController:mouseDown(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseDown(x,y)","slotKey":"${slotKey:hpScreen}"},"key":"${key}"},
         {"code":"${code:_G.hpScreenController:mouseUp(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseUp(x,y)","slotKey":"${slotKey:hpScreen}"},"key":"${key}"},

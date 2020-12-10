@@ -11,8 +11,9 @@ _G.hpController = {}
 -------------------------
 -- Begin Configuration --
 -------------------------
-local hpUpdateFrequency = 1 --export: Ship Health data/screen update rate (Hz)
-local hpShipName = "asdf" --export: Ship Name, if left empty will use id.
+local hpUpdateFrequency = 1 / 5 --export: Ship Health data/screen update rate (Hz)
+local SHIP_NAME_DEFAULT = "use_id"
+local hpShipName = "default" --export: Ship Name, if left "use_id" will use id.
 
 -- slot definitions
 _G.hpController.slots = {}
@@ -43,22 +44,37 @@ local databank = slots.databank
 -- load preferences, either from databank or exported parameters
 local HP_UPDATE_FREQUENCY_KEY = "HP.unit:UPDATE_FREQUENCY"
 local HP_UPDATE_FREQUENCY = _G.Utilities.getPreference(databank, HP_UPDATE_FREQUENCY_KEY, hpUpdateFrequency)
-local HP_SHIP_NAME_KEY = "HP.unit:SHIP_NAME"
-if string.len(hpShipName) == 0 then
-    hpShipName = core.getConstructId()
+local SHIP_NAME_KEY = "HP.unit:SHIP_NAME"
+if string.len(hpShipName) == 0 or hpShipName == SHIP_NAME_DEFAULT then
+    hpShipName = string.format("%d", core.getConstructId())
 end
-local SHIP_NAME = _G.Utilities.getPreference(databank, HP_SHIP_NAME_KEY, hpShipName)
+local SHIP_NAME = _G.Utilities.getPreference(databank, SHIP_NAME_KEY, hpShipName)
 
--- TODO controller-level keys?
+-- define controller-level keys
+local SELECTED_ELEMENT_KEY = "HP.unit:SELECTED_ELEMENT"
 
-local elementData = {}
-local elementMetadata = {}
+_G.hpController.elementData = {}
+_G.hpController.elementMetadata = {}
+_G.hpController.arrowOffsetDistance = 4
 
-local progressIndicatorIndex = 0
-local elementsBetweenBreaks = 5
 local initializationComplete = false
 local function loadElementData()
+    local INIT_TEMPLATE = [[<span style="font-family:Arial">Initializing<br>%d of %d loaded</span>]]
     local elementKeys = core.getElementIdList()
+    local elementsBetweenBreaks = 50
+
+    local coreMaxHp = core.getMaxHitPoints()
+    local centerOffset = 128
+    if coreMaxHp < 150 then
+        centerOffset = 16
+        _G.hpController.arrowOffsetDistance = 1
+    elseif coreMaxHp < 1100 then
+        centerOffset = 32
+        _G.hpController.arrowOffsetDistance = 1.5
+    elseif coreMaxHp < 10000 then
+        centerOffset = 64
+        _G.hpController.arrowOffsetDistance = 2
+    end
 
     local min = {}
     local max = {}
@@ -68,13 +84,16 @@ local function loadElementData()
     local pos, hp, mhp
     for index, key in pairs(elementKeys) do
         pos = core.getElementPositionById(key)
+        pos[1] = pos[1] - centerOffset
+        pos[2] = pos[2] - centerOffset
+        pos[3] = pos[3] - centerOffset
         mhp = core.getElementMaxHitPointsById(key)
         hp = core.getElementHitPointsById(key)
-        elementData[key] = {
+        _G.hpController.elementData[key] = {
             n = core.getElementNameById(key),
             t = core.getElementTypeById(key),
             p = pos,
-            -- r = core.getElementRotationById(key),
+            r = core.getElementRotationById(key),
             m = mhp,
             h = hp,
         }
@@ -98,6 +117,9 @@ local function loadElementData()
         if not max.z or pos[3] > max.z then
             max.z = pos[3]
         end
+        if not min.hp or mhp < min.hp then
+            min.hp = mhp
+        end
         if not max.hp or mhp > max.hp then
             max.hp = mhp
         end
@@ -106,25 +128,21 @@ local function loadElementData()
 
         if index % elementsBetweenBreaks == 0 then
             -- show progress
-            progressIndicatorIndex = progressIndicatorIndex + 1
-            screen.setCenteredText("Initializing" .. string.rep(".", progressIndicatorIndex % 4))
+            screen.setCenteredText(string.format(INIT_TEMPLATE, index, #elementKeys))
 
             coroutine.yield()
         end
     end
 
-    elementMetadata.min = min
-    elementMetadata.max = max
-    elementMetadata.totalHp = totalHp
-    elementMetadata.totalMaxHp = totalMaxHp
+    _G.hpController.elementMetadata.min = min
+    _G.hpController.elementMetadata.max = max
+    _G.hpController.elementMetadata.totalHp = totalHp
+    _G.hpController.elementMetadata.totalMaxHp = totalMaxHp
 
     initializationComplete = true
 end
 
 local initCoroutine = coroutine.create(loadElementData)
-
--- TODO define screen-level keys: filter selection, active panel, zoom level
--- local TARGET_ALTITUDE_KEY = "targetAltitude"
 
 -- declare methods
 local INIT_TIMER_KEY = "initHp"
@@ -139,19 +157,15 @@ function _G.hpController:finishInitialize()
         unit.stopTimer(INIT_TIMER_KEY)
     end
 
-    system.print("X: " .. elementMetadata.min.x .. ", " .. elementMetadata.max.x)
-    system.print("Y: " .. elementMetadata.min.y .. ", " .. elementMetadata.max.y)
-    system.print("Z: " .. elementMetadata.min.z .. ", " .. elementMetadata.max.z)
-    system.print("Max HP: " .. elementMetadata.max.hp)
     -- init screen
-    -- _G.hpScreenController:init(_G.hpController)
+    _G.hpScreenController:init(_G.hpController)
 
     -- init stored values
-    -- if databank and databank.hasKey(TARGET_ALTITUDE_KEY) == 1 then
-    --     _G.agController:setBaseAltitude(databank.getFloatValue(TARGET_ALTITUDE_KEY))
-    -- else
-    --     _G.agController:setBaseAltitude(antigrav.getBaseAltitude())
-    -- end
+    if databank and databank.hasKey(SELECTED_ELEMENT_KEY) == 1 then
+        self:select(databank.getIntValue(SELECTED_ELEMENT_KEY))
+    else
+        self:select(nil)
+    end
 
     _G.hpController:updateState()
 
@@ -166,15 +180,66 @@ function _G.hpController:updateState()
     local hp
     for _, key in pairs(core.getElementIdList()) do
         hp = core.getElementHitPointsById(key)
-        elementData[key].h = hp
+        self.elementData[key].h = hp
         currentTotalHp = currentTotalHp + hp
-    end
-    elementMetadata.totalHp = currentTotalHp
 
-    local tempOutputTemplate = [[Ship Name: %s<br>Current Integrity: %.1f%%<br>Max HP: %d]]
-    screen.addText(0,0,10,string.format(tempOutputTemplate, SHIP_NAME, (100 * elementMetadata.totalHp / elementMetadata.totalMaxHp), elementMetadata.totalMaxHp))
+        if math.random() > 0.90 then
+            self:select(key)
+        end
+    end
+    self.elementMetadata.totalHp = currentTotalHp
+
     -- signal draw of screen with updated state
-    -- _G.hpScreenController.needRefresh = true
+    _G.hpScreenController.needRefresh = true
+end
+
+local stickerIds = {}
+--- Selects the provided elementId, or deselects the current element if provided nil or an unknown id.
+function _G.hpController:select(elementId)
+    -- clear existing stickers
+    for _, stickerId in pairs(stickerIds) do
+        core.deleteSticker(stickerId)
+    end
+
+    -- persist selection in case of restart of board
+    if databank then
+        databank.setIntValue(SELECTED_ELEMENT_KEY, elementId)
+    end
+
+    -- skip remaining if no valid element actually selected
+    if not self.elementData[elementId] then
+        return
+    end
+
+    local elementPos = self.elementData[elementId].p
+
+    -- draw arrows on element
+    -- TODO scale by mass of target instead of core size?
+    local offset = self.arrowOffsetDistance
+    stickerIds = {
+        core.spawnArrowSticker(elementPos[1] + offset, elementPos[2], elementPos[3], "north"),
+        core.spawnArrowSticker(elementPos[1] - offset, elementPos[2], elementPos[3], "south"),
+        core.spawnArrowSticker(elementPos[1], elementPos[2] + offset, elementPos[3], "west"),
+        core.spawnArrowSticker(elementPos[1], elementPos[2] - offset, elementPos[3], "east"),
+        core.spawnArrowSticker(elementPos[1], elementPos[2], elementPos[3] + offset, "down"),
+        core.spawnArrowSticker(elementPos[1], elementPos[2], elementPos[3] - offset, "up"),
+        core.spawnArrowSticker(elementPos[1] + offset * 2, elementPos[2], elementPos[3], "north"),
+        core.spawnArrowSticker(elementPos[1] - offset * 2, elementPos[2], elementPos[3], "south"),
+        core.spawnArrowSticker(elementPos[1], elementPos[2] + offset * 2, elementPos[3], "west"),
+        core.spawnArrowSticker(elementPos[1], elementPos[2] - offset * 2, elementPos[3], "east"),
+    }
+    -- rotate for visibility (so opposite arrows aren't in same plane and won't vanish at the same angle)
+    core.rotateSticker(stickerIds[1], 45, 90, 0)
+    core.rotateSticker(stickerIds[2], -45, -90, 0)
+    core.rotateSticker(stickerIds[3], -90, 0, -45)
+    core.rotateSticker(stickerIds[4], 90, 0, -45)
+    core.rotateSticker(stickerIds[5], 0, 0, 45)
+    core.rotateSticker(stickerIds[6], 180, 0, 45)
+    core.rotateSticker(stickerIds[7], -45, 90, 0)
+    core.rotateSticker(stickerIds[8], 45, -90, 0)
+    core.rotateSticker(stickerIds[9], -90, 0, 45)
+    core.rotateSticker(stickerIds[10], 90, 0, 45)
+
 end
 
 -- call repeatedly until finished
