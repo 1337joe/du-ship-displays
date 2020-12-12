@@ -12,7 +12,7 @@
   * Fix for current altitude displaying 0 when too far from planet but still within gravity well
   * Vertical velocity now is signed: positive for up, negative for down
 * 2020-11-18
-  * Added flush handling to quickly set base altitude to target altitude while AGG is turned off
+  * ~~Added flush handling to quickly set base altitude to target altitude while AGG is turned off~~ *Disabled in Beta 1 r0.23*
   * Added warning message to explain 0 power level
 * 2020-11-13
   * Changed target altitude databank key to match ButtonsHud for interoperability

@@ -23,13 +23,6 @@ local ELEMENT_CLASS_POWER_SLIDER = "powerSlideClass"
 
 local ALTITUDE_ADJUST_KEY = "altitudeAdjustment"
 
--- add SVG-specific fields
-_G.agScreenController.SVG_TEMPLATE = [[${file:ag.screen.basic.svg minify}]]
-_G.agScreenController.SVG_LOGO = [[${file:../logo.svg minify}]]
-
--- one-time transforms
-_G.agScreenController.SVG_TEMPLATE = string.gsub(_G.agScreenController.SVG_TEMPLATE, '<svg id="logo"/>', _G.agScreenController.SVG_LOGO)
-
 -- constant button definition labels
 _G.agScreenController.BUTTON_ALTITUDE_UP = "Altitude Up"
 _G.agScreenController.BUTTON_ALTITUDE_DOWN = "Altitude Down"
