@@ -14,6 +14,12 @@ function _G.ScreenUtils.replaceClass(html, find, replace)
     return string.gsub(html, "([\"%s])" .. find, "%1" .. replace)
 end
 
+--- Adds an additional value to a class attribute.
+function _G.ScreenUtils.addClass(html, find, add)
+    -- ensure preceeded by " or space
+    return string.gsub(html, "([\"%s]" .. find .. ")", "%1 " .. add)
+end
+
 --- Returns the button that intersects the provided coordinates or nil if none is found.
 -- @tparam table buttonCoordinates Table of "buttonLabel" => {x1, y1, x2, y2} or "buttonLabel" => {1={x1, y1, x2, y2}, 2={x1, y1, x2, y2}, ...}
 -- @tparam number x The x screen position to test.
@@ -44,6 +50,25 @@ function _G.ScreenUtils.detectButton(buttonCoordinates, x, y)
         end
     end
     return nil
+end
+
+--- Replaces the class for the currently moused-over button with the mouseoverClass
+-- @tparam table buttonCoordinates Table of "buttonLabel" => {x1, y1, x2, y2, class} or 
+--  "buttonLabel" => {1={x1, y1, x2, y2}, 2={x1, y1, x2, y2}, ..., class="elementClass"}
+-- @tparam number x The x screen position to test.
+-- @tparam number y The y screen position to test.
+-- @tparam string html The html document to update.
+-- @tparam string mouseoverClass The css class to replace the current button with.
+function _G.ScreenUtils.mouseoverButtons(buttonCoordinates, x, y, html, mouseoverClass)
+    local mouseover, index = _G.ScreenUtils.detectButton(buttonCoordinates, x, y)
+    -- nil doesn't concatenate nicely
+    index = index or ""
+
+    if mouseover then
+        local findClass = buttonCoordinates[mouseover].class .. index
+        return _G.ScreenUtils.replaceClass(html, findClass, mouseoverClass)
+    end
+    return html
 end
 
 return _G.ScreenUtils
