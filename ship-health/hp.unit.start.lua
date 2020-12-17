@@ -11,9 +11,9 @@ _G.hpController = {}
 -------------------------
 -- Begin Configuration --
 -------------------------
-local hpUpdateFrequency = 1 / 5 --export: Ship Health data/screen update rate (Hz)
+local hpUpdateRate = 0.5 --export: How often (in seconds) to update ship health data and refresh screen. Raise this number if running the script causes lower framerate.
 local SHIP_NAME_DEFAULT = "use_id"
-local hpShipName = "default" --export: Ship Name, if left "use_id" will use id.
+local hpShipName = "use_id" --export: Ship Name, if left "use_id" will use id.
 
 -- slot definitions
 _G.hpController.slots = {}
@@ -42,13 +42,13 @@ local screen = slots.screen
 local databank = slots.databank
 
 -- load preferences, either from databank or exported parameters
-local HP_UPDATE_FREQUENCY_KEY = "HP.unit:UPDATE_FREQUENCY"
-local HP_UPDATE_FREQUENCY = _G.Utilities.getPreference(databank, HP_UPDATE_FREQUENCY_KEY, hpUpdateFrequency)
+local HP_UPDATE_RATE_KEY = "HP.unit:UPDATE_RATE"
+local HP_UPDATE_RATE = _G.Utilities.getPreference(databank, HP_UPDATE_RATE_KEY, hpUpdateRate)
 local SHIP_NAME_KEY = "HP.unit:SHIP_NAME"
 if string.len(hpShipName) == 0 or hpShipName == SHIP_NAME_DEFAULT then
     hpShipName = string.format("%d", core.getConstructId())
 end
-local SHIP_NAME = _G.Utilities.getPreference(databank, SHIP_NAME_KEY, hpShipName)
+_G.hpController.shipName = _G.Utilities.getPreference(databank, SHIP_NAME_KEY, hpShipName)
 
 -- define controller-level keys
 local SELECTED_ELEMENT_KEY = "HP.unit:SELECTED_ELEMENT"
@@ -81,12 +81,14 @@ local function loadElementData()
     local totalHp = 0
     local totalMaxHp = 0
 
-    local pos, hp, mhp
+    local tPos, hp, mhp, pos
     for index, key in pairs(elementKeys) do
-        pos = core.getElementPositionById(key)
-        pos[1] = pos[1] - centerOffset
-        pos[2] = pos[2] - centerOffset
-        pos[3] = pos[3] - centerOffset
+        tPos = core.getElementPositionById(key)
+        pos = {}
+        pos.x = tPos[1] - centerOffset
+        pos.y = tPos[2] - centerOffset
+        pos.z = tPos[3] - centerOffset
+
         mhp = core.getElementMaxHitPointsById(key)
         hp = core.getElementHitPointsById(key)
         _G.hpController.elementData[key] = {
@@ -99,23 +101,23 @@ local function loadElementData()
         }
 
         -- track metadata
-        if not min.x or pos[1] < min.x then
-            min.x = pos[1]
+        if not min.x or pos.x < min.x then
+            min.x = pos.x
         end
-        if not max.x or pos[1] > max.x then
-            max.x = pos[1]
+        if not max.x or pos.x > max.x then
+            max.x = pos.x
         end
-        if not min.y or pos[2] < min.y then
-            min.y = pos[2]
+        if not min.y or pos.y < min.y then
+            min.y = pos.y
         end
-        if not max.y or pos[2] > max.y then
-            max.y = pos[2]
+        if not max.y or pos.y > max.y then
+            max.y = pos.y
         end
-        if not min.z or pos[3] < min.z then
-            min.z = pos[3]
+        if not min.z or pos.z < min.z then
+            min.z = pos.z
         end
-        if not max.z or pos[3] > max.z then
-            max.z = pos[3]
+        if not max.z or pos.z > max.z then
+            max.z = pos.z
         end
         if not min.hp or mhp < min.hp then
             min.hp = mhp
@@ -170,8 +172,11 @@ function _G.hpController:finishInitialize()
     _G.hpController:updateState()
 
     -- schedule updating
-    unit.setTimer("updateHp", 1 / HP_UPDATE_FREQUENCY)
+    unit.setTimer("updateHp", HP_UPDATE_RATE)
 end
+
+-- call repeatedly until finished
+unit.setTimer(INIT_TIMER_KEY, 0)
 
 function _G.hpController:updateState()
     -- TODO - determine if this needs to be in a background coroutine for large ships
@@ -183,11 +188,17 @@ function _G.hpController:updateState()
         self.elementData[key].h = hp
         currentTotalHp = currentTotalHp + hp
 
-        if math.random() > 0.90 then
+        -- TODO test code, remove
+        if math.random() > 0.9 then
             self:select(key)
         end
     end
     self.elementMetadata.totalHp = currentTotalHp
+
+    -- sync between users if someone else selects an element
+    if self.databank and self.databank.getIntValue(SELECTED_ELEMENT_KEY) ~= self.selectedElement then
+        self:select(self.databank.getIntValue(SELECTED_ELEMENT_KEY))
+    end
 
     -- signal draw of screen with updated state
     _G.hpScreenController.needRefresh = true
@@ -205,6 +216,7 @@ function _G.hpController:select(elementId)
     if databank then
         databank.setIntValue(SELECTED_ELEMENT_KEY, elementId)
     end
+    self.selectedElement = elementId
 
     -- skip remaining if no valid element actually selected
     if not self.elementData[elementId] then
@@ -217,16 +229,16 @@ function _G.hpController:select(elementId)
     -- TODO scale by mass of target instead of core size?
     local offset = self.arrowOffsetDistance
     stickerIds = {
-        core.spawnArrowSticker(elementPos[1] + offset, elementPos[2], elementPos[3], "north"),
-        core.spawnArrowSticker(elementPos[1] - offset, elementPos[2], elementPos[3], "south"),
-        core.spawnArrowSticker(elementPos[1], elementPos[2] + offset, elementPos[3], "west"),
-        core.spawnArrowSticker(elementPos[1], elementPos[2] - offset, elementPos[3], "east"),
-        core.spawnArrowSticker(elementPos[1], elementPos[2], elementPos[3] + offset, "down"),
-        core.spawnArrowSticker(elementPos[1], elementPos[2], elementPos[3] - offset, "up"),
-        core.spawnArrowSticker(elementPos[1] + offset * 2, elementPos[2], elementPos[3], "north"),
-        core.spawnArrowSticker(elementPos[1] - offset * 2, elementPos[2], elementPos[3], "south"),
-        core.spawnArrowSticker(elementPos[1], elementPos[2] + offset * 2, elementPos[3], "west"),
-        core.spawnArrowSticker(elementPos[1], elementPos[2] - offset * 2, elementPos[3], "east"),
+        core.spawnArrowSticker(elementPos.x + offset, elementPos.y, elementPos.z, "north"),
+        core.spawnArrowSticker(elementPos.x - offset, elementPos.y, elementPos.z, "south"),
+        core.spawnArrowSticker(elementPos.x, elementPos.y + offset, elementPos.z, "west"),
+        core.spawnArrowSticker(elementPos.x, elementPos.y - offset, elementPos.z, "east"),
+        core.spawnArrowSticker(elementPos.x, elementPos.y, elementPos.z + offset, "down"),
+        core.spawnArrowSticker(elementPos.x, elementPos.y, elementPos.z - offset, "up"),
+        core.spawnArrowSticker(elementPos.x + offset * 2, elementPos.y, elementPos.z, "north"),
+        core.spawnArrowSticker(elementPos.x - offset * 2, elementPos.y, elementPos.z, "south"),
+        core.spawnArrowSticker(elementPos.x, elementPos.y + offset * 2, elementPos.z, "west"),
+        core.spawnArrowSticker(elementPos.x, elementPos.y - offset * 2, elementPos.z, "east"),
     }
     -- rotate for visibility (so opposite arrows aren't in same plane and won't vanish at the same angle)
     core.rotateSticker(stickerIds[1], 45, 90, 0)
@@ -241,6 +253,3 @@ function _G.hpController:select(elementId)
     core.rotateSticker(stickerIds[10], 90, 0, 45)
 
 end
-
--- call repeatedly until finished
-unit.setTimer(INIT_TIMER_KEY, 0)

@@ -5,28 +5,28 @@
             font-family: arial;
             font-weight: normal;
         }
-		.header text {
-			font-size:108px;
-			font-weight:bold;
-		}
+        .header text {
+            font-size:108px;
+            font-weight:bold;
+        }
         .hidden {
             display: none;
         }
-		.broken {
-			fill: #ff1300 !important;
-			stop-color: #ff1300;
-		}
-		.damaged {
-			fill: #ffd700 !important;
-			stop-color: #ffd700;
-		}
-		.healthy, .titleColorClass { <!-- TODO remove titleColorClass when hooked to script -->
-			fill: #00c322 !important;
-			stop-color: #00c322;
-		}
-		#sidebar, #tabs{
-			text-anchor: middle;
-		}
+        .broken {
+            fill: #ff1300 !important;
+            stop-color: #ff1300;
+        }
+        .damaged {
+            fill: #ffd700 !important;
+            stop-color: #ffd700;
+        }
+        .healthy, .titleColor {
+            fill: #00c322 !important;
+            stop-color: #00c322;
+        }
+        #sidebar, #tabs{
+            text-anchor: middle;
+        }
         .majorLabel {
             font-size: 100px;
             fill: #777777;
@@ -37,40 +37,40 @@
         }
         .majorValue {
             font-size: 125px;
-			fill: #ffffff;
+            fill: #ffffff;
         }
         .minorValue {
             font-size: 75px;
             fill: #aaaaaa;
         }
-		#filters use {
-			stroke: #777777;
-			stroke-width: 5px;
-		}
-		#filters text {
-			font-size: 75px;
-			fill: #777777;
-			stroke-width: 2px;
-			stroke: #000000;
-		}
-		#filters .selected use, #tabs .selected use {
-			stroke: #ffffff;
-		}
-		#filters .selected text, #tabs .selected text {
-			fill: #ffffff;
-		}
-		#tabs text {
+        #filters use {
+            stroke: #777777;
+            stroke-width: 5px;
+        }
+        #filters text {
+            font-size: 75px;
+            fill: #777777;
+            stroke-width: 2px;
+            stroke: #000000;
+        }
+        #filters .selected use, #tabs .selected use {
+            stroke: #ffffff;
+        }
+        #filters .selected text, #tabs .selected text {
+            fill: #ffffff;
+        }
+        #tabs text {
             font-size: 60px;
             fill: #777777;
-		}
-		#tabs use {
-			stroke: #777777;
-			stroke-width: 5px;
-		}
-		#tabs rect {
-			stroke: #ffffff;
-			stroke-width: 5px;
-		}
+        }
+        #tabs use {
+            stroke: #777777;
+            stroke-width: 5px;
+        }
+        #tabs rect {
+            stroke: #ffffff;
+            stroke-width: 5px;
+        }
         .indicator {
             stroke: #000000;
             stroke-width: 3;
@@ -82,72 +82,66 @@
             stroke: #5dd572 !important;
             stroke-width: 10px;
         }
-		#filters .mouseOver use {
+        #filters .mouseOver use {
             stroke: #5dd572 !important;
             stroke-width: 10px;
-		}
+        }
     </style>
     <defs>
         <svg id="logo"/>
-		<svg id="shipTop"/>
-		<svg id="shipSide"/>
-		<svg id="shipFront"/>
-		<rect id="filterButton" x="-182" y="-44" width="364" height="88" rx="20" />
-		<path id="tabSweep" d="m -130,7 c 50,0 20,-59 70,-59 l 120,0 c 50,0 20,59 70,59" />
+        <svg id="tabContents"/>
+        <rect id="filterButton" x="-182" y="-44" width="364" height="88" rx="20" />
+        <path id="tabSweep" d="m -130,7 c 50,0 20,-59 70,-59 l 120,0 c 50,0 20,59 70,59" />
         <linearGradient id="titleGradient">
             <stop offset="0%" stop-color="#000000" />
-            <stop offset="100%" class="titleColorClass" />
+            <stop offset="100%" class="titleColor" />
         </linearGradient>
     </defs>
     <rect x="0" y="0" fill="#000000" width="1920" height="1080" />
-	<g id="sidebar">
-		<text x="384" y="216" class="majorValue">%s</text>
-		<text x="384" y="324" class="majorLabel">Overall Health</text>
-		<text x="384" y="405" text-anchor="end" class="label">Element:</text>
-		<text x="384" y="405" text-anchor="start" class="minorValue elementHealthClass">%s <tspan class="units">%</tspan></text>
-		<text x="384" y="486" text-anchor="end" class="label">Voxel:</text>
-		<text x="384" y="486" text-anchor="start" class="minorValue voxelHealthClass">%s <tspan class="units">%</tspan></text>
-		<text x="384" y="648" class="majorLabel">Filters</text>
-		<g id="filters">
-			<g class="flightFilterClass selected">
-				<use xlink:href="#filterButton" x="192" y="702" />
-				<text x="192" y="725">Flight</text>
-			</g>
-			<g class="propulsionFilterClass">
-				<use xlink:href="#filterButton" x="192" y="810" />
-				<text x="192" y="833">Propulsion</text>
-			</g>
-			<g class="industryFilterClass">
-				<use xlink:href="#filterButton" x="192" y="918" />
-				<text x="192" y="941">Industry</text>
-			</g>
-		</g>
-	</g>
-	<g id="display">
-		<g id="tabs">
-			<g class="selected">
-				<use xlink:href="#tabSweep" x="960" y="182" />
-				<text x="960" y="182">Table</text>
-			</g>
-			<g>
-				<use xlink:href="#tabSweep" x="1216" y="182" />
-				<text x="1216" y="182">Top</text>
-			</g>
-			<g>
-				<use xlink:href="#tabSweep" x="1472" y="182" />
-				<text x="1472" y="182">Side</text>
-			</g>
-			<g>
-				<use xlink:href="#tabSweep" x="1728" y="182" />
-				<text x="1728" y="182">Front</text>
-			</g>
-			<rect x="768" y="189" width="1152" height="891" />
-		</g>
-		<svg x="771" y="192" viewbox="0 0 1146 885">
-			<rect width="1146" height="885" fill="blue" />
-		</svg>
-		<text x="1146" y="100" text-anchor="end">Slice</text>
-	</g>
+    <g id="sidebar">
+        <text x="384" y="216" class="majorValue">%s</text>
+        <text x="384" y="324" class="majorLabel">Overall Health</text>
+        <text x="384" y="405" text-anchor="end" class="label">Element:</text>
+        <text x="384" y="405" text-anchor="start" class="minorValue elementHealthClass">%s <tspan class="units">%</tspan></text>
+<!--        <text x="384" y="648" class="majorLabel">Filters</text>
+        <g id="filters">
+            <g class="flightFilterClass selected">
+                <use xlink:href="#filterButton" x="192" y="702" />
+                <text x="192" y="725">Flight</text>
+            </g>
+            <g class="propulsionFilterClass">
+                <use xlink:href="#filterButton" x="192" y="810" />
+                <text x="192" y="833">Propulsion</text>
+            </g>
+            <g class="industryFilterClass">
+                <use xlink:href="#filterButton" x="192" y="918" />
+                <text x="192" y="941">Industry</text>
+            </g>
+        </g> -->
+    </g>
+    <g id="display">
+        <g id="tabs">
+            <g class="tableClass">
+                <use xlink:href="#tabSweep" x="960" y="182" />
+                <text x="960" y="182">Table</text>
+            </g>
+            <g class="topClass">
+                <use xlink:href="#tabSweep" x="1216" y="182" />
+                <text x="1216" y="182">Top</text>
+            </g>
+            <g class="sideClass">
+                <use xlink:href="#tabSweep" x="1472" y="182" />
+                <text x="1472" y="182">Side</text>
+            </g>
+            <g class="frontClass">
+                <use xlink:href="#tabSweep" x="1728" y="182" />
+                <text x="1728" y="182">Front</text>
+            </g>
+            <rect x="768" y="189" width="1152" height="891" />
+            <use xlink:href="#tabContents" x="771" y="192" width="1146" height="885" />
+        </g>
+        <text x="1146" y="100" text-anchor="end">Slice</text>
+    </g>
     <g class="header">
         <rect x="0" y="0" fill="url('#titleGradient')" width="1920" height="108" />
         <use xlink:href="#logo" x="4" y="4" width="178" height="100" />
