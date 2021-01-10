@@ -1,5 +1,10 @@
 --- Run first, define agScreenController basic functionality: SVG-specific definitions and functions are not included.
 
+-- Guard to keep this module from reinitializing any time the start event fires.
+if _G.hpScreenController then
+    return
+end
+
 -- constants and editable lua script parameters
 
 local SELECTED_TAB_KEY = "HP.screen:SELECTED_TAB"
@@ -159,20 +164,19 @@ function _G.hpScreenController:refresh()
         return
     end
 
-    -- -- update mouse position for tracking drags
-    -- self.mouse.x = self.screen.getMouseX()
-    -- self.mouse.y = self.screen.getMouseY()
-    -- self.mouse.state = self.screen.getMouseState() == 1
-    -- -- if mouse has left screen remove pressed flag
-    -- if self.mouse.x < 0 then
-    --     self.mouse.pressed = nil
-    -- end
+    -- update mouse position for tracking drags
+    self.mouse.x = self.screen.getMouseX()
+    self.mouse.y = self.screen.getMouseY()
+    self.mouse.state = self.screen.getMouseState() == 1
+    -- if mouse has left screen remove pressed flag
+    if self.mouse.x < 0 then
+        self.mouse.pressed = nil
+    end
 
-    -- local mouseOver = _G.ScreenUtils.detectButton(self.buttonCoordinates, self.mouse.x, self.mouse.y)
+    local mouseOver = _G.ScreenUtils.detectButton(self.buttonCoordinates, self.mouse.x, self.mouse.y)
 
     -- refresh conditions: needRefresh, mouse-over state changed
-    --or self.mouse.over ~= mouseOver
-    if not (self.needRefresh ) then
+    if not (self.needRefresh or self.mouse.over ~= mouseOver) then
         return
     end
     self.needRefresh = false
@@ -210,18 +214,23 @@ function _G.hpScreenController:refresh()
         if self.selectedTab == 2 then
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_TOP_CLASS, SELECTED_CLASS)
         elseif self.selectedTab == 3 then
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_SIDE_CLASS, SELECTED_CLASS)
             tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData, self.controller.selectedElement)
         elseif self.selectedTab == 4 then
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_FRONT_CLASS, SELECTED_CLASS)
             tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData, self.controller.selectedElement)
         end
+
+        -- TODO extract constants: width, height
+        tabContents = string.gsub(tabContents, "(<svg.-)>", string.format([[%%1 width="%f" height="%f">]], 1152, 891))
+
     end
     html = string.gsub(html, TAB_CONTENTS_TAG, tabContents)
 
-    -- TODO has performance problems, only with large ships?
     -- add mouse-over highlights
-    -- if not self.mouse.pressed then
-    --     html = _G.ScreenUtils.mouseoverButtons(self.buttonCoordinates, self.mouse.x, self.mouse.y, html, MOUSE_OVER_CLASS)
-    -- end
+    if not self.mouse.pressed then
+        html = _G.ScreenUtils.mouseoverButtons(self.buttonCoordinates, self.mouse.x, self.mouse.y, html, MOUSE_OVER_CLASS)
+    end
 
     self.screen.setHTML(html)
 end
@@ -246,7 +255,7 @@ end
 
 local CLOUD_REPLACE_TARGET = [[<g id="pointCloud"%s*/>]]
 local DEFAULT_OUTLINE = [[
-<svg id="tabContents" viewBox="%f %f %f %f" scaleMultiplier="%d">
+<svg viewBox="%f %f %f %f" scaleMultiplier="%d">
     <style>
     circle {
         stroke: black;
@@ -321,6 +330,16 @@ function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXF
     return outline, elementList
 end
 
+local function addPoint(point, hp, maxHp, broken, damaged, healthy)
+    if hp == 0 then
+        broken[#broken + 1] = point
+    elseif hp < maxHp then
+        damaged[#damaged + 1] = point
+    else
+        healthy[#healthy + 1] = point
+    end
+end
+
 function _G.updateCloud(outline, points, elementData, selectedId)
     -- if not initialized
     if not outline or not points then
@@ -333,19 +352,17 @@ function _G.updateCloud(outline, points, elementData, selectedId)
 
     local hp, maxHp
     for id, point in pairs(points) do
-        if id == selectedId then
-            point = string.gsub(point, ">", [[ class="selected">]])
-        end
-
         hp = elementData[id].h
         maxHp = elementData[id].m
-        if hp == 0 then
-            broken[#broken + 1] = point
-        elseif hp < maxHp then
-            damaged[#damaged + 1] = point
-        else
-            healthy[#healthy + 1] = point
-        end
+        addPoint(point, hp, maxHp, broken, damaged, healthy)
+    end
+
+    -- add selected point to end of type - places on top of similarly (un)damaged elements
+    if points[selectedId] then
+        local point = string.gsub(points[selectedId], "/>", [[ class="selected"/>]])
+        hp = elementData[selectedId].h
+        maxHp = elementData[selectedId].m
+        addPoint(point, hp, maxHp, broken, damaged, healthy)
     end
 
     local brokenGroup = string.format(HEALTH_GROUP_TEMPLATE, BROKEN_CLASS, table.concat(broken, ""))
