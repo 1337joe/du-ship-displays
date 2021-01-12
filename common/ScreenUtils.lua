@@ -53,8 +53,9 @@ function _G.ScreenUtils.detectButton(buttonCoordinates, x, y)
 end
 
 --- Replaces the class for the currently moused-over button with the mouseoverClass
--- @tparam table buttonCoordinates Table of "buttonLabel" => {x1, y1, x2, y2, class} or 
---  "buttonLabel" => {1={x1, y1, x2, y2}, 2={x1, y1, x2, y2}, ..., class="elementClass"}
+-- @tparam table buttonCoordinates Table of "buttonLabel" => {x1, y1, x2, y2, class} or
+--  "buttonLabel" => {1={x1, y1, x2, y2}, 2={x1, y1, x2, y2}, ..., class="elementClass"} or
+--  "buttonLabel" => {x1, y1, x2, y2, {class1, class2, ...}}
 -- @tparam number x The x screen position to test.
 -- @tparam number y The y screen position to test.
 -- @tparam string html The html document to update.
@@ -65,8 +66,16 @@ function _G.ScreenUtils.mouseoverButtons(buttonCoordinates, x, y, html, mouseove
     index = index or ""
 
     if mouseover then
-        local findClass = buttonCoordinates[mouseover].class .. index
-        return _G.ScreenUtils.replaceClass(html, findClass, mouseoverClass)
+        if type(buttonCoordinates[mouseover].class) == "table" then
+            local newHtml = html
+            for _,findClass in pairs(buttonCoordinates[mouseover].class) do
+                newHtml = _G.ScreenUtils.replaceClass(newHtml, findClass, mouseoverClass)
+            end
+            return newHtml
+        else
+            local findClass = buttonCoordinates[mouseover].class .. index
+            return _G.ScreenUtils.replaceClass(html, findClass, mouseoverClass)
+        end
     end
     return html
 end

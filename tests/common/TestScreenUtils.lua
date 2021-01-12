@@ -172,6 +172,7 @@ end
 function _G.TestScreenUtils.testMouseoverButtons()
     local BUTTON_ALTITUDE_UP = "Altitude Up"
     local BUTTON_ALTITUDE_ADJUST_UP = "Altitude Adjust Up"
+    local BUTTON_MINMAX = "Min/Max"
 
     local buttonCoordinates = {}
     buttonCoordinates[BUTTON_ALTITUDE_UP] = {
@@ -196,6 +197,14 @@ function _G.TestScreenUtils.testMouseoverButtons()
         },
         class = "adjustUpClass"
     }
+    buttonCoordinates[BUTTON_MINMAX] =
+        {
+            x1 = 0.9,
+            x2 = 1.0,
+            y1 = 0.9,
+            y2 = 1.0,
+            class = {"maximizeClass", "minimizeClass"}
+        }
 
     local expectedHtml, actualHtml
     local htmlIn = [[
@@ -274,6 +283,23 @@ function _G.TestScreenUtils.testMouseoverButtons()
     </g>
     ]]
     actualHtml = _G.ScreenUtils.mouseoverButtons(buttonCoordinates, 0.325, 0.725, htmlIn, mouseover)
+    lu.assertEquals(actualHtml, expectedHtml)
+
+    -- multiclass
+    htmlIn = [[
+    <g class="cloudButtonBar">
+        <use xlink:href="#maximizeButton" class="maximizeClass" x="1866" y="1026" />
+        <use xlink:href="#minimizeButton" class="minimizeClass" x="1866" y="1026" />
+    </g>
+    ]]
+
+    expectedHtml = [[
+    <g class="cloudButtonBar">
+        <use xlink:href="#maximizeButton" class="mouseover" x="1866" y="1026" />
+        <use xlink:href="#minimizeButton" class="mouseover" x="1866" y="1026" />
+    </g>
+    ]]
+    actualHtml = _G.ScreenUtils.mouseoverButtons(buttonCoordinates, 0.95, 0.95, htmlIn, mouseover)
     lu.assertEquals(actualHtml, expectedHtml)
 end
 
