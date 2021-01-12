@@ -9,7 +9,7 @@
             font-size:108px;
             font-weight:bold;
         }
-        .hidden {
+        .hidden, .maximizedHidden {
             display: none;
         }
         .broken {
@@ -63,7 +63,7 @@
             font-size: 60px;
             fill: #777777;
         }
-        #tabs use {
+        #tabs use, .cloudButtonBar use {
             stroke: #777777;
             stroke-width: 5px;
         }
@@ -91,12 +91,21 @@
         <svg id="logo"/>
         <rect id="filterButton" x="-182" y="-44" width="364" height="88" rx="20" />
         <path id="tabSweep" d="m -130,7 c 50,0 20,-59 70,-59 l 120,0 c 50,0 20,59 70,59" />
+        <path id="maximizeButton" d="M 45,15 l 0,30 -30,0 m -30,0 l -30,0 0,-30 m 0,-30 l 0,-30 30,0 m 30,0 l 30,0 0,30 m 0,30 M 45,45 l -30,-30 m -30,-30 l -30,-30 m 90,0 l -30,30 m -30,30 l -30,30" />
+        <path id="minimizeButton" d="M 45,15 l -30,0 0,30 m -30,0 l 0,-30 -30,0 m 0,-30 l 30,0 0,-30 m 30,0 l 0,30 30,0 m 0,30 M 45,45 l -30,-30 m -30,-30 l -30,-30 m 90,0 l -30,30 m -30,30 l -30,30" />
+        <path id="stretchButton" d="M 0,40 l 0,-80 M 15,0 l 30,0 m -15,-15 l 15,15 -15,15 M -15,0 l -30,0 m 15,-15 l -15,15 15,15" />
+        <path id="preserveButton" d="M 0,40 l 0,-80 M -45,0 l 30,0 m -15,-15 l 15,15 -15,15 M 45,0 l -30,0 m 15,-15 l -15,15 15,15" />
         <linearGradient id="titleGradient">
             <stop offset="0%" stop-color="#000000" />
             <stop offset="100%" class="titleColor" />
         </linearGradient>
     </defs>
     <rect x="0" y="0" fill="#000000" width="1920" height="1080" />
+    <g class="header">
+        <rect x="0" y="0" fill="url('#titleGradient')" width="1920" height="108" />
+        <use xlink:href="#logo" x="4" y="4" width="178" height="100" />
+        <text x="1920" y="108" text-anchor="end">SHIP HEALTH</text>
+    </g>
     <g id="sidebar">
         <text x="384" y="216" class="majorValue">%s</text>
         <text x="384" y="324" class="majorLabel">Overall Health</text>
@@ -118,35 +127,37 @@
             </g>
         </g> -->
     </g>
-    <g id="display">
-        <g id="tabs">
-            <g class="tableClass">
-                <use xlink:href="#tabSweep" x="960" y="182" />
-                <text x="960" y="182">Table</text>
-            </g>
-            <g class="topClass">
-                <use xlink:href="#tabSweep" x="1216" y="182" />
-                <text x="1216" y="182">Top</text>
-            </g>
-            <g class="sideClass">
-                <use xlink:href="#tabSweep" x="1472" y="182" />
-                <text x="1472" y="182">Side</text>
-            </g>
-            <g class="frontClass">
-                <use xlink:href="#tabSweep" x="1728" y="182" />
-                <text x="1728" y="182">Front</text>
-            </g>
-            <rect x="768" y="189" width="1152" height="891" />
-            <g transform="translate(768,189)">
-                <svg id="tabContents"/>
-            </g>
+    <g id="tabs">
+        <g class="tableClass">
+            <use xlink:href="#tabSweep" x="960" y="182" />
+            <text x="960" y="182">Table</text>
         </g>
-        <text x="1146" y="100" text-anchor="end">Slice</text>
+        <g class="topClass">
+            <use xlink:href="#tabSweep" x="1216" y="182" />
+            <text x="1216" y="182">Top</text>
+        </g>
+        <g class="sideClass">
+            <use xlink:href="#tabSweep" x="1472" y="182" />
+            <text x="1472" y="182">Side</text>
+        </g>
+        <g class="frontClass">
+            <use xlink:href="#tabSweep" x="1728" y="182" />
+            <text x="1728" y="182">Front</text>
+        </g>
+        <rect x="768" y="189" width="1152" height="891" />
     </g>
-    <g class="header">
-        <rect x="0" y="0" fill="url('#titleGradient')" width="1920" height="108" />
-        <use xlink:href="#logo" x="4" y="4" width="178" height="100" />
-        <text x="1920" y="108" text-anchor="end">SHIP HEALTH</text>
+    <g transform="translate(768,189)">
+        <svg id="tabContents"/>
+    </g>
+    <g class="maximizedHidden">
+        <rect x="0" y="0" fill="#000000" width="1920" height="1080" />
+        <svg id="maximizedContents"/>
+    </g>
+    <g class="cloudButtonBar">
+        <use xlink:href="#maximizeButton" class="maximizeClass" x="1866" y="1026" />
+        <use xlink:href="#minimizeButton" class="minimizeClass" x="1866" y="1026" />
+        <use xlink:href="#stretchButton" class="stretchClass" x="1758" y="1026" />
+        <use xlink:href="#preserveButton" class="preserveClass" x="1758" y="1026" />
     </g>
     <g id="overlay grid" style="opacity=0.5;">
         <g id="10% grid" style="stroke-width:1px;stroke:#444444;">

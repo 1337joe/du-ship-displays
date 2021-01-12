@@ -9,20 +9,35 @@ end
 
 local SELECTED_TAB_KEY = "HP.screen:SELECTED_TAB"
 local SELECTED_TAB_DEFAULT = 1
+local STRECH_CLOUD_KEY = "HP.screen:STRETCH_CLOUD"
+local STRETCH_CLOUD_DEFAULT = false
+local MAXIMIZE_CLOUD_KEY = "HP.screen:MAXIMIZE_CLOUD"
+local MAXIMIZE_CLOUD_DEFAULT = false
 
 -- constants for svg file
 local HEALTHY_CLASS = "healthy"
 local DAMAGED_CLASS = "damaged"
 local BROKEN_CLASS = "broken"
 local SELECTED_CLASS = "selected"
+local HIDDEN_CLASS = "hidden"
 local MOUSE_OVER_CLASS = "mouseOver"
 local ELEMENT_TITLE_COLOR_CLASS = "titleColor"
 local ELEMENT_TABLE_CLASS = "tableClass"
 local ELEMENT_TOP_CLASS = "topClass"
 local ELEMENT_SIDE_CLASS = "sideClass"
 local ELEMENT_FRONT_CLASS = "frontClass"
+local ELEMENT_CLOUD_BUTTONS = "cloudButtonBar"
+local ELEMENT_CLOUD_STRETCH = "stretchClass"
+local ELEMENT_CLOUD_PRESERVE = "preserveClass"
+local ELEMENT_CLOUD_MAXIMIZE = "maximizeClass"
+local ELEMENT_CLOUD_MINIMIZE = "minimizeClass"
+local ELEMENT_MAXIMIZED_HIDDEN = "maximizedHidden"
+
+local TAB_CONTENTS_WIDTH = 1152
+local TAB_CONTENTS_HEIGHT = 891
 
 local TAB_CONTENTS_TAG = [[<svg id="tabContents"/>]]
+local MAXIMIZED_CONTENTS_TAG = [[<svg id="maximizedContents"/>]]
 
 -- initialize object and fields
 _G.hpScreenController = {
@@ -41,6 +56,8 @@ _G.hpScreenController.BUTTON_TAB_TABLE = "Tab: Table"
 _G.hpScreenController.BUTTON_TAB_TOP = "Tab: Top"
 _G.hpScreenController.BUTTON_TAB_SIDE = "Tab: Side"
 _G.hpScreenController.BUTTON_TAB_FRONT = "Tab: Front"
+_G.hpScreenController.BUTTON_STRETCH_CLOUD = "Cloud: Stretch"
+_G.hpScreenController.BUTTON_MAXIMIZE_CLOUD = "Cloud: Maximize"
 
 -- add SVG-specific fields
 _G.hpScreenController.SVG_TEMPLATE = [[${file:hp.screen.basic.svg}]]
@@ -71,6 +88,16 @@ buttonCoordinates[_G.hpScreenController.BUTTON_TAB_FRONT] = {
     y1 = 0.1, y2 = 0.169,
     class = ELEMENT_FRONT_CLASS
 }
+buttonCoordinates[_G.hpScreenController.BUTTON_STRETCH_CLOUD] = {
+    x1 = 0.8875, x2 = 0.94375,
+    y1 = 0.9, y2 = 1.0,
+    class = {ELEMENT_CLOUD_STRETCH, ELEMENT_CLOUD_PRESERVE}
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_MAXIMIZE_CLOUD] = {
+    x1 = 0.94375, x2 = 1.0,
+    y1 = 0.9, y2 = 1.0,
+    class = {ELEMENT_CLOUD_MAXIMIZE, ELEMENT_CLOUD_MINIMIZE}
+}
 -- save to controller for press/release event handling
 _G.hpScreenController.buttonCoordinates = buttonCoordinates
 
@@ -84,6 +111,17 @@ function _G.hpScreenController:init(controller)
     else
         self:setSelectedTab(SELECTED_TAB_DEFAULT)
     end
+    if self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) == 1 then
+        self.stretchCloud = self.databank.getIntValue(STRECH_CLOUD_KEY) == 1
+    else
+        self.stretchCloud = STRETCH_CLOUD_DEFAULT
+    end
+    if self.databank and self.databank.hasKey(MAXIMIZE_CLOUD_KEY) == 1 then
+        self.maximizeCloud = self.databank.getIntValue(MAXIMIZE_CLOUD_KEY) == 1
+    else
+        self.maximizeCloud = MAXIMIZE_CLOUD_DEFAULT
+    end
+    
 end
 
 --- Handle a mouse down event at the provided coordinates.
@@ -188,6 +226,13 @@ function _G.hpScreenController:refresh()
 
     -- if initializing tab in background say so?
 
+    if self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) then
+        self.stretchCloud = self.databank.getIntValue(STRECH_CLOUD_KEY) == 1
+    end
+    if self.databank and self.databank.hasKey(MAXIMIZE_CLOUD_KEY) then
+        self.maximizeCloud = self.databank.getIntValue(MAXIMIZE_CLOUD_KEY) == 1
+    end
+
 
     local html = self.SVG_TEMPLATE
 
@@ -208,6 +253,9 @@ function _G.hpScreenController:refresh()
     local tabContents = TAB_CONTENTS_TAG
     if self.selectedTab == 1 then
         html = _G.ScreenUtils.replaceClass(html, ELEMENT_TABLE_CLASS, SELECTED_CLASS)
+
+        -- disable cloud button bar
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_BUTTONS, HIDDEN_CLASS)
     elseif self.selectedTab == 2 or self.selectedTab == 3 or self.selectedTab == 4 then
         tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData, self.controller.selectedElement)
 
@@ -221,8 +269,26 @@ function _G.hpScreenController:refresh()
             tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData, self.controller.selectedElement)
         end
 
-        -- TODO extract constants: width, height
-        tabContents = string.gsub(tabContents, "(<svg.-)>", string.format([[%%1 width="%f" height="%f">]], 1152, 891))
+        -- manage button states
+        if self.stretchCloud then
+            tabContents = string.gsub(tabContents, "(<svg.-)>", [[%1 preserveAspectRatio="none">]])
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_STRETCH, HIDDEN_CLASS)
+        else
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_PRESERVE, HIDDEN_CLASS)
+        end
+
+        if self.maximizeCloud then
+            tabContents = string.gsub(tabContents, "(<svg.-)>", string.format([[%%1 width="%f" height="%f">]], 1920, 1080))
+            html = string.gsub(html, MAXIMIZED_CONTENTS_TAG, tabContents)
+            tabContents = ""
+
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_MAXIMIZE, HIDDEN_CLASS)
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_MAXIMIZED_HIDDEN, "")
+        else
+            tabContents = string.gsub(tabContents, "(<svg.-)>", string.format([[%%1 width="%f" height="%f">]], TAB_CONTENTS_WIDTH, TAB_CONTENTS_HEIGHT))
+
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_MINIMIZE, HIDDEN_CLASS)
+        end
 
     end
     html = string.gsub(html, TAB_CONTENTS_TAG, tabContents)
@@ -248,6 +314,26 @@ function _G.hpScreenController:handleButton(buttonId)
         modified = self:setSelectedTab(3)
     elseif buttonId == _G.hpScreenController.BUTTON_TAB_FRONT then
         modified = self:setSelectedTab(4)
+    elseif buttonId == _G.hpScreenController.BUTTON_STRETCH_CLOUD and self.selectedTab > 1 then
+        self.stretchCloud = not self.stretchCloud
+        if self.databank then
+            if self.stretchCloud then
+                self.databank.setIntValue(STRECH_CLOUD_KEY, 1)
+            else
+                self.databank.setIntValue(STRECH_CLOUD_KEY, 0)
+            end
+        end
+        modified = true
+    elseif buttonId == _G.hpScreenController.BUTTON_MAXIMIZE_CLOUD and self.selectedTab > 1 then
+        self.maximizeCloud = not self.maximizeCloud
+        if self.databank then
+            if self.maximizeCloud then
+                self.databank.setIntValue(MAXIMIZE_CLOUD_KEY, 1)
+            else
+                self.databank.setIntValue(MAXIMIZE_CLOUD_KEY, 0)
+            end
+        end
+        modified = true
     end
 
     return modified
@@ -260,15 +346,6 @@ local DEFAULT_OUTLINE = [[
     circle {
         stroke: black;
         stroke-width: 1vmin;
-    }
-    .broken {
-        fill: #ff1300;
-    }
-    .damaged {
-        fill: #ffd700;
-    }
-    .healthy {
-        fill: #00c322;
     }
     .selected {
         stroke: white;
