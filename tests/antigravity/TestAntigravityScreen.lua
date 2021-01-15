@@ -8,8 +8,6 @@ local lu = require("luaunit")
 require("common.Utilities")
 require("common.ScreenUtils")
 
-local SVG_OUTPUT_FILE = "tests/results/images/antigravity-basic.svg"
-
 -- load file into a function for efficient calling
 local screenStart1 = loadfile("./antigravity/ag.screen.start1.lua")
 
@@ -97,7 +95,7 @@ function _G.TestAntigravityScreen:testInitNoDatabank()
 end
 
 --- Verify altitude adjust works without a databank.
-function _G.TestAntigravityScreen:testSetAltitudeAdjust()
+function _G.TestAntigravityScreen:testSetAltitudeAdjustNoDatabank()
     self.agController.slots.databank = nil
 
     screenStart1()
