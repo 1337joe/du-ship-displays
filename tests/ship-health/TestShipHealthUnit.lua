@@ -17,7 +17,7 @@ local mockControlUnit = require("dumocks.ControlUnit")
 
 local pocketScoutElements = require("tests.ship-health.PocketScout")
 
-local TARGET_ALTITUDE_KEY = "targetAltitude"
+local SELECTED_ELEMENT_KEY = "HP.unit:SELECTED_ELEMENT"
 
 _G.TestShipHealthUnit = {}
 
@@ -109,6 +109,9 @@ end
 function _G.TestShipHealthUnit:testInitialize()
     _G.unit = self.unit
 
+    -- init to non-default: select screen
+    self.databankMock.data[SELECTED_ELEMENT_KEY] = 90
+
     unitStart()
 
     -- relevant mappings are correct
@@ -132,6 +135,9 @@ function _G.TestShipHealthUnit:testInitialize()
     lu.assertEquals(_G.hpController.elementMetadata.max.hp, 1933)
     lu.assertEquals(_G.hpController.elementMetadata.totalHp, 10650)
     lu.assertEquals(_G.hpController.elementMetadata.totalMaxHp, 10670)
+
+    -- verify select called
+    lu.assertEquals(_G.hpController.selectedElement, 90)
 
     -- verify result of final init function
     lu.assertNotNil(self.unitMock.timers["updateHp"])
@@ -159,6 +165,85 @@ function _G.TestShipHealthUnit:testUpdateState()
     -- _G.hpController:updateState()
 
     -- lu.fail("NYI")
+end
+
+--- Verify select.
+function _G.TestShipHealthUnit:testSelect()
+
+    _G.unit = self.unit
+
+    unitStart()
+
+    -- relevant mappings are correct
+    lu.assertIs(_G.hpController.slots.core, self.core)
+    lu.assertIs(_G.hpController.slots.databank, self.databank)
+
+    -- init to default: no selection
+    self.databankMock.data[SELECTED_ELEMENT_KEY] = nil
+
+    local expected
+
+    -- set to core
+    expected = 1
+    _G.hpController:select(expected)
+    lu.assertEquals(_G.hpController.selectedElement, expected)
+    lu.assertEquals(self.databankMock.data[SELECTED_ELEMENT_KEY], expected)
+
+    -- unset
+    expected = nil
+    _G.hpController:select(expected)
+    lu.assertEquals(_G.hpController.selectedElement, expected)
+    lu.assertEquals(self.databankMock.data[SELECTED_ELEMENT_KEY], -1)
+
+    -- set to screen
+    expected = 90
+    _G.hpController:select(expected)
+    lu.assertEquals(_G.hpController.selectedElement, expected)
+    lu.assertEquals(self.databankMock.data[SELECTED_ELEMENT_KEY], expected)
+
+    -- unset
+    expected = -1
+    _G.hpController:select(expected)
+    lu.assertEquals(_G.hpController.selectedElement, nil)
+    lu.assertEquals(self.databankMock.data[SELECTED_ELEMENT_KEY], expected)
+end
+
+--- Verify set base altitude works when no databank is mapped.
+function _G.TestShipHealthUnit:testSelectNoDatabank()
+    -- disable databank
+    self.unitMock = mockControlUnit:new(nil, 5, "programming board")
+    self.unitMock.linkedElements["hpScreen"] = self.screen
+    self.unitMock.linkedElements["core"] = self.core
+    self.unit = self.unitMock:mockGetClosure()
+    _G.unit = self.unit
+
+    unitStart()
+
+    -- relevant mappings are correct
+    lu.assertIs(_G.hpController.slots.core, self.core)
+    lu.assertNil(_G.hpController.slots.databank)
+
+    local expected
+
+    -- set to core
+    expected = 1
+    _G.hpController:select(expected)
+    lu.assertEquals(_G.hpController.selectedElement, expected)
+
+    -- unset
+    expected = nil
+    _G.hpController:select(expected)
+    lu.assertEquals(_G.hpController.selectedElement, expected)
+
+    -- set to screen
+    expected = 90
+    _G.hpController:select(expected)
+    lu.assertEquals(_G.hpController.selectedElement, expected)
+
+    -- unset
+    expected = -1
+    _G.hpController:select(expected)
+    lu.assertEquals(_G.hpController.selectedElement, nil)
 end
 
 os.exit(lu.LuaUnit.run())

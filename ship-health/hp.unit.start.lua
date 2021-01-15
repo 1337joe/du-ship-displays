@@ -190,7 +190,7 @@ function _G.hpController:updateState()
 
         -- TODO test code, remove
         if math.random() > 0.9 then
-            self:select(key)
+            -- self:select(key)
         end
     end
     self.elementMetadata.totalHp = currentTotalHp
@@ -214,9 +214,17 @@ function _G.hpController:select(elementId)
 
     -- persist selection in case of restart of board
     if databank then
+        -- can't unset value in database, set to out of range
+        if elementId == nil then
+            elementId = -1
+        end
         databank.setIntValue(SELECTED_ELEMENT_KEY, elementId)
     end
-    self.selectedElement = elementId
+    -- handle load from database set out of range
+    if elementId and elementId < 0 then
+        elementId = nil
+    end
+self.selectedElement = elementId
 
     -- skip remaining if no valid element actually selected
     if not self.elementData[elementId] then
