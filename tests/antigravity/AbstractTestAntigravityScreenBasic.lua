@@ -1,24 +1,15 @@
 #!/usr/bin/env lua
---- Tests for antigravity screen.start3.basic
+--- Additional generic display test conditions for running through antigravity basic screens.
 
 package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
 
 local lu = require("luaunit")
 
--- load file into a function for efficient calling
-local screenStart1 = loadfile("./antigravity/ag.screen.start1.lua")
-local screenStart2 = loadfile("./antigravity/ag.screen.start2.basic.lua")
-local screenStart3 = loadfile("./antigravity/ag.screen.start3.basic.banner.lua")
--- load base SVG
-local inputHandle = io.open("antigravity/ag.screen.basic.svg", "rb")
-local BASE_SVG = io.input(inputHandle):read("*all")
-inputHandle:close()
-
 local abstractTestScreen = require("tests.antigravity.AbstractTestAntigravityScreen")
 
-_G.TestAntigravityScreenBasic = abstractTestScreen:new()
+_G.AbstractTestAntigravityScreenBasic = abstractTestScreen:new()
 
-function TestAntigravityScreenBasic:new()
+function AbstractTestAntigravityScreenBasic:new()
     o = abstractTestScreen:new()
     setmetatable(o, self)
     self.__index = self
@@ -157,4 +148,4 @@ function TestAntigravityScreenBasic:new()
     return o
 end
 
-return TestAntigravityScreenBasic
+return AbstractTestAntigravityScreenBasic

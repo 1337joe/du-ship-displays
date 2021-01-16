@@ -11,9 +11,9 @@ require("common.ScreenUtils")
 local mockScreenUnit = require("dumocks.ScreenUnit")
 local mockDatabankUnit = require("dumocks.DatabankUnit")
 
-local TestAntigravityScreen = {}
+local AbstractTestAntigravityScreen = {}
 
-function TestAntigravityScreen:new()
+function AbstractTestAntigravityScreen:new()
     local o = {}
     setmetatable(o, self)
     self.__index = self
@@ -66,11 +66,11 @@ function TestAntigravityScreen:new()
     return o
 end
 
-function TestAntigravityScreen:runScreenSetup()
+function AbstractTestAntigravityScreen:runScreenSetup()
     lu.fail("Override with whatever is needed to initialize the display.")
 end
 
-function TestAntigravityScreen:setup()
+function AbstractTestAntigravityScreen:setup()
 
     self.screenMock = mockScreenUnit:new(nil, 2)
     self.screen = self.screenMock:mockGetClosure()
@@ -100,14 +100,14 @@ function TestAntigravityScreen:setup()
 end
 
 --- Unset all globals set/used by screen.start.
-function TestAntigravityScreen:teardown()
+function AbstractTestAntigravityScreen:teardown()
     _G.agScreenController = nil
 end
 
 local SVG_WRAPPER_TEMPLATE = [[<li><p>%s<br>%s</p></li>]]
 
 --- Generate screen images for various configurations, saving as a sample image and grid of test outputs.
-function TestAntigravityScreen:testDisplay()
+function AbstractTestAntigravityScreen:testDisplay()
     local allSvg = {}
     allSvg[#allSvg + 1] = [[
 <html>
@@ -135,14 +135,14 @@ function TestAntigravityScreen:testDisplay()
 
     local index = 0
     local result, msg, actual, label
-    for name, configuration in pairs(self.displayConfigurations) do
+    for configKey, configuration in pairs(self.displayConfigurations) do
 
         self:setup()
         self:runScreenSetup()
 
         self.displayConfigurationName = nil
         configuration(self)
-        label = string.format("%s (%s)", name, self.displayConfigurationName)
+        label = string.format("%s (%s)", configKey, self.displayConfigurationName)
 
         _G.agScreenController.needRefresh = true
         result, msg = pcall(_G.agScreenController.refresh, _G.agScreenController)
@@ -151,7 +151,7 @@ function TestAntigravityScreen:testDisplay()
         actual = self.screenMock.html
         lu.assertFalse(actual:len() == 0, string.format("%s produced no output.", label))
 
-        if name == self.sampleDisplayConfiguration then
+        if configKey == self.sampleDisplayConfiguration then
             -- save as file
             local outputHandle, errorMsg = io.open(self.SVG_SAMPLE_OUTPUT_FILE, "w")
             if errorMsg then
@@ -185,4 +185,4 @@ function TestAntigravityScreen:testDisplay()
     end
 end
 
-return TestAntigravityScreen
+return AbstractTestAntigravityScreen
