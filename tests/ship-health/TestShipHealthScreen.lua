@@ -1,5 +1,5 @@
 #!/usr/bin/env lua
---- Tests for antigravity screen.start1 - functionality tests, not display
+--- Tests for ship health screen.start1 - functionality tests, not display
 
 package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
 
@@ -51,7 +51,7 @@ function _G.TestShipHealthScreen:setup()
     local data = {}
     local centerOffset = 16
     local tPos, pos
-    for key,element in pairs(pocketScoutElements) do
+    for key, element in pairs(pocketScoutElements) do
         tPos = element.position
         pos = {}
         pos.x = tPos[1] - centerOffset
@@ -78,6 +78,7 @@ function _G.TestShipHealthScreen:setup()
         elementData = data
     }
     function self.hpController:select(elementId)
+        self.hpController.selectedElement = elementId
     end
 end
 

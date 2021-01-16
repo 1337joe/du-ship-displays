@@ -189,11 +189,11 @@ function _G.TestShipHealthUnit:testSelect()
     lu.assertEquals(_G.hpController.selectedElement, expected)
     lu.assertEquals(self.databankMock.data[SELECTED_ELEMENT_KEY], expected)
 
-    -- unset
-    expected = nil
-    _G.hpController:select(expected)
+    -- unset with nil
+    expected = 0
+    _G.hpController:select(nil)
     lu.assertEquals(_G.hpController.selectedElement, expected)
-    lu.assertEquals(self.databankMock.data[SELECTED_ELEMENT_KEY], -1)
+    lu.assertEquals(self.databankMock.data[SELECTED_ELEMENT_KEY], expected)
 
     -- set to screen
     expected = 90
@@ -202,9 +202,9 @@ function _G.TestShipHealthUnit:testSelect()
     lu.assertEquals(self.databankMock.data[SELECTED_ELEMENT_KEY], expected)
 
     -- unset
-    expected = -1
+    expected = 0
     _G.hpController:select(expected)
-    lu.assertEquals(_G.hpController.selectedElement, nil)
+    lu.assertEquals(_G.hpController.selectedElement, expected)
     lu.assertEquals(self.databankMock.data[SELECTED_ELEMENT_KEY], expected)
 end
 
@@ -230,9 +230,9 @@ function _G.TestShipHealthUnit:testSelectNoDatabank()
     _G.hpController:select(expected)
     lu.assertEquals(_G.hpController.selectedElement, expected)
 
-    -- unset
-    expected = nil
-    _G.hpController:select(expected)
+    -- unset with nil
+    expected = 0
+    _G.hpController:select(nil)
     lu.assertEquals(_G.hpController.selectedElement, expected)
 
     -- set to screen
@@ -241,9 +241,9 @@ function _G.TestShipHealthUnit:testSelectNoDatabank()
     lu.assertEquals(_G.hpController.selectedElement, expected)
 
     -- unset
-    expected = -1
+    expected = 0
     _G.hpController:select(expected)
-    lu.assertEquals(_G.hpController.selectedElement, nil)
+    lu.assertEquals(_G.hpController.selectedElement, expected)
 end
 
 os.exit(lu.LuaUnit.run())

@@ -213,18 +213,14 @@ function _G.hpController:select(elementId)
     end
 
     -- persist selection in case of restart of board
+    if elementId == nil then
+        elementId = 0
+    end
     if databank then
-        -- can't unset value in database, set to out of range
-        if elementId == nil then
-            elementId = -1
-        end
+        -- can't unset value in database but 0 is out of range
         databank.setIntValue(SELECTED_ELEMENT_KEY, elementId)
     end
-    -- handle load from database set out of range
-    if elementId and elementId < 0 then
-        elementId = nil
-    end
-self.selectedElement = elementId
+    self.selectedElement = elementId
 
     -- skip remaining if no valid element actually selected
     if not self.elementData[elementId] then

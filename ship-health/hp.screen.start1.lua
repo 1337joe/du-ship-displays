@@ -7,8 +7,16 @@ end
 
 -- constants and editable lua script parameters
 
+local SHOW_HEALTHY_KEY = "HP.screen:SHOW_HEALTHY"
+local SHOW_HEALTHY_DEFAULT = true
+local SHOW_DAMAGED_KEY = "HP.screen:SHOW_DAMAGED"
+local SHOW_DAMAGED_DEFAULT = true
+local SHOW_BROKEN_KEY = "HP.screen:SHOW_BROKEN"
+local SHOW_BROKEN_DEFAULT = true
 local SELECTED_TAB_KEY = "HP.screen:SELECTED_TAB"
 local SELECTED_TAB_DEFAULT = 1
+local SCROLL_INDEX_KEY = "HP.screen:SCROLL_INDEX"
+local SCROLL_INDEX_DEFAULT = 1
 local STRECH_CLOUD_KEY = "HP.screen:STRETCH_CLOUD"
 local STRETCH_CLOUD_DEFAULT = false
 local MAXIMIZE_CLOUD_KEY = "HP.screen:MAXIMIZE_CLOUD"
@@ -31,7 +39,7 @@ local ELEMENT_CLOUD_STRETCH = "stretchClass"
 local ELEMENT_CLOUD_PRESERVE = "preserveClass"
 local ELEMENT_CLOUD_MAXIMIZE = "maximizeClass"
 local ELEMENT_CLOUD_MINIMIZE = "minimizeClass"
-local ELEMENT_MAXIMIZED_HIDDEN = "maximizedHidden"
+local ELEMENT_HIDE_INTERFACE = "hideInterface"
 
 local TAB_CONTENTS_WIDTH = 1152
 local TAB_CONTENTS_HEIGHT = 891
@@ -52,6 +60,9 @@ _G.hpScreenController = {
 }
 
 -- constant button definition labels
+_G.hpScreenController.BUTTON_FILTER_HEALTHY = "Filter: Healthy"
+_G.hpScreenController.BUTTON_FILTER_DAMAGED = "Filter: Damaged"
+_G.hpScreenController.BUTTON_FILTER_BROKEN = "Filter: Broken"
 _G.hpScreenController.BUTTON_TAB_TABLE = "Tab: Table"
 _G.hpScreenController.BUTTON_TAB_TOP = "Tab: Top"
 _G.hpScreenController.BUTTON_TAB_SIDE = "Tab: Side"
@@ -224,8 +235,6 @@ function _G.hpScreenController:refresh()
         self:setSelectedTab(self.databank.getIntValue(SELECTED_TAB_KEY))
     end
 
-    -- if initializing tab in background say so?
-
     if self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) then
         self.stretchCloud = self.databank.getIntValue(STRECH_CLOUD_KEY) == 1
     end
@@ -248,6 +257,8 @@ function _G.hpScreenController:refresh()
     html = string.format(html, shipName, elementIntegrity)
 
     html = _G.ScreenUtils.replaceClass(html, ELEMENT_TITLE_COLOR_CLASS, HEALTHY_CLASS)
+
+    -- if initializing tab in background say so?
 
     -- replacing class on tab intentionally prevents mousing over it from working
     local tabContents = TAB_CONTENTS_TAG
@@ -283,7 +294,7 @@ function _G.hpScreenController:refresh()
             tabContents = ""
 
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_MAXIMIZE, HIDDEN_CLASS)
-            html = _G.ScreenUtils.replaceClass(html, ELEMENT_MAXIMIZED_HIDDEN, "")
+            html = _G.ScreenUtils.replaceClass(html, ELEMENT_HIDE_INTERFACE, "")
         else
             tabContents = string.gsub(tabContents, "(<svg.-)>", string.format([[%%1 width="%f" height="%f">]], TAB_CONTENTS_WIDTH, TAB_CONTENTS_HEIGHT))
 
@@ -407,6 +418,7 @@ function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXF
     return outline, elementList
 end
 
+--- Helper function for updateCloud to add a point to the appropriate list.
 local function addPoint(point, hp, maxHp, broken, damaged, healthy)
     if hp == 0 then
         broken[#broken + 1] = point

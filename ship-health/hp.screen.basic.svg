@@ -9,7 +9,7 @@
             font-size:108px;
             font-weight:bold;
         }
-        .hidden, .maximizedHidden {
+        .hidden, .hideInterface {
             display: none;
         }
         .broken {
@@ -146,13 +146,11 @@
         </g>
         <rect x="768" y="189" width="1152" height="891" />
     </g>
+    <rect class="hideInterface" x="0" y="0" fill="#000000" width="1920" height="1080" />
     <g transform="translate(768,189)">
         <svg id="tabContents"/>
     </g>
-    <g class="maximizedHidden">
-        <rect x="0" y="0" fill="#000000" width="1920" height="1080" />
-        <svg id="maximizedContents"/>
-    </g>
+    <svg id="maximizedContents"/>
     <g class="cloudButtonBar">
         <use xlink:href="#maximizeButton" class="maximizeClass" x="1866" y="1026" />
         <use xlink:href="#minimizeButton" class="minimizeClass" x="1866" y="1026" />
