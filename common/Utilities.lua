@@ -38,6 +38,7 @@ end
 -- @tparam string text The string to sanitize.
 function _G.Utilities.sanitizeFormatString(text)
     text = string.gsub(text, "%%([^sdf])", "%%%%%1")
+    text = string.gsub(text, "%%%%(%d*%.%d*f)", "%%%1") -- allow float specifiers
     text = string.gsub(text, "%%$", "%%%%") -- handle % at end of string
     return text
 end

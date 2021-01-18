@@ -294,6 +294,12 @@ function _G.TestUtilities.testSanitizeFormatString()
     expected = "%d"
     actual = _G.Utilities.sanitizeFormatString(input)
     lu.assertEquals(actual, expected)
+
+    -- complex format strings
+    input = "%.0f"
+    expected = "%.0f"
+    actual = _G.Utilities.sanitizeFormatString(input)
+    lu.assertEquals(actual, expected)
 end
 
 --- Verify find slot retreives values appropriately.
