@@ -91,27 +91,40 @@ end
 function _G.TestShipHealthScreen:testInit()
     screenStart1()
 
-    local expectedTab = 2
-    self.databankMock.data[SELECTED_TAB_KEY] = expectedTab
-    local expectedStretchCloud = true
-    self.databankMock.data[STRECH_CLOUD_KEY] = 1
-    local expectedMaximizeCloud = true
-    self.databankMock.data[MAXIMIZE_CLOUD_KEY] = 1
+    -- local expectedShowHealthy = false
+    -- self.databankMock.data[SHOW_HEALTHY_KEY] = 0
+    -- local expectedShowDamaged = false
+    -- self.databankMock.data[SHOW_DAMAGED_KEY] = 0
+    -- local expectedShowBroken = false
+    -- self.databankMock.data[SHOW_BROKEN_KEY] = 0
+    -- local expectedTab = 2
+    -- self.databankMock.data[SELECTED_TAB_KEY] = expectedTab
+    -- local expectedStretchCloud = true
+    -- self.databankMock.data[STRECH_CLOUD_KEY] = 1
+    -- local expectedMaximizeCloud = true
+    -- self.databankMock.data[MAXIMIZE_CLOUD_KEY] = 1
 
     _G.hpScreenController:init(self.hpController)
 
     lu.assertIs(_G.hpScreenController.screen, self.screen)
     lu.assertIs(_G.hpScreenController.databank, self.databank)
 
-    lu.assertEquals(_G.hpScreenController.selectedTab, expectedTab)
-    lu.assertEquals(_G.hpScreenController.stretchCloud, expectedStretchCloud)
-    lu.assertEquals(_G.hpScreenController.maximizeCloud, expectedMaximizeCloud)
+    -- only defaults set in init, db values load in refresh
+    -- lu.assertEquals(_G.hpScreenController.showHealthy, expectedShowHealthy)
+    -- lu.assertEquals(_G.hpScreenController.showDamaged, expectedShowDamaged)
+    -- lu.assertEquals(_G.hpScreenController.showBroken, expectedShowBroken)
+    -- lu.assertEquals(_G.hpScreenController.selectedTab, expectedTab)
+    -- lu.assertEquals(_G.hpScreenController.stretchCloud, expectedStretchCloud)
+    -- lu.assertEquals(_G.hpScreenController.maximizeCloud, expectedMaximizeCloud)
 end
 
 --- Verify init stores references and defaults settings due to unpopulated databank.
 function _G.TestShipHealthScreen:testInitEmptyDatabank()
     screenStart1()
 
+    local expectedShowHealthy = true
+    local expectedShowDamaged = true
+    local expectedShowBroken = true
     local expectedTab = 1
     local expectedStretchCloud = false
     local expectedMaximizeCloud = false
@@ -121,6 +134,9 @@ function _G.TestShipHealthScreen:testInitEmptyDatabank()
     lu.assertIs(_G.hpScreenController.screen, self.screen)
     lu.assertIs(_G.hpScreenController.databank, self.databank)
 
+    lu.assertEquals(_G.hpScreenController.showHealthy, expectedShowHealthy)
+    lu.assertEquals(_G.hpScreenController.showDamaged, expectedShowDamaged)
+    lu.assertEquals(_G.hpScreenController.showBroken, expectedShowBroken)
     lu.assertEquals(_G.hpScreenController.selectedTab, expectedTab)
     lu.assertEquals(_G.hpScreenController.stretchCloud, expectedStretchCloud)
     lu.assertEquals(_G.hpScreenController.maximizeCloud, expectedMaximizeCloud)
@@ -132,6 +148,9 @@ function _G.TestShipHealthScreen:testInitNoDatabank()
 
     screenStart1()
 
+    local expectedShowHealthy = true
+    local expectedShowDamaged = true
+    local expectedShowBroken = true
     local expectedTab = 1
     local expectedStretchCloud = false
     local expectedMaximizeCloud = false
@@ -141,6 +160,9 @@ function _G.TestShipHealthScreen:testInitNoDatabank()
     lu.assertIs(_G.hpScreenController.screen, self.screen)
     lu.assertNil(_G.hpScreenController.databank)
 
+    lu.assertEquals(_G.hpScreenController.showHealthy, expectedShowHealthy)
+    lu.assertEquals(_G.hpScreenController.showDamaged, expectedShowDamaged)
+    lu.assertEquals(_G.hpScreenController.showBroken, expectedShowBroken)
     lu.assertEquals(_G.hpScreenController.selectedTab, expectedTab)
     lu.assertEquals(_G.hpScreenController.stretchCloud, expectedStretchCloud)
     lu.assertEquals(_G.hpScreenController.maximizeCloud, expectedMaximizeCloud)

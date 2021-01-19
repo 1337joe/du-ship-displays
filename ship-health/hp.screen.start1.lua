@@ -30,6 +30,12 @@ local SELECTED_CLASS = "selected"
 local HIDDEN_CLASS = "hidden"
 local MOUSE_OVER_CLASS = "mouseOver"
 local ELEMENT_TITLE_COLOR_CLASS = "titleColor"
+local ELEMENT_FILTER_HEALTHY_CLASS = "healthyFilterClass"
+local ELEMENT_FILTER_DAMAGED_CLASS = "damagedFilterClass"
+local ELEMENT_FILTER_BROKEN_CLASS = "brokenFilterClass"
+local ELEMENT_COUNT_DAMAGED_CLASS = "damagedCountClass"
+local ELEMENT_COUNT_HEALTHY_CLASS = "healthyCountClass"
+local ELEMENT_COUNT_BROKEN_CLASS = "brokenCountClass"
 local ELEMENT_TABLE_CLASS = "tableClass"
 local ELEMENT_TOP_CLASS = "topClass"
 local ELEMENT_SIDE_CLASS = "sideClass"
@@ -75,10 +81,26 @@ _G.hpScreenController.SVG_TEMPLATE = [[${file:hp.screen.basic.svg}]]
 _G.hpScreenController.SVG_LOGO = [[${file:../logo.svg minify}]]
 
 -- one-time transforms
-_G.hpScreenController.SVG_TEMPLATE = string.gsub(_G.hpScreenController.SVG_TEMPLATE, '<svg id="logo"/>', _G.hpScreenController.SVG_LOGO)
+_G.hpScreenController.SVG_TEMPLATE = string.gsub(_G.hpScreenController.SVG_TEMPLATE, '<svg id="logo"/>',
+                                         _G.hpScreenController.SVG_LOGO)
 
 -- Define button ranges, either in tables of x1,y1,x2,y2 or lists of those tables.
 local buttonCoordinates = {}
+buttonCoordinates[_G.hpScreenController.BUTTON_FILTER_HEALTHY] = {
+    x1 = 0, x2 = 0.2,
+    y1 = 0.7, y2 = 0.8,
+    class = ELEMENT_FILTER_HEALTHY_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_FILTER_DAMAGED] = {
+    x1 = 0, x2 = 0.2,
+    y1 = 0.8, y2 = 0.9,
+    class = ELEMENT_FILTER_DAMAGED_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_FILTER_BROKEN] = {
+    x1 = 0, x2 = 0.2,
+    y1 = 0.9, y2 = 1.0,
+    class = ELEMENT_FILTER_BROKEN_CLASS
+}
 buttonCoordinates[_G.hpScreenController.BUTTON_TAB_TABLE] = {
     x1 = 0.433, x2 = 0.567,
     y1 = 0.1, y2 = 0.169,
@@ -117,22 +139,25 @@ function _G.hpScreenController:init(controller)
     self.screen = controller.slots.screen
     self.databank = controller.slots.databank
 
-    if self.databank and self.databank.hasKey(SELECTED_TAB_KEY) == 1 then
-        self:setSelectedTab(self.databank.getIntValue(SELECTED_TAB_KEY))
-    else
+    if not (self.databank and self.databank.hasKey(SHOW_HEALTHY_KEY) == 1) then
+        self.showHealthy = SHOW_HEALTHY_DEFAULT
+    end
+    if not (self.databank and self.databank.hasKey(SHOW_DAMAGED_KEY) == 1) then
+        self.showDamaged = SHOW_DAMAGED_DEFAULT
+    end
+    if not (self.databank and self.databank.hasKey(SHOW_BROKEN_KEY) == 1) then
+        self.showBroken = SHOW_BROKEN_DEFAULT
+    end
+
+    if not (self.databank and self.databank.hasKey(SELECTED_TAB_KEY) == 1) then
         self:setSelectedTab(SELECTED_TAB_DEFAULT)
     end
-    if self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) == 1 then
-        self.stretchCloud = self.databank.getIntValue(STRECH_CLOUD_KEY) == 1
-    else
+    if not (self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) == 1) then
         self.stretchCloud = STRETCH_CLOUD_DEFAULT
     end
-    if self.databank and self.databank.hasKey(MAXIMIZE_CLOUD_KEY) == 1 then
-        self.maximizeCloud = self.databank.getIntValue(MAXIMIZE_CLOUD_KEY) == 1
-    else
+    if not (self.databank and self.databank.hasKey(MAXIMIZE_CLOUD_KEY) == 1) then
         self.maximizeCloud = MAXIMIZE_CLOUD_DEFAULT
     end
-    
 end
 
 --- Handle a mouse down event at the provided coordinates.
@@ -173,7 +198,8 @@ function _G.hpScreenController:setSelectedTab(tabIndex)
         local screenYFunc = function(pos)
             return -pos.y
         end
-        local template, points = _G.buildShipCloudPoints(self.outlineTop, self.controller.elementData, self.controller.elementMetadata, screenXFunc, screenYFunc)
+        local template, points = _G.buildShipCloudPoints(self.outlineTop, self.controller.elementData,
+                                     self.controller.elementMetadata, screenXFunc, screenYFunc)
         self.tabData.template = template
         self.tabData.points = points
 
@@ -185,7 +211,8 @@ function _G.hpScreenController:setSelectedTab(tabIndex)
         local screenYFunc = function(pos)
             return -pos.z
         end
-        local template, points = _G.buildShipCloudPoints(self.outlineSide, self.controller.elementData, self.controller.elementMetadata, screenXFunc, screenYFunc)
+        local template, points = _G.buildShipCloudPoints(self.outlineSide, self.controller.elementData,
+                                     self.controller.elementMetadata, screenXFunc, screenYFunc)
         self.tabData.template = template
         self.tabData.points = points
 
@@ -197,7 +224,8 @@ function _G.hpScreenController:setSelectedTab(tabIndex)
         local screenYFunc = function(pos)
             return -pos.z
         end
-        local template, points = _G.buildShipCloudPoints(self.outlineFront, self.controller.elementData, self.controller.elementMetadata, screenXFunc, screenYFunc)
+        local template, points = _G.buildShipCloudPoints(self.outlineFront, self.controller.elementData,
+                                     self.controller.elementMetadata, screenXFunc, screenYFunc)
         self.tabData.template = template
         self.tabData.points = points
 
@@ -231,17 +259,26 @@ function _G.hpScreenController:refresh()
     self.needRefresh = false
     -- self.mouse.over = mouseOver
 
+    if self.databank and self.databank.hasKey(SHOW_HEALTHY_KEY) == 1 then
+        self.showHealthy = self.databank.getIntValue(SHOW_HEALTHY_KEY) == 1
+    end
+    if self.databank and self.databank.hasKey(SHOW_DAMAGED_KEY) == 1 then
+        self.showDamaged = self.databank.getIntValue(SHOW_DAMAGED_KEY) == 1
+    end
+    if self.databank and self.databank.hasKey(SHOW_BROKEN_KEY) == 1 then
+        self.showBroken = self.databank.getIntValue(SHOW_BROKEN_KEY) == 1
+    end
+
     if self.databank and self.databank.getIntValue(SELECTED_TAB_KEY) ~= self.selectedTab then
         self:setSelectedTab(self.databank.getIntValue(SELECTED_TAB_KEY))
     end
 
-    if self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) then
+    if self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) == 1 then
         self.stretchCloud = self.databank.getIntValue(STRECH_CLOUD_KEY) == 1
     end
-    if self.databank and self.databank.hasKey(MAXIMIZE_CLOUD_KEY) then
+    if self.databank and self.databank.hasKey(MAXIMIZE_CLOUD_KEY) == 1 then
         self.maximizeCloud = self.databank.getIntValue(MAXIMIZE_CLOUD_KEY) == 1
     end
-
 
     local html = self.SVG_TEMPLATE
 
@@ -251,12 +288,56 @@ function _G.hpScreenController:refresh()
 
     local shipName = self.controller.shipName
     local elementIntegrity = math.floor(elementMetadata.totalHp / elementMetadata.totalMaxHp * 100)
+    local currentHp = elementMetadata.totalHp
+    local maxHp = elementMetadata.totalMaxHp
+    local healthyElements = 0
+    local damagedElements = 0
+    local brokenElements = 0
+    for _, element in pairs(self.controller.elementData) do
+        if element.h == element.m then
+            healthyElements = healthyElements + 1
+        elseif element.h > 0 then
+            damagedElements = damagedElements + 1
+        else
+            brokenElements = brokenElements + 1
+        end
+    end
 
     -- insert values to svg
     html = _G.Utilities.sanitizeFormatString(html)
-    html = string.format(html, shipName, elementIntegrity)
+    html = string.format(html, shipName, elementIntegrity, currentHp, maxHp, healthyElements, damagedElements,
+               brokenElements)
 
-    html = _G.ScreenUtils.replaceClass(html, ELEMENT_TITLE_COLOR_CLASS, HEALTHY_CLASS)
+    if brokenElements > 0 then
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_TITLE_COLOR_CLASS, BROKEN_CLASS)
+    elseif damagedElements > 0 then
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_TITLE_COLOR_CLASS, DAMAGED_CLASS)
+    else
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_TITLE_COLOR_CLASS, HEALTHY_CLASS)
+    end
+
+    if brokenElements > 0 then
+        html = _G.ScreenUtils.addClass(html, ELEMENT_FILTER_BROKEN_CLASS, BROKEN_CLASS)
+    end
+    if damagedElements > 0 then
+        html = _G.ScreenUtils.addClass(html, ELEMENT_FILTER_DAMAGED_CLASS, DAMAGED_CLASS)
+    end
+    if healthyElements > 0 then
+        html = _G.ScreenUtils.addClass(html, ELEMENT_FILTER_HEALTHY_CLASS, HEALTHY_CLASS)
+    end
+
+    if self.showHealthy then
+        html = _G.ScreenUtils.addClass(html, ELEMENT_FILTER_HEALTHY_CLASS, SELECTED_CLASS)
+        html = _G.ScreenUtils.addClass(html, ELEMENT_COUNT_HEALTHY_CLASS, SELECTED_CLASS)
+    end
+    if self.showDamaged then
+        html = _G.ScreenUtils.addClass(html, ELEMENT_FILTER_DAMAGED_CLASS, SELECTED_CLASS)
+        html = _G.ScreenUtils.addClass(html, ELEMENT_COUNT_DAMAGED_CLASS, SELECTED_CLASS)
+    end
+    if self.showBroken then
+        html = _G.ScreenUtils.addClass(html, ELEMENT_FILTER_BROKEN_CLASS, SELECTED_CLASS)
+        html = _G.ScreenUtils.addClass(html, ELEMENT_COUNT_BROKEN_CLASS, SELECTED_CLASS)
+    end
 
     -- if initializing tab in background say so?
 
@@ -268,16 +349,19 @@ function _G.hpScreenController:refresh()
         -- disable cloud button bar
         html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_BUTTONS, HIDDEN_CLASS)
     elseif self.selectedTab == 2 or self.selectedTab == 3 or self.selectedTab == 4 then
-        tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData, self.controller.selectedElement)
+        tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData,
+                          self.controller.selectedElement, self.showHealthy, self.showDamaged, self.showBroken)
 
         if self.selectedTab == 2 then
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_TOP_CLASS, SELECTED_CLASS)
         elseif self.selectedTab == 3 then
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_SIDE_CLASS, SELECTED_CLASS)
-            tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData, self.controller.selectedElement)
+            tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData,
+                              self.controller.selectedElement, self.showHealthy, self.showDamaged, self.showBroken)
         elseif self.selectedTab == 4 then
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_FRONT_CLASS, SELECTED_CLASS)
-            tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData, self.controller.selectedElement)
+            tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData,
+                              self.controller.selectedElement, self.showHealthy, self.showDamaged, self.showBroken)
         end
 
         -- manage button states
@@ -289,14 +373,16 @@ function _G.hpScreenController:refresh()
         end
 
         if self.maximizeCloud then
-            tabContents = string.gsub(tabContents, "(<svg.-)>", string.format([[%%1 width="%f" height="%f">]], 1920, 1080))
+            tabContents = string.gsub(tabContents, "(<svg.-)>",
+                              string.format([[%%1 width="%f" height="%f">]], 1920, 1080))
             html = string.gsub(html, MAXIMIZED_CONTENTS_TAG, tabContents)
             tabContents = ""
 
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_MAXIMIZE, HIDDEN_CLASS)
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_HIDE_INTERFACE, "")
         else
-            tabContents = string.gsub(tabContents, "(<svg.-)>", string.format([[%%1 width="%f" height="%f">]], TAB_CONTENTS_WIDTH, TAB_CONTENTS_HEIGHT))
+            tabContents = string.gsub(tabContents, "(<svg.-)>", string.format([[%%1 width="%f" height="%f">]],
+                              TAB_CONTENTS_WIDTH, TAB_CONTENTS_HEIGHT))
 
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_MINIMIZE, HIDDEN_CLASS)
         end
@@ -306,7 +392,8 @@ function _G.hpScreenController:refresh()
 
     -- add mouse-over highlights
     if not self.mouse.pressed then
-        html = _G.ScreenUtils.mouseoverButtons(self.buttonCoordinates, self.mouse.x, self.mouse.y, html, MOUSE_OVER_CLASS)
+        html = _G.ScreenUtils.mouseoverButtons(self.buttonCoordinates, self.mouse.x, self.mouse.y, html,
+                   MOUSE_OVER_CLASS)
     end
 
     self.screen.setHTML(html)
@@ -317,7 +404,37 @@ end
 function _G.hpScreenController:handleButton(buttonId)
     local modified = false
 
-    if buttonId == _G.hpScreenController.BUTTON_TAB_TABLE then
+    if buttonId == _G.hpScreenController.BUTTON_FILTER_HEALTHY then
+        self.showHealthy = not self.showHealthy
+        if self.databank then
+            if self.showHealthy then
+                self.databank.setIntValue(SHOW_HEALTHY_KEY, 1)
+            else
+                self.databank.setIntValue(SHOW_HEALTHY_KEY, 0)
+            end
+        end
+        modified = true
+    elseif buttonId == _G.hpScreenController.BUTTON_FILTER_DAMAGED then
+        self.showDamaged = not self.showDamaged
+        if self.databank then
+            if self.showDamaged then
+                self.databank.setIntValue(SHOW_DAMAGED_KEY, 1)
+            else
+                self.databank.setIntValue(SHOW_DAMAGED_KEY, 0)
+            end
+        end
+        modified = true
+    elseif buttonId == _G.hpScreenController.BUTTON_FILTER_BROKEN then
+        self.showBroken = not self.showBroken
+        if self.databank then
+            if self.showBroken then
+                self.databank.setIntValue(SHOW_BROKEN_KEY, 1)
+            else
+                self.databank.setIntValue(SHOW_BROKEN_KEY, 0)
+            end
+        end
+        modified = true
+    elseif buttonId == _G.hpScreenController.BUTTON_TAB_TABLE then
         modified = self:setSelectedTab(1)
     elseif buttonId == _G.hpScreenController.BUTTON_TAB_TOP then
         modified = self:setSelectedTab(2)
@@ -391,7 +508,8 @@ function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXF
         outline = string.format(DEFAULT_OUTLINE, minX, minY, width, height, scale)
     end
 
-    local minX, minY, width, height = string.match(outline, 'viewBox%s*=%s*"([%d.-]+)%s+([%d.-]+)%s+([%d.-]+)%s+([%d.-]+)"')
+    local minX, minY, width, height = string.match(outline,
+                                          'viewBox%s*=%s*"([%d.-]+)%s+([%d.-]+)%s+([%d.-]+)%s+([%d.-]+)"')
     local scaleMultiplier = string.match(outline, 'scaleMultiplier="([0-9.]+)"')
     scaleMultiplier = scaleMultiplier or 100
     local maxX = minX + width
@@ -404,7 +522,9 @@ function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXF
     local minHp2 = elementMetadata.min.hp * elementMetadata.min.hp
     local maxHp2 = elementMetadata.max.hp * elementMetadata.max.hp
 
-    local sortedIds = sortIds(elementData, function(e) return e.p.z end)
+    local sortedIds = sortIds(elementData, function(e)
+        return e.p.z
+    end)
 
     local elementList = {}
     local element, hp2, radius
@@ -413,7 +533,8 @@ function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXF
         hp2 = element.h * element.h
         radius = (hp2 - minHp2) / (maxHp2 - minHp2) * (maxElementSize - minElementSize) + minElementSize
 
-        elementList[id] = string.format(CLOUD_ELEMENT_TEMPLATE, screenXFunc(element.p) * scaleMultiplier, screenYFunc(element.p) * scaleMultiplier, radius)
+        elementList[id] = string.format(CLOUD_ELEMENT_TEMPLATE, screenXFunc(element.p) * scaleMultiplier,
+                              screenYFunc(element.p) * scaleMultiplier, radius)
     end
     return outline, elementList
 end
@@ -429,7 +550,7 @@ local function addPoint(point, hp, maxHp, broken, damaged, healthy)
     end
 end
 
-function _G.updateCloud(outline, points, elementData, selectedId)
+function _G.updateCloud(outline, points, elementData, selectedId, showHealthy, showDamaged, showBroken)
     -- if not initialized
     if not outline or not points then
         return ""
@@ -454,9 +575,18 @@ function _G.updateCloud(outline, points, elementData, selectedId)
         addPoint(point, hp, maxHp, broken, damaged, healthy)
     end
 
-    local brokenGroup = string.format(HEALTH_GROUP_TEMPLATE, BROKEN_CLASS, table.concat(broken, ""))
-    local damagedGroup = string.format(HEALTH_GROUP_TEMPLATE, DAMAGED_CLASS, table.concat(damaged, ""))
-    local healthyGroup = string.format(HEALTH_GROUP_TEMPLATE, HEALTHY_CLASS, table.concat(healthy, ""))
+    local brokenGroup = ""
+    if showBroken then
+        brokenGroup = string.format(HEALTH_GROUP_TEMPLATE, BROKEN_CLASS, table.concat(broken, ""))
+    end
+    local damagedGroup = ""
+    if showDamaged then
+        damagedGroup = string.format(HEALTH_GROUP_TEMPLATE, DAMAGED_CLASS, table.concat(damaged, ""))
+    end
+    local healthyGroup = ""
+    if showHealthy then
+        healthyGroup = string.format(HEALTH_GROUP_TEMPLATE, HEALTHY_CLASS, table.concat(healthy, ""))
+    end
 
     return string.gsub(outline, CLOUD_REPLACE_TARGET, healthyGroup .. damagedGroup .. brokenGroup)
 end

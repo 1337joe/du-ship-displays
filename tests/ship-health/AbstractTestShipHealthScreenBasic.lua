@@ -29,6 +29,36 @@ function AbstractTestShipHealthScreenBasic:new()
     -- override default display
     o.sampleDisplayConfiguration = #o.displayConfigurations
     o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
+        self.displayConfigurationName = "top no healthy"
+        self.hpController.elementMetadata = self.generateElementMetadataData()
+        self.hpController.elementData = self.generateElementData(pocketScoutElements)
+        self.hpController.shipName = "Pocket Scout"
+        self.hpController.selectedElement = 1
+
+        self.databankMock.data["HP.screen:SELECTED_TAB"] = 2
+        self.databankMock.data["HP.screen:SHOW_HEALTHY"] = 0
+    end
+    o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
+        self.displayConfigurationName = "top no damaged"
+        self.hpController.elementMetadata = self.generateElementMetadataData()
+        self.hpController.elementData = self.generateElementData(pocketScoutElements)
+        self.hpController.shipName = "Pocket Scout"
+        self.hpController.selectedElement = 1
+
+        self.databankMock.data["HP.screen:SELECTED_TAB"] = 2
+        self.databankMock.data["HP.screen:SHOW_DAMAGED"] = 0
+    end
+    o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
+        self.displayConfigurationName = "top no broken"
+        self.hpController.elementMetadata = self.generateElementMetadataData()
+        self.hpController.elementData = self.generateElementData(pocketScoutElements)
+        self.hpController.shipName = "Pocket Scout"
+        self.hpController.selectedElement = 1
+
+        self.databankMock.data["HP.screen:SELECTED_TAB"] = 2
+        self.databankMock.data["HP.screen:SHOW_BROKEN"] = 0
+    end
+    o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
         self.displayConfigurationName = "top maximized"
         self.hpController.elementMetadata = self.generateElementMetadataData()
         self.hpController.elementData = self.generateElementData(pocketScoutElements)
@@ -79,7 +109,7 @@ function AbstractTestShipHealthScreenBasic:new()
     end
 
     -- Table display
-    local buttons = {"Tab: Top", "Tab: Side", "Tab: Front"}
+    local buttons = {"Filter: Healthy", "Filter: Damaged", "Filter: Broken", "Tab: Top", "Tab: Side", "Tab: Front"}
     for _, button in pairs(buttons) do
         o.displayConfigurations[#o.displayConfigurations + 1] =
             function(self)
