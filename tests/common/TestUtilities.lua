@@ -315,11 +315,15 @@ function _G.TestUtilities.testFindFirstSlot()
     local databankMock = mockDatabankUnit:new(nil, 4)
     local databank = databankMock:mockGetClosure()
 
+    local coreMock = mockCoreUnit:new(nil, 7)
+    local core = coreMock:mockGetClosure()
+
     local unitMock = mockControlUnit:new(nil, 5, "programming board")
 
     unitMock.linkedElements["screen1"] = screen1
     unitMock.linkedElements["screen2"] = screen2
     unitMock.linkedElements["databank"] = databank
+    unitMock.linkedElements["core"] = core
 
     _G.unit = unitMock:mockGetClosure()
 
@@ -353,6 +357,17 @@ function _G.TestUtilities.testFindFirstSlot()
     actual, actualSlot = _G.Utilities.findFirstSlot(screen1.getElementClass(), {screen2});
     lu.assertIs(actual, screen1)
     lu.assertEquals(actualSlot, "screen1")
+
+    -- find from a list of search types, use exclusion to get testable result
+    actual, actualSlot = _G.Utilities.findFirstSlot({core.getElementClass(), databank.getElementClass()}, {core});
+    lu.assertIs(actual, databank)
+    lu.assertEquals(actualSlot, "databank")
+    actual, actualSlot = _G.Utilities.findFirstSlot({core.getElementClass(), databank.getElementClass()}, {databank});
+    lu.assertIs(actual, core)
+    lu.assertEquals(actualSlot, "core")
+    actual, actualSlot = _G.Utilities.findFirstSlot({core.getElementClass(), databank.getElementClass()}, {core, databank});
+    lu.assertNil(actual)
+    lu.assertNil(actualSlot)
 end
 
 --- Verify variations on loadSlot function properly with error reporting.
@@ -368,12 +383,11 @@ function _G.TestUtilities.testLoadSlot()
     local databank = databankMock:mockGetClosure()
 
     local unitMock = mockControlUnit:new(nil, 5, "programming board")
-
     unitMock.linkedElements["screenSlot"] = screen
     unitMock.linkedElements["coreSlot"] = core
     unitMock.linkedElements["dbSlot"] = databank
-
     local populatedUnit = unitMock:mockGetClosure()
+
     local emptyUnit = mockControlUnit:new(nil, 5, "programming board"):mockGetClosure()
 
     local printOutput
@@ -446,7 +460,51 @@ function _G.TestUtilities.testLoadSlot()
     -- screen should also have message
     lu.assertStrContains(screenMock.html, errorMsg)
 
-        ----------
+    ----------
+    -- test for multi-core - error screen provided
+    ----------
+    local coreStaticMock = mockCoreUnit:new(nil, 1, "Static Core XS")
+    local coreStatic = coreStaticMock:mockGetClosure()
+
+    local coreStaticUnitMock = mockControlUnit:new(nil, 5, "programming board")
+    coreStaticUnitMock.linkedElements["coreSlot"] = coreStatic
+    local coreStaticUnit = coreStaticUnitMock:mockGetClosure()
+
+    targetClass = {"CoreUnitDynamic", "CoreUnitStatic"}
+    errorScreen = screen
+    mappedSlotName = "core"
+    optional = nil
+    optionalMessage = nil
+
+    -- provided correct link, no output
+    _G.unit = populatedUnit
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(core, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, core)
+    lu.assertEquals(printOutput, "")
+
+    -- provided correct link, no output
+    _G.unit = coreStaticUnit
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(coreStatic, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, coreStatic)
+    lu.assertEquals(printOutput, "")
+
+    -- provided nil, automapping prints mapping result
+    _G.unit = populatedUnit
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, core)
+    lu.assertStrContains(printOutput, "Slot coreSlot mapped to antigrav core.")
+
+    -- provided nil, automapping prints mapping result
+    _G.unit = coreStaticUnit
+    printOutput = ""
+    actual = _G.Utilities.loadSlot(nil, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    lu.assertIs(actual, coreStatic)
+    lu.assertStrContains(printOutput, "Slot coreSlot mapped to antigrav core.")
+
+    ----------
     -- test for databank - optional with error screen provided
     ----------
     targetClass = "DataBankUnit"

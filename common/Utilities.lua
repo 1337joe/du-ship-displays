@@ -44,11 +44,14 @@ function _G.Utilities.sanitizeFormatString(text)
 end
 
 --- Finds the first slot on 'unit' that has element class 'slotClass' and is not listed in the exclude list.
--- @tparam string slotClass The element class of the target slot.
+-- @tparam string slotClass The element class of the target slot. May instead be a table containing a list of class names.
 -- @tparam table exclude A list of slots to exclude from search.
 -- @return The first element found of the desired type, or nil if none is found.
 -- @return The name of the slot where the returned element was found.
 function _G.Utilities.findFirstSlot(slotClass, exclude)
+    if type(slotClass) ~= "table" then
+        slotClass = {slotClass}
+    end
     exclude = exclude or {}
 
     for key, value in pairs(unit) do
@@ -60,8 +63,12 @@ function _G.Utilities.findFirstSlot(slotClass, exclude)
             end
         end
 
-        if value and type(value) == "table" and value.getElementClass and value.getElementClass() == slotClass then
-            return value, key
+        if value and type(value) == "table" and value.getElementClass then
+            for _, class in pairs(slotClass) do
+                if value.getElementClass() == class then
+                    return value, key
+                end
+            end
         end
 
         ::continueOuter::
@@ -85,13 +92,16 @@ end
 
 --- Attempts to verify the provided slot against the expected type, finding missing slot inputs in unit.
 -- @tparam Element provided A named slot that should fill the need for this type. May be nil.
--- @tparam string targetClass The ElementClass to look for/validate against.
+-- @tparam string targetClass The ElementClass to look for/validate against. May be a table containing a list of classes.
 -- @tparam ScreenUnit/ScreenSignUnit errorScreen A screen to display error messages to on failure.
 -- @tparam string moduleName The name of the module, to help disambiguate problems when multiple modules are run on the same controller.
 -- @tparam string mappedSlotName The internal name of the slot to indicate exactly what mapping failed.
 -- @tparam boolean optional True if this element is optional and should not produce an error on failure to map.
 -- @tparam string optionalMessage A message to print to the console on failure to map an optional element.
 function _G.Utilities.loadSlot(provided, targetClass, errorScreen, moduleName, mappedSlotName, optional, optionalMessage)
+    if type(targetClass) ~= "table" then
+        targetClass = {targetClass}
+    end
     local slotName
 
     local typedSlot = provided
@@ -108,7 +118,11 @@ function _G.Utilities.loadSlot(provided, targetClass, errorScreen, moduleName, m
         end
     else
         local class = typedSlot.getElementClass()
-        assertValid(class == targetClass, string.format("%s %s slot is of type: %s", moduleName, mappedSlotName, class), errorScreen)
+        local valid = false
+        for _, tClass in pairs(targetClass) do
+            valid = valid or class == tClass
+        end
+        assertValid(valid, string.format("%s %s slot is of type: %s", moduleName, mappedSlotName, class), errorScreen)
     end
     return typedSlot
 end
