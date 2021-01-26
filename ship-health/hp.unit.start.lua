@@ -30,7 +30,8 @@ local slots = _G.hpController.slots
 local module = "ship-health"
 slots.screen = _G.Utilities.loadSlot(slots.screen, "ScreenUnit", nil, module, "screen")
 slots.screen.activate()
-slots.core = _G.Utilities.loadSlot(slots.core, "CoreUnitDynamic", slots.screen, module, "core")
+slots.core = _G.Utilities.loadSlot(slots.core, {"CoreUnitDynamic", "CoreUnitStatic", "CoreUnitSpace"}, slots.screen,
+                 module, "core")
 slots.databank = _G.Utilities.loadSlot(slots.databank, "DataBankUnit", slots.screen, module, "databank", true,
                      "No databank found, controller state will not persist between sessions.")
 

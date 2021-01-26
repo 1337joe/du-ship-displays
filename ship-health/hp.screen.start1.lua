@@ -40,6 +40,18 @@ local ELEMENT_TABLE_CLASS = "tableClass"
 local ELEMENT_TOP_CLASS = "topClass"
 local ELEMENT_SIDE_CLASS = "sideClass"
 local ELEMENT_FRONT_CLASS = "frontClass"
+local ELEMENT_HIDDEN_TABLE_INTERFACE = "hiddenTableInterface"
+local ELEMENT_TABLE_INTERFACE = "tableInterface"
+local ELEMENT_SORT_ID_CLASS = "sortIdClass"
+local ELEMENT_SORT_NAME_CLASS = "sortNameClass"
+local ELEMENT_SORT_DMG_CLASS = "sortDmgClass"
+local ELEMENT_SORT_MAX_CLASS = "sortMaxClass"
+local ELEMENT_SORT_INT_CLASS = "sortIntClass"
+local ELEMENT_SKIP_UP_CLASS = "skipUpClass"
+local ELEMENT_SCROLL_UP_CLASS = "scrollUpClass"
+local ELEMENT_SCROLL_DOWN_CLASS = "scrollDownClass"
+local ELEMENT_SKIP_DOWN_CLASS = "skipDownClass"
+local ELEMENT_HIDDEN_CLOUD_BUTTONS = "hiddenCloudButtonBar"
 local ELEMENT_CLOUD_BUTTONS = "cloudButtonBar"
 local ELEMENT_CLOUD_STRETCH = "stretchClass"
 local ELEMENT_CLOUD_PRESERVE = "preserveClass"
@@ -73,6 +85,15 @@ _G.hpScreenController.BUTTON_TAB_TABLE = "Tab: Table"
 _G.hpScreenController.BUTTON_TAB_TOP = "Tab: Top"
 _G.hpScreenController.BUTTON_TAB_SIDE = "Tab: Side"
 _G.hpScreenController.BUTTON_TAB_FRONT = "Tab: Front"
+_G.hpScreenController.BUTTON_SORT_ID = "Table: Sort Id"
+_G.hpScreenController.BUTTON_SORT_NAME = "Table: Sort Name"
+_G.hpScreenController.BUTTON_SORT_DMG = "Table: Sort Dmg"
+_G.hpScreenController.BUTTON_SORT_MAX = "Table: Sort Max"
+_G.hpScreenController.BUTTON_SORT_INT = "Table: Sort Int"
+_G.hpScreenController.BUTTON_SKIP_UP = "Table: Skip Up"
+_G.hpScreenController.BUTTON_SCROLL_UP = "Table: Scroll Up"
+_G.hpScreenController.BUTTON_SCROLL_DOWN = "Table: Scroll Down"
+_G.hpScreenController.BUTTON_SKIP_DOWN = "Table: Skip Down"
 _G.hpScreenController.BUTTON_STRETCH_CLOUD = "Cloud: Stretch"
 _G.hpScreenController.BUTTON_MAXIMIZE_CLOUD = "Cloud: Maximize"
 
@@ -120,6 +141,51 @@ buttonCoordinates[_G.hpScreenController.BUTTON_TAB_FRONT] = {
     x1 = 0.833, x2 = 0.967,
     y1 = 0.1, y2 = 0.169,
     class = ELEMENT_FRONT_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_SORT_ID] = {
+    x1 = 0.4, x2 = 0.457,
+    y1 = 0.175, y2 = 0.235,
+    class = ELEMENT_SORT_ID_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_SORT_NAME] = {
+    x1 = 0.457, x2 = 0.76,
+    y1 = 0.175, y2 = 0.235,
+    class = ELEMENT_SORT_NAME_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_SORT_DMG] = {
+    x1 = 0.76, x2 = 0.841,
+    y1 = 0.175, y2 = 0.235,
+    class = ELEMENT_SORT_DMG_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_SORT_MAX] = {
+    x1 = 0.841, x2 = 0.919,
+    y1 = 0.175, y2 = 0.235,
+    class = ELEMENT_SORT_MAX_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_SORT_INT] = {
+    x1 = 0.919, x2 = 0.972,
+    y1 = 0.175, y2 = 0.235,
+    class = ELEMENT_SORT_INT_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_SKIP_UP] = {
+    x1 = 0.972, x2 = 1.0,
+    y1 = 0.235, y2 = 0.285,
+    class = ELEMENT_SKIP_UP_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_SCROLL_UP] = {
+    x1 = 0.972, x2 = 1.0,
+    y1 = 0.285, y2 = 0.335,
+    class = ELEMENT_SCROLL_UP_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_SCROLL_DOWN] = {
+    x1 = 0.972, x2 = 1.0,
+    y1 = 0.90, y2 = 0.95,
+    class = ELEMENT_SCROLL_DOWN_CLASS
+}
+buttonCoordinates[_G.hpScreenController.BUTTON_SKIP_DOWN] = {
+    x1 = 0.972, x2 = 1.0,
+    y1 = 0.95, y2 = 1.0,
+    class = ELEMENT_SKIP_DOWN_CLASS
 }
 buttonCoordinates[_G.hpScreenController.BUTTON_STRETCH_CLOUD] = {
     x1 = 0.8875, x2 = 0.94375,
@@ -346,11 +412,16 @@ function _G.hpScreenController:refresh()
     if self.selectedTab == 1 then
         html = _G.ScreenUtils.replaceClass(html, ELEMENT_TABLE_CLASS, SELECTED_CLASS)
 
-        -- disable cloud button bar
-        html = _G.ScreenUtils.replaceClass(html, ELEMENT_CLOUD_BUTTONS, HIDDEN_CLASS)
+        -- enable table header
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_HIDDEN_TABLE_INTERFACE, ELEMENT_TABLE_INTERFACE)
+
+        tabContents = buildTable(self.controller.elementData, 1, 0, true, self.controller.selectedElement, self.showHealthy, self.showDamaged, self.showBroken)
     elseif self.selectedTab == 2 or self.selectedTab == 3 or self.selectedTab == 4 then
         tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData,
                           self.controller.selectedElement, self.showHealthy, self.showDamaged, self.showBroken)
+
+        -- enable cloud button bar
+        html = _G.ScreenUtils.replaceClass(html, ELEMENT_HIDDEN_CLOUD_BUTTONS, ELEMENT_CLOUD_BUTTONS)
 
         if self.selectedTab == 2 then
             html = _G.ScreenUtils.replaceClass(html, ELEMENT_TOP_CLASS, SELECTED_CLASS)
@@ -434,6 +505,7 @@ function _G.hpScreenController:handleButton(buttonId)
             end
         end
         modified = true
+
     elseif buttonId == _G.hpScreenController.BUTTON_TAB_TABLE then
         modified = self:setSelectedTab(1)
     elseif buttonId == _G.hpScreenController.BUTTON_TAB_TOP then
@@ -442,6 +514,27 @@ function _G.hpScreenController:handleButton(buttonId)
         modified = self:setSelectedTab(3)
     elseif buttonId == _G.hpScreenController.BUTTON_TAB_FRONT then
         modified = self:setSelectedTab(4)
+
+    elseif buttonId == _G.hpScreenController.BUTTON_SORT_ID then
+        -- TODO
+    elseif buttonId == _G.hpScreenController.BUTTON_SORT_NAME then
+        -- TODO
+    elseif buttonId == _G.hpScreenController.BUTTON_SORT_DMB then
+        -- TODO
+    elseif buttonId == _G.hpScreenController.BUTTON_SORT_MAX then
+        -- TODO
+    elseif buttonId == _G.hpScreenController.BUTTON_SORT_INT then
+        -- TODO
+
+    elseif buttonId == _G.hpScreenController.BUTTON_SKIP_UP then
+        -- TODO
+    elseif buttonId == _G.hpScreenController.BUTTON_SKIP_DOWN then
+        -- TODO
+    elseif buttonId == _G.hpScreenController.BUTTON_SCROLL_UP then
+        -- TODO
+    elseif buttonId == _G.hpScreenController.BUTTON_SCROLL_DOWN then
+        -- TODO
+
     elseif buttonId == _G.hpScreenController.BUTTON_STRETCH_CLOUD and self.selectedTab > 1 then
         self.stretchCloud = not self.stretchCloud
         if self.databank then
@@ -467,6 +560,55 @@ function _G.hpScreenController:handleButton(buttonId)
     return modified
 end
 
+local TABLE_ROW_BASE_OFFSET = 65 -- height of heading
+-- Use nth-child css selector on .tableRow to style row elements
+local TABLE_ROW_TEMPLATE = [[
+<g class="tableRow %s" transform="translate(0,%.0f)">
+<text x="100">%d</text>
+<text x="120">%s</text>
+<text x="796">%s</text>
+<text x="796">%s</text>
+<text x="946">%s</text>
+<text x="946">%s</text>
+<text x="1081">%d</text>
+</g>
+]]
+function _G.buildTable(elementData, index, sortColumn, sortDown, selectedId, showHealthy, showDamaged, showBroken)
+    local table = [[<g id="tableContents">]]
+
+    local rowIndex = 0
+    local hp, max, selected, yOffset, hpPrint, hpUnit, maxPrint, maxUnit
+    for id, data in pairs(elementData) do
+        hp = data.h
+        max = data.m
+        yOffset = TABLE_ROW_BASE_OFFSET + 40 * (rowIndex + 1)
+
+        if yOffset > 891 then
+            break
+        end
+
+        if id == selectedId then
+            selected = "selected"
+        else
+            selected = ""
+        end
+
+        hpPrint, hpUnit = Utilities.printableNumber(math.floor(max - hp + 0.5), "")
+        if hpPrint == "0.0" then
+            hpPrint = "0"
+        end
+        maxPrint, maxUnit = Utilities.printableNumber(max, "")
+
+        if (hp == 0 and showBroken) or (hp > 0 and hp < max and showDamaged) or (hp == max and showHealthy) then
+            table = table .. string.format(TABLE_ROW_TEMPLATE, selected, yOffset, id, data.n, hpPrint, hpUnit, maxPrint, maxUnit, math.floor(100 * hp / max + 0.5))
+            rowIndex = rowIndex + 1
+        end
+    end
+
+    table = table .. [[</g>]]
+    return table
+end
+
 local CLOUD_REPLACE_TARGET = [[<g id="pointCloud"%s*/>]]
 local DEFAULT_OUTLINE = [[
 <svg viewBox="%f %f %f %f" scaleMultiplier="%d">
@@ -486,7 +628,7 @@ local DEFAULT_OUTLINE = [[
 ]]
 local HEALTH_GROUP_TEMPLATE = [[<g class="%s">%s</g>]]
 -- TODO make coroutine
-local CLOUD_ELEMENT_TEMPLATE = [[<circle cx="%s" cy="%s" r="%s"/>]]
+local CLOUD_ELEMENT_TEMPLATE = [[<circle cx="%.2f" cy="%.2f" r="%.2f"/>]]
 function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXFunc, screenYFunc)
     if not outline then
         local scale = 100

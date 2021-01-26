@@ -9,7 +9,7 @@
             font-size:108px;
             font-weight:bold;
         }
-        .hidden, .hideInterface {
+        .hidden, .hideInterface, #hiddenCloudButtonBar, #hiddenTableInterface {
             display: none;
         }
         .broken {
@@ -63,7 +63,7 @@
             font-size: 60px;
             fill: #777777;
         }
-        #tabs use, .cloudButtonBar use {
+        #tabs use, #cloudButtonBar use {
             stroke: #777777;
             stroke-width: 5px;
         }
@@ -86,11 +86,81 @@
             stroke: #5dd572 !important;
             stroke-width: 10px;
         }
+        #tableInterface text {
+            font-size: 50px;
+            fill: #ffffff;
+        }
+        #tableInterface line {
+            stroke: #ffffff;
+            stroke-width: 5;
+        }
+        #tableInterface .tableHeader use {
+            fill: #777777;
+        }
+        #tableInterface .tableHeader use.selected {
+            fill: #ffffff;
+        }
+        #tableInterface .scrollbar use, #tableInterface .scrollbar line {
+            stroke: #777777;
+            stroke-width: 5px;
+        }
+        #tableContents text {
+            font-size: 40px;
+            fill: #777777;
+        }
+        #tableContents text.selected {
+            fill: #ffffff;
+        }
+        #tableContents g.tableRow text:nth-child(1) {
+            clip-path: url(#tableIdClip);
+            text-anchor: end;
+        }
+        #tableContents g.tableRow text:nth-child(2) {
+            clip-path: url(#tableNameClip);
+        }
+        #tableContents g.tableRow text:nth-child(3) {
+            clip-path: url(#tableDmgClip);
+            text-anchor: end;
+        }
+        #tableContents g.tableRow text:nth-child(4) {
+            clip-path: url(#tableDmgClip);
+        }
+        #tableContents g.tableRow text:nth-child(5) {
+            clip-path: url(#tableMaxClip);
+            text-anchor: end;
+        }
+        #tableContents g.tableRow text:nth-child(6) {
+            clip-path: url(#tableMaxClip);
+        }
+        #tableContents g.tableRow text:nth-child(7) {
+            clip-path: url(#tableIntClip);
+            text-anchor: end;
+        }
     </style>
     <defs>
         <svg id="logo"/>
         <rect id="filterButton" x="-182" y="-44" width="364" height="88" rx="20" />
         <path id="tabSweep" d="m -130,7 c 50,0 20,-59 70,-59 l 120,0 c 50,0 20,59 70,59" />
+        <path id="sortUp" d="m -22,27 l 10,-10 10,10 z" />
+        <path id="sortDown" d="m -22,37 l 10,10 10,-10 z" />
+        <clipPath id="tableIdClip">
+            <rect y="-100" width="100" height="1180" />
+        </clipPath>
+        <clipPath id="tableNameClip">
+            <rect x="120" y="-100" width="561" height="1180" />
+        </clipPath>
+        <clipPath id="tableDmgClip">
+            <rect x="701" y="-100" width="135" height="1180" />
+        </clipPath>
+        <clipPath id="tableMaxClip">
+            <rect x="856" y="-100" width="130" height="1180" />
+        </clipPath>
+        <clipPath id="tableIntClip">
+            <rect x="1006" y="-100" width="82" height="1180" />
+        </clipPath>
+        <path id="skipButton" d="M -20,-15 l 40,0 M 0,-10 l 15,25 -30,0 z" />
+        <path id="scrollButton" d="M 0,-15 l 15,30 -30,0 z" />
+        <!-- TODO if these are only ever used once inline them -->
         <path id="maximizeButton" d="M 45,15 l 0,30 -30,0 m -30,0 l -30,0 0,-30 m 0,-30 l 0,-30 30,0 m 30,0 l 30,0 0,30 m 0,30 M 45,45 l -30,-30 m -30,-30 l -30,-30 m 90,0 l -30,30 m -30,30 l -30,30" />
         <path id="minimizeButton" d="M 45,15 l -30,0 0,30 m -30,0 l 0,-30 -30,0 m 0,-30 l 30,0 0,-30 m 30,0 l 0,30 30,0 m 0,30 M 45,45 l -30,-30 m -30,-30 l -30,-30 m 90,0 l -30,30 m -30,30 l -30,30" />
         <path id="stretchButton" d="M 0,40 l 0,-80 M 15,0 l 30,0 m -15,-15 l 15,15 -15,15 M -15,0 l -30,0 m 15,-15 l -15,15 15,15" />
@@ -155,10 +225,48 @@
     </g>
     <rect class="hideInterface" x="0" y="0" fill="#000000" width="1920" height="1080" />
     <g transform="translate(768,189)">
+        <g id="hiddenTableInterface">
+            <g class="tableHeader">
+                <g class="sortIdClass">
+                    <use class="sortUpId" xlink:href="#sortUp" x="30" />
+                    <use class="sortDownId" xlink:href="#sortDown" x="30" />
+                    <text x="30" y="50">ID</text>
+                </g>
+                <g class="sortNameClass">
+                    <use class="sortUpName" xlink:href="#sortUp" x="150" />
+                    <use class="sortDownName" xlink:href="#sortDown" x="150" />
+                    <text x="150" y="50">Name</text>
+                </g>
+                <g class="sortDmgClass">
+                    <use class="sortUpDmg" xlink:href="#sortUp" x="731" />
+                    <use class="sortDownDmg" xlink:href="#sortDown" x="731" />
+                    <text x="731" y="50">Dmg</text>
+                </g>
+                <g class="sortMaxClass">
+                    <use class="sortUpMax" xlink:href="#sortUp" x="886" />
+                    <use class="sortDownMax" xlink:href="#sortDown" x="886" />
+                    <text x="886" y="50">Max</text>
+                </g>
+                <g class="sortIntClass">
+                    <use class="sortUpInt" xlink:href="#sortUp" x="1036" />
+                    <use class="sortDownInt" xlink:href="#sortDown" x="1036" />
+                    <text x="1036" y="50">%</text>
+                </g>
+                <line x1="0" y1="65" x2="1152" y2="65" />
+            </g>
+           <line x1="1098" y1="65" x2="1098" y2="891" />
+            <g class="scrollbar">
+                <use xlink:href="#skipButton" class="skipUpClass" x="1125" y="92" />
+                <use xlink:href="#scrollButton" class="scrollUpClass" x="1125" y="146" />
+                <use xlink:href="#scrollButton" transform="translate(1125,810) rotate(180)" class="scrollDownClass" />
+                <use xlink:href="#skipButton" transform="translate(1125,864) rotate(180)" class="skipDownClass" />
+                <line x1="1125" y1="173" x2="1125" y2="783" />
+            </g>
+        </g>
         <svg id="tabContents"/>
     </g>
     <svg id="maximizedContents"/>
-    <g class="cloudButtonBar">
+    <g id="hiddenCloudButtonBar">
         <use xlink:href="#maximizeButton" class="maximizeClass" x="1866" y="1026" />
         <use xlink:href="#minimizeButton" class="minimizeClass" x="1866" y="1026" />
         <use xlink:href="#stretchButton" class="stretchClass" x="1758" y="1026" />

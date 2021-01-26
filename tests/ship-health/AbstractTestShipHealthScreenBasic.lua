@@ -16,7 +16,17 @@ function AbstractTestShipHealthScreenBasic:new()
     setmetatable(o, self)
     self.__index = self
 
-    -- configuration changes
+    o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
+        self.displayConfigurationName = "table no healthy"
+        self.hpController.elementMetadata = self.generateElementMetadataData()
+        self.hpController.elementData = self.generateElementData(pocketScoutElements)
+        self.hpController.shipName = "Pocket Scout"
+        self.hpController.selectedElement = 1
+
+        self.databankMock.data["HP.screen:SHOW_HEALTHY"] = 0
+    end
+
+    -- new default: top view
     o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
         self.displayConfigurationName = "tab: top"
         self.hpController.elementMetadata = self.generateElementMetadataData()
@@ -27,7 +37,8 @@ function AbstractTestShipHealthScreenBasic:new()
         self.databankMock.data["HP.screen:SELECTED_TAB"] = 2
     end
     -- override default display
-    o.sampleDisplayConfiguration = #o.displayConfigurations
+    -- o.sampleDisplayConfiguration = #o.displayConfigurations
+
     o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
         self.displayConfigurationName = "top no healthy"
         self.hpController.elementMetadata = self.generateElementMetadataData()
@@ -109,7 +120,9 @@ function AbstractTestShipHealthScreenBasic:new()
     end
 
     -- Table display
-    local buttons = {"Filter: Healthy", "Filter: Damaged", "Filter: Broken", "Tab: Top", "Tab: Side", "Tab: Front"}
+    local buttons = {"Filter: Healthy", "Filter: Damaged", "Filter: Broken", "Tab: Top", "Tab: Side", "Tab: Front",
+                     "Table: Sort Id", "Table: Sort Name", "Table: Sort Dmg", "Table: Sort Max", "Table: Sort Int",
+                     "Table: Skip Up", "Table: Scroll Up", "Table: Scroll Down", "Table: Skip Down"}
     for _, button in pairs(buttons) do
         o.displayConfigurations[#o.displayConfigurations + 1] =
             function(self)
