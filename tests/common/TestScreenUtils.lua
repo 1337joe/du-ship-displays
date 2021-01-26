@@ -42,6 +42,14 @@ function _G.TestScreenUtils.testReplaceClass()
     newClass = "hidden"
     actual = _G.ScreenUtils.replaceClass(html, oldClass, newClass)
     lu.assertEquals(actual, expected)
+
+    -- does not match part of word
+    html = [[class="unlockSlideClass"]]
+    expected = html
+    oldClass = "unlockSlide"
+    newClass = "hidden"
+    actual = _G.ScreenUtils.replaceClass(html, oldClass, newClass)
+    lu.assertEquals(actual, expected)
 end
 
 --- Verify add class works as expected.
@@ -68,6 +76,14 @@ function _G.TestScreenUtils.testAddClass()
     html = [[class="label unlockSlideClass"]]
     expected = [[class="label unlockSlideClass newClass"]]
     oldClass = "unlockSlideClass"
+    newClass = "newClass"
+    actual = _G.ScreenUtils.addClass(html, oldClass, newClass)
+    lu.assertEquals(actual, expected)
+
+    -- does not match part of word
+    html = [[class="label unlockSlideClass"]]
+    expected = html
+    oldClass = "unlockSlide"
     newClass = "newClass"
     actual = _G.ScreenUtils.addClass(html, oldClass, newClass)
     lu.assertEquals(actual, expected)

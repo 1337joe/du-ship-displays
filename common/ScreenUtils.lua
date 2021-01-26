@@ -10,14 +10,14 @@ _G.ScreenUtils = {}
 
 --- Replaces a value from within a class attribute.
 function _G.ScreenUtils.replaceClass(html, find, replace)
-    -- ensure preceeded by " or space
-    return string.gsub(html, "([\"%s])" .. find, "%1" .. replace)
+    -- ensure preceeded and followed by " or space
+    return string.gsub(html, "([\"%s])" .. find .. "([%s\"])", "%1" .. replace .. "%2")
 end
 
 --- Adds an additional value to a class attribute.
 function _G.ScreenUtils.addClass(html, find, add)
-    -- ensure preceeded by " or space
-    return string.gsub(html, "([\"%s]" .. find .. ")", "%1 " .. add)
+    -- ensure preceeded and followed by " or space
+    return string.gsub(html, "([\"%s]" .. find .. ")([%s\"])", "%1 " .. add .. "%2")
 end
 
 --- Returns the button that intersects the provided coordinates or nil if none is found.
