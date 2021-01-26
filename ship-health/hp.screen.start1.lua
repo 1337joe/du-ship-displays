@@ -15,6 +15,10 @@ local SHOW_BROKEN_KEY = "HP.screen:SHOW_BROKEN"
 local SHOW_BROKEN_DEFAULT = true
 local SELECTED_TAB_KEY = "HP.screen:SELECTED_TAB"
 local SELECTED_TAB_DEFAULT = 1
+local SORT_COLUMN_KEY = "HP.screen:SORT_COLUMN"
+local SORT_COLUMN_DEFAULT = 5
+local SORT_UP_KEY = "HP.screen:SORT_UP"
+local SORT_UP_DEFAULT = true
 local SCROLL_INDEX_KEY = "HP.screen:SCROLL_INDEX"
 local SCROLL_INDEX_DEFAULT = 1
 local STRECH_CLOUD_KEY = "HP.screen:STRETCH_CLOUD"
@@ -218,6 +222,14 @@ function _G.hpScreenController:init(controller)
     if not (self.databank and self.databank.hasKey(SELECTED_TAB_KEY) == 1) then
         self:setSelectedTab(SELECTED_TAB_DEFAULT)
     end
+
+    if not (self.databank and self.databank.hasKey(SORT_COLUMN_KEY) == 1) then
+        self.sortColumn = SORT_COLUMN_DEFAULT
+    end
+    if not (self.databank and self.databank.hasKey(SORT_UP_KEY) == 1) then
+        self.sortUp = SORT_UP_DEFAULT
+    end
+
     if not (self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) == 1) then
         self.stretchCloud = STRETCH_CLOUD_DEFAULT
     end
@@ -339,6 +351,13 @@ function _G.hpScreenController:refresh()
         self:setSelectedTab(self.databank.getIntValue(SELECTED_TAB_KEY))
     end
 
+    if self.databank and self.databank.hasKey(SORT_COLUMN_KEY) == 1 then
+        self.sortColumn = self.databank.getIntValue(SORT_COLUMN_KEY)
+    end
+    if self.databank and self.databank.hasKey(SORT_UP_KEY) == 1 then
+        self.sortUp = self.databank.getIntValue(SORT_UP_KEY) == 1
+    end
+
     if self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) == 1 then
         self.stretchCloud = self.databank.getIntValue(STRECH_CLOUD_KEY) == 1
     end
@@ -415,7 +434,29 @@ function _G.hpScreenController:refresh()
         -- enable table header
         html = _G.ScreenUtils.replaceClass(html, ELEMENT_HIDDEN_TABLE_INTERFACE, ELEMENT_TABLE_INTERFACE)
 
-        tabContents = buildTable(self.controller.elementData, 1, 0, true, self.controller.selectedElement, self.showHealthy, self.showDamaged, self.showBroken)
+        tabContents = buildTable(self.controller.elementData, 1, self.sortColumn, self.sortUp, self.controller.selectedElement, self.showHealthy, self.showDamaged, self.showBroken)
+
+        -- manage header states
+        local columnElementClass = nil
+        if self.sortColumn == 1 then
+            columnElementClass = ELEMENT_SORT_ID_CLASS
+        elseif self.sortColumn == 2 then
+            columnElementClass = ELEMENT_SORT_NAME_CLASS
+        elseif self.sortColumn == 3 then
+            columnElementClass = ELEMENT_SORT_DMG_CLASS
+        elseif self.sortColumn == 4 then
+            columnElementClass = ELEMENT_SORT_MAX_CLASS
+        elseif self.sortColumn == 5 then
+            columnElementClass = ELEMENT_SORT_INT_CLASS
+        end
+        if columnElementClass then
+            html = _G.ScreenUtils.addClass(html, columnElementClass, SELECTED_CLASS)
+            if self.sortUp then
+                html = _G.ScreenUtils.addClass(html, columnElementClass .. "Up", SELECTED_CLASS)
+            else
+                html = _G.ScreenUtils.addClass(html, columnElementClass .. "Down", SELECTED_CLASS)
+            end
+        end
     elseif self.selectedTab == 2 or self.selectedTab == 3 or self.selectedTab == 4 then
         tabContents = updateCloud(self.tabData.template, self.tabData.points, self.controller.elementData,
                           self.controller.selectedElement, self.showHealthy, self.showDamaged, self.showBroken)
@@ -474,6 +515,7 @@ end
 -- @treturn boolean True if the state was changed by this action.
 function _G.hpScreenController:handleButton(buttonId)
     local modified = false
+    local storeSort = false
 
     if buttonId == _G.hpScreenController.BUTTON_FILTER_HEALTHY then
         self.showHealthy = not self.showHealthy
@@ -516,15 +558,55 @@ function _G.hpScreenController:handleButton(buttonId)
         modified = self:setSelectedTab(4)
 
     elseif buttonId == _G.hpScreenController.BUTTON_SORT_ID then
-        -- TODO
+        if self.sortColumn == 1 then
+            self.sortUp = not self.sortUp
+        else
+            self.sortColumn = 1
+            self.sortUp = SORT_UP_DEFAULT
+        end
+
+        storeSort = true
+        modified = true
     elseif buttonId == _G.hpScreenController.BUTTON_SORT_NAME then
-        -- TODO
-    elseif buttonId == _G.hpScreenController.BUTTON_SORT_DMB then
-        -- TODO
+        if self.sortColumn == 2 then
+            self.sortUp = not self.sortUp
+        else
+            self.sortColumn = 2
+            self.sortUp = SORT_UP_DEFAULT
+        end
+
+        storeSort = true
+        modified = true
+    elseif buttonId == _G.hpScreenController.BUTTON_SORT_DMG then
+        if self.sortColumn == 3 then
+            self.sortUp = not self.sortUp
+        else
+            self.sortColumn = 3
+            self.sortUp = SORT_UP_DEFAULT
+        end
+
+        storeSort = true
+        modified = true
     elseif buttonId == _G.hpScreenController.BUTTON_SORT_MAX then
-        -- TODO
+        if self.sortColumn == 4 then
+            self.sortUp = not self.sortUp
+        else
+            self.sortColumn = 4
+            self.sortUp = SORT_UP_DEFAULT
+        end
+
+        storeSort = true
+        modified = true
     elseif buttonId == _G.hpScreenController.BUTTON_SORT_INT then
-        -- TODO
+        if self.sortColumn == 5 then
+            self.sortUp = not self.sortUp
+        else
+            self.sortColumn = 5
+            self.sortUp = SORT_UP_DEFAULT
+        end
+
+        storeSort = true
+        modified = true
 
     elseif buttonId == _G.hpScreenController.BUTTON_SKIP_UP then
         -- TODO
@@ -557,6 +639,15 @@ function _G.hpScreenController:handleButton(buttonId)
         modified = true
     end
 
+    if storeSort and self.databank then
+        self.databank.setIntValue(SORT_COLUMN_KEY, self.sortColumn)
+        if self.sortUp then
+            self.databank.setIntValue(SORT_UP_KEY, 1)
+        else
+            self.databank.setIntValue(SORT_UP_KEY, 0)
+        end
+    end
+
     return modified
 end
 
@@ -573,12 +664,37 @@ local TABLE_ROW_TEMPLATE = [[
 <text x="1081">%d</text>
 </g>
 ]]
-function _G.buildTable(elementData, index, sortColumn, sortDown, selectedId, showHealthy, showDamaged, showBroken)
+function _G.buildTable(elementData, index, sortColumn, sortUp, selectedId, showHealthy, showDamaged, showBroken)
     local table = [[<g id="tableContents">]]
 
+    local sortFunction
+    if sortColumn == 1 then -- id
+        sortFunction = function(e)
+            return 1 -- fallback to id sort
+        end
+    elseif sortColumn == 2 then -- name
+        sortFunction = function(e)
+            return e.n
+        end
+    elseif sortColumn == 3 then -- damage
+        sortFunction = function(e)
+            return e.m - e.h
+        end
+    elseif sortColumn == 4 then -- max
+        sortFunction = function(e)
+            return e.m
+        end
+    elseif sortColumn == 5 then -- integrity
+        sortFunction = function(e)
+            return e.h / e.m
+        end
+    end
+    local sortedIds = sortIds(elementData, sortFunction, not sortUp)
+
     local rowIndex = 0
-    local hp, max, selected, yOffset, hpPrint, hpUnit, maxPrint, maxUnit
-    for id, data in pairs(elementData) do
+    local data, hp, max, selected, yOffset, hpPrint, hpUnit, maxPrint, maxUnit
+    for _, id in pairs(sortedIds) do
+        data = elementData[id]
         hp = data.h
         max = data.m
         yOffset = TABLE_ROW_BASE_OFFSET + 40 * (rowIndex + 1)
@@ -664,6 +780,7 @@ function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXF
     local minHp2 = elementMetadata.min.hp * elementMetadata.min.hp
     local maxHp2 = elementMetadata.max.hp * elementMetadata.max.hp
 
+    -- TODO should change for each perspective, not be staticly set to the z axis
     local sortedIds = sortIds(elementData, function(e)
         return e.p.z
     end)
@@ -743,7 +860,7 @@ function filterIds(ids, filter)
     return filtered
 end
 
-function sortIds(elementData, axisAccessor)
+function sortIds(elementData, valueAccessor, reverse)
     local ids = {}
     for k, _ in pairs(elementData) do
         ids[#ids + 1] = k
@@ -752,21 +869,17 @@ function sortIds(elementData, axisAccessor)
     local comparator = function(a, b)
         local ea = elementData[a]
         local eb = elementData[b]
-        -- -- if a and b are not in the same damaged state sort by state
-        -- if not ((ea.h == 0 and eb.h == 0) or (ea.h < ea.m and eb.h < eb.m) or (ea.h == ea.m and eb.h == eb.m)) then
-        --     -- more damaged comes later in list
-        --     return not (ea.h == 0 and eb.h > 0) or (ea.h < ea.m and eb.h == eb.m)
-        -- end
 
         -- else sort by axis
-        local axisA = axisAccessor(ea)
-        local axisB = axisAccessor(eb)
-        if axisA == axisB then
+        local valueA = valueAccessor(ea)
+        local valueB = valueAccessor(eb)
+        if valueA == valueB then
             -- fall back to index
-            return a < b
+
+            return (not reverse and a < b) or (reverse and a > b)
         end
-        -- higher axis value comes later in list
-        return axisA < axisB
+        -- higher value comes later in list
+        return (not reverse and valueA < valueB) or (reverse and valueA > valueB)
     end
     table.sort(ids, comparator)
     return ids

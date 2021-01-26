@@ -25,6 +25,53 @@ function AbstractTestShipHealthScreenBasic:new()
 
         self.databankMock.data["HP.screen:SHOW_HEALTHY"] = 0
     end
+    o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
+        self.displayConfigurationName = "table sort id down"
+        self.hpController.elementMetadata = self.generateElementMetadataData()
+        self.hpController.elementData = self.generateElementData(pocketScoutElements)
+        self.hpController.shipName = "Pocket Scout"
+        self.hpController.selectedElement = 1
+
+        self.databankMock.data["HP.screen:SORT_UP"] = 0
+    end
+    o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
+        self.displayConfigurationName = "table sort name up"
+        self.hpController.elementMetadata = self.generateElementMetadataData()
+        self.hpController.elementData = self.generateElementData(pocketScoutElements)
+        self.hpController.shipName = "Pocket Scout"
+        self.hpController.selectedElement = 1
+
+        self.databankMock.data["HP.screen:SORT_COLUMN"] = 2
+    end
+    o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
+        self.displayConfigurationName = "table sort dmg down"
+        self.hpController.elementMetadata = self.generateElementMetadataData()
+        self.hpController.elementData = self.generateElementData(pocketScoutElements)
+        self.hpController.shipName = "Pocket Scout"
+        self.hpController.selectedElement = 1
+
+        self.databankMock.data["HP.screen:SORT_COLUMN"] = 3
+        self.databankMock.data["HP.screen:SORT_UP"] = 0
+    end
+    o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
+        self.displayConfigurationName = "table sort max up"
+        self.hpController.elementMetadata = self.generateElementMetadataData()
+        self.hpController.elementData = self.generateElementData(pocketScoutElements)
+        self.hpController.shipName = "Pocket Scout"
+        self.hpController.selectedElement = 1
+
+        self.databankMock.data["HP.screen:SORT_COLUMN"] = 4
+    end
+    o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
+        self.displayConfigurationName = "table sort int down"
+        self.hpController.elementMetadata = self.generateElementMetadataData()
+        self.hpController.elementData = self.generateElementData(pocketScoutElements)
+        self.hpController.shipName = "Pocket Scout"
+        self.hpController.selectedElement = 1
+
+        self.databankMock.data["HP.screen:SORT_COLUMN"] = 5
+        self.databankMock.data["HP.screen:SORT_UP"] = 0
+    end
 
     -- new default: top view
     o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
@@ -37,7 +84,7 @@ function AbstractTestShipHealthScreenBasic:new()
         self.databankMock.data["HP.screen:SELECTED_TAB"] = 2
     end
     -- override default display
-    -- o.sampleDisplayConfiguration = #o.displayConfigurations
+    o.sampleDisplayConfiguration = #o.displayConfigurations
 
     o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
         self.displayConfigurationName = "top no healthy"
