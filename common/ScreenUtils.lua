@@ -45,6 +45,11 @@ function _G.ScreenUtils.detectButton(buttonCoordinates, x, y)
             end
         end
 
+        -- test for inactive flag, reset found if not active
+        if found then
+            found = coords.active ~= false
+        end
+
         if found then
             return buttonLabel, index
         end

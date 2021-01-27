@@ -124,6 +124,20 @@ function _G.TestScreenUtils.testDetectButton()
     lu.assertEquals(actualButton, expectedButton)
     lu.assertNil(actualIndex)
 
+    -- does not detect when button is not active
+    buttonCoordinates[BUTTON_ALTITUDE_UP].active = false
+    expectedButton = nil
+    actualButton, actualIndex = _G.ScreenUtils.detectButton(buttonCoordinates, 0.2, 0.3)
+    lu.assertEquals(actualButton, expectedButton)
+    lu.assertNil(actualIndex)
+
+    -- detects again with active set to true
+    buttonCoordinates[BUTTON_ALTITUDE_UP].active = true
+    expectedButton = BUTTON_ALTITUDE_UP
+    actualButton, actualIndex = _G.ScreenUtils.detectButton(buttonCoordinates, 0.2, 0.3)
+    lu.assertEquals(actualButton, expectedButton)
+    lu.assertNil(actualIndex)
+
     -- edges of button, inside - detects and no index
     expectedButton = BUTTON_ALTITUDE_UP
 
@@ -147,7 +161,7 @@ function _G.TestScreenUtils.testDetectButton()
     expectedButton = nil
 
     actualButton, actualIndex = _G.ScreenUtils.detectButton(buttonCoordinates, 0.1 - epsilon, 0.3)
-    lu.assertNil(actualButton, expectedButton)
+    lu.assertEquals(actualButton, expectedButton)
     lu.assertNil(actualIndex)
 
     actualButton, actualIndex = _G.ScreenUtils.detectButton(buttonCoordinates, 0.3 + epsilon, 0.3)
