@@ -88,7 +88,7 @@
         }
         #tableInterface text {
             font-size: 50px;
-            fill: #777777;
+            fill: #ffffff;
         }
         #tableInterface line {
             stroke: #ffffff;
@@ -100,39 +100,43 @@
         #tableInterface .tableHeader use.selected {
             fill: #ffffff;
         }
-        #tableInterface .scrollbar use, #tableInterface .scrollbar line {
-            stroke: #777777;
+        #tableInterface .scrollbar use, #tableInterface .scrollbar line, rect.scrollbar {
+            stroke: #ffffff;
             stroke-width: 5px;
+            fill: #777777;
         }
         #tableContents text {
             font-size: 40px;
-            fill: #777777;
-        }
-        #tableContents text.selected {
             fill: #ffffff;
         }
-        #tableContents g.tableRow text:nth-child(1) {
+        #tableContents g.selected text {
+            fill: #77ff00;
+        }
+        #tableContents g rect {
+            fill-opacity: 0.3;
+        }
+        #tableContents g text:nth-child(2) {
             clip-path: url(#tableIdClip);
             text-anchor: end;
         }
-        #tableContents g.tableRow text:nth-child(2) {
+        #tableContents g text:nth-child(3) {
             clip-path: url(#tableNameClip);
         }
-        #tableContents g.tableRow text:nth-child(3) {
+        #tableContents g text:nth-child(4) {
             clip-path: url(#tableDmgClip);
             text-anchor: end;
         }
-        #tableContents g.tableRow text:nth-child(4) {
+        #tableContents g text:nth-child(5) {
             clip-path: url(#tableDmgClip);
         }
-        #tableContents g.tableRow text:nth-child(5) {
+        #tableContents g text:nth-child(6) {
             clip-path: url(#tableMaxClip);
             text-anchor: end;
         }
-        #tableContents g.tableRow text:nth-child(6) {
+        #tableContents g text:nth-child(7) {
             clip-path: url(#tableMaxClip);
         }
-        #tableContents g.tableRow text:nth-child(7) {
+        #tableContents g text:nth-child(8) {
             clip-path: url(#tableIntClip);
             text-anchor: end;
         }
@@ -270,53 +274,5 @@
         <use xlink:href="#minimizeButton" class="minimizeClass" x="1866" y="1026" />
         <use xlink:href="#stretchButton" class="stretchClass" x="1758" y="1026" />
         <use xlink:href="#preserveButton" class="preserveClass" x="1758" y="1026" />
-    </g>
-    <g id="overlay grid" style="opacity=0.5;">
-        <g id="10% grid" style="stroke-width:1px;stroke:#444444;">
-            <line x1="0" y1="0" x2="1920" y2="0" />
-            <line x1="0" y1="108" x2="1920" y2="108" />
-            <line x1="0" y1="216" x2="1920" y2="216" />
-            <line x1="0" y1="324" x2="1920" y2="324" />
-            <line x1="0" y1="432" x2="1920" y2="432" />
-            <line x1="0" y1="540" x2="1920" y2="540" />
-            <line x1="0" y1="648" x2="1920" y2="648" />
-            <line x1="0" y1="756" x2="1920" y2="756" />
-            <line x1="0" y1="864" x2="1920" y2="864" />
-            <line x1="0" y1="972" x2="1920" y2="972" />
-            <line x1="0" y1="1080" x2="1920" y2="1080" />
-            <line x1="0" y1="0" x2="0" y2="1080" />
-            <line x1="192" y1="0" x2="192" y2="1080" />
-            <line x1="384" y1="0" x2="384" y2="1080" />
-            <line x1="576" y1="0" x2="576" y2="1080" />
-            <line x1="768" y1="0" x2="768" y2="1080" />
-            <line x1="960" y1="0" x2="960" y2="1080" />
-            <line x1="1152" y1="0" x2="1152" y2="1080" />
-            <line x1="1344" y1="0" x2="1344" y2="1080" />
-            <line x1="1536" y1="0" x2="1536" y2="1080" />
-            <line x1="1728" y1="0" x2="1728" y2="1080" />
-            <line x1="1920" y1="0" x2="1920" y2="1080" />
-        </g>
-        <g id="5% grid" style="stroke-width:1px;stroke:#444444;stroke-dasharray:4;opacity:0.5;">
-            <line x1="0" y1="54" x2="1920" y2="54" />
-            <line x1="0" y1="162" x2="1920" y2="162" />
-            <line x1="0" y1="270" x2="1920" y2="270" />
-            <line x1="0" y1="378" x2="1920" y2="378" />
-            <line x1="0" y1="486" x2="1920" y2="486" />
-            <line x1="0" y1="594" x2="1920" y2="594" />
-            <line x1="0" y1="702" x2="1920" y2="702" />
-            <line x1="0" y1="810" x2="1920" y2="810" />
-            <line x1="0" y1="918" x2="1920" y2="918" />
-            <line x1="0" y1="1026" x2="1920" y2="1026" />
-            <line x1="96" y1="0" x2="96" y2="1080" />
-            <line x1="288" y1="0" x2="288" y2="1080" />
-            <line x1="480" y1="0" x2="480" y2="1080" />
-            <line x1="672" y1="0" x2="672" y2="1080" />
-            <line x1="864" y1="0" x2="864" y2="1080" />
-            <line x1="1056" y1="0" x2="1056" y2="1080" />
-            <line x1="1248" y1="0" x2="1248" y2="1080" />
-            <line x1="1440" y1="0" x2="1440" y2="1080" />
-            <line x1="1632" y1="0" x2="1632" y2="1080" />
-            <line x1="1824" y1="0" x2="1824" y2="1080" />
-        </g>
     </g>
 </svg>

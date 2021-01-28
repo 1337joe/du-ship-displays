@@ -55,6 +55,7 @@ local ELEMENT_SKIP_UP_CLASS = "skipUpClass"
 local ELEMENT_SCROLL_UP_CLASS = "scrollUpClass"
 local ELEMENT_SCROLL_DOWN_CLASS = "scrollDownClass"
 local ELEMENT_SKIP_DOWN_CLASS = "skipDownClass"
+local ELEMENT_TABLE_ROW_CLASS = "tableRow"
 local ELEMENT_HIDDEN_CLOUD_BUTTONS = "hiddenCloudButtonBar"
 local ELEMENT_CLOUD_BUTTONS = "cloudButtonBar"
 local ELEMENT_CLOUD_STRETCH = "stretchClass"
@@ -98,6 +99,7 @@ _G.hpScreenController.BUTTON_SKIP_UP = "Table: Skip Up"
 _G.hpScreenController.BUTTON_SCROLL_UP = "Table: Scroll Up"
 _G.hpScreenController.BUTTON_SCROLL_DOWN = "Table: Scroll Down"
 _G.hpScreenController.BUTTON_SKIP_DOWN = "Table: Skip Down"
+_G.hpScreenController.BUTTON_TABLE_ROW = "Table: Row "
 _G.hpScreenController.BUTTON_STRETCH_CLOUD = "Cloud: Stretch"
 _G.hpScreenController.BUTTON_MAXIMIZE_CLOUD = "Cloud: Maximize"
 
@@ -201,6 +203,15 @@ buttonCoordinates[_G.hpScreenController.BUTTON_MAXIMIZE_CLOUD] = {
     y1 = 0.9, y2 = 1.0,
     class = {ELEMENT_CLOUD_MAXIMIZE, ELEMENT_CLOUD_MINIMIZE}
 }
+
+for row = 1, 20 do
+    buttonCoordinates[_G.hpScreenController.BUTTON_TABLE_ROW .. row] = {
+        x1 = 0.4, x2 = 0.972,
+        y1 = (189 + 65 - 5 + 41 * row - 30) / 1080, y2 = (189 + 65 + 41 * row + 11) / 1080,
+        class = ELEMENT_TABLE_ROW_CLASS .. row
+    }
+end
+
 -- save to controller for press/release event handling
 _G.hpScreenController.buttonCoordinates = buttonCoordinates
 
@@ -228,6 +239,10 @@ function _G.hpScreenController:init(controller)
     end
     if not (self.databank and self.databank.hasKey(SORT_UP_KEY) == 1) then
         self.sortUp = SORT_UP_DEFAULT
+    end
+
+    if not (self.databank and self.databank.hasKey(SCROLL_INDEX_KEY) == 1) then
+        self.scrollIndex = SCROLL_INDEX_DEFAULT
     end
 
     if not (self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) == 1) then
@@ -337,32 +352,40 @@ function _G.hpScreenController:refresh()
     self.needRefresh = false
     -- self.mouse.over = mouseOver
 
-    if self.databank and self.databank.hasKey(SHOW_HEALTHY_KEY) == 1 then
-        self.showHealthy = self.databank.getIntValue(SHOW_HEALTHY_KEY) == 1
-    end
-    if self.databank and self.databank.hasKey(SHOW_DAMAGED_KEY) == 1 then
-        self.showDamaged = self.databank.getIntValue(SHOW_DAMAGED_KEY) == 1
-    end
-    if self.databank and self.databank.hasKey(SHOW_BROKEN_KEY) == 1 then
-        self.showBroken = self.databank.getIntValue(SHOW_BROKEN_KEY) == 1
-    end
+    if self.databank then
+        if self.databank.hasKey(SHOW_HEALTHY_KEY) == 1 then
+            self.showHealthy = self.databank.getIntValue(SHOW_HEALTHY_KEY) == 1
+        end
+        if self.databank.hasKey(SHOW_DAMAGED_KEY) == 1 then
+            self.showDamaged = self.databank.getIntValue(SHOW_DAMAGED_KEY) == 1
+        end
+        if self.databank.hasKey(SHOW_BROKEN_KEY) == 1 then
+            self.showBroken = self.databank.getIntValue(SHOW_BROKEN_KEY) == 1
+        end
 
-    if self.databank and self.databank.getIntValue(SELECTED_TAB_KEY) ~= self.selectedTab then
-        self:setSelectedTab(self.databank.getIntValue(SELECTED_TAB_KEY))
-    end
+        if self.databank.getIntValue(SELECTED_TAB_KEY) ~= self.selectedTab then
+            self:setSelectedTab(self.databank.getIntValue(SELECTED_TAB_KEY))
+        end
 
-    if self.databank and self.databank.hasKey(SORT_COLUMN_KEY) == 1 then
-        self.sortColumn = self.databank.getIntValue(SORT_COLUMN_KEY)
-    end
-    if self.databank and self.databank.hasKey(SORT_UP_KEY) == 1 then
-        self.sortUp = self.databank.getIntValue(SORT_UP_KEY) == 1
-    end
+        if self.databank.hasKey(SORT_COLUMN_KEY) == 1 then
+            self.sortColumn = self.databank.getIntValue(SORT_COLUMN_KEY)
+        end
+        if self.databank.hasKey(SORT_UP_KEY) == 1 then
+            self.sortUp = self.databank.getIntValue(SORT_UP_KEY) == 1
+        end
+        if self.databank.hasKey(SCROLL_INDEX_KEY) == 1 then
+            self.scrollIndex = self.databank.getIntValue(SCROLL_INDEX_KEY)
+        end
 
-    if self.databank and self.databank.hasKey(STRECH_CLOUD_KEY) == 1 then
-        self.stretchCloud = self.databank.getIntValue(STRECH_CLOUD_KEY) == 1
-    end
-    if self.databank and self.databank.hasKey(MAXIMIZE_CLOUD_KEY) == 1 then
-        self.maximizeCloud = self.databank.getIntValue(MAXIMIZE_CLOUD_KEY) == 1
+        if self.databank.hasKey(STRECH_CLOUD_KEY) == 1 then
+            self.stretchCloud = self.databank.getIntValue(STRECH_CLOUD_KEY) == 1
+        end
+        if self.databank.hasKey(MAXIMIZE_CLOUD_KEY) == 1 then
+            self.maximizeCloud = self.databank.getIntValue(MAXIMIZE_CLOUD_KEY) == 1
+        end
+
+        -- will call more than desired, but will keep state up to date
+        self:updateButtonStates()
     end
 
     local html = self.SVG_TEMPLATE
@@ -434,7 +457,7 @@ function _G.hpScreenController:refresh()
         -- enable table header
         html = _G.ScreenUtils.replaceClass(html, ELEMENT_HIDDEN_TABLE_INTERFACE, ELEMENT_TABLE_INTERFACE)
 
-        tabContents = buildTable(self.controller.elementData, 1, self.sortColumn, self.sortUp, self.controller.selectedElement, self.showHealthy, self.showDamaged, self.showBroken)
+        tabContents, self.maxScrollIndex = self:buildTable(self.controller.elementData, self.scrollIndex, self.sortColumn, self.sortUp, self.controller.selectedElement)
 
         -- manage header states
         local columnElementClass = nil
@@ -516,6 +539,9 @@ end
 function _G.hpScreenController:handleButton(buttonId)
     local modified = false
     local storeSort = false
+    local storeScroll = false
+
+    local tableRow = string.match(buttonId, self.BUTTON_TABLE_ROW .. "(%d+)")
 
     if buttonId == _G.hpScreenController.BUTTON_FILTER_HEALTHY then
         self.showHealthy = not self.showHealthy
@@ -526,6 +552,10 @@ function _G.hpScreenController:handleButton(buttonId)
                 self.databank.setIntValue(SHOW_HEALTHY_KEY, 0)
             end
         end
+
+        self.scrollIndex = 1
+        storeScroll = true
+
         modified = true
     elseif buttonId == _G.hpScreenController.BUTTON_FILTER_DAMAGED then
         self.showDamaged = not self.showDamaged
@@ -536,6 +566,10 @@ function _G.hpScreenController:handleButton(buttonId)
                 self.databank.setIntValue(SHOW_DAMAGED_KEY, 0)
             end
         end
+
+        self.scrollIndex = 1
+        storeScroll = true
+
         modified = true
     elseif buttonId == _G.hpScreenController.BUTTON_FILTER_BROKEN then
         self.showBroken = not self.showBroken
@@ -546,6 +580,10 @@ function _G.hpScreenController:handleButton(buttonId)
                 self.databank.setIntValue(SHOW_BROKEN_KEY, 0)
             end
         end
+
+        self.scrollIndex = 1
+        storeScroll = true
+
         modified = true
 
     elseif buttonId == _G.hpScreenController.BUTTON_TAB_TABLE then
@@ -609,15 +647,44 @@ function _G.hpScreenController:handleButton(buttonId)
         modified = true
 
     elseif buttonId == _G.hpScreenController.BUTTON_SKIP_UP then
-        -- TODO
+        if self.scrollIndex > 1 then
+            self.scrollIndex = 1
+            storeScroll = true
+            modified = true
+        end
     elseif buttonId == _G.hpScreenController.BUTTON_SKIP_DOWN then
-        -- TODO
+        if self.scrollIndex < self.maxScrollIndex then
+            self.scrollIndex = self.maxScrollIndex
+            storeScroll = true
+            modified = true
+        end
     elseif buttonId == _G.hpScreenController.BUTTON_SCROLL_UP then
-        -- TODO
+        if self.scrollIndex > 1 then
+            self.scrollIndex = self.scrollIndex - 1
+            storeScroll = true
+            modified = true
+        end
     elseif buttonId == _G.hpScreenController.BUTTON_SCROLL_DOWN then
-        -- TODO
+        if self.scrollIndex < self.maxScrollIndex then
+            self.scrollIndex = self.scrollIndex + 1
+            storeScroll = true
+            modified = true
+        end
 
-    elseif buttonId == _G.hpScreenController.BUTTON_STRETCH_CLOUD and self.selectedTab > 1 then
+    elseif tableRow then
+        local index = self.scrollIndex + tonumber(tableRow) - 1 -- both are 1-indexed
+        local sortedIds = self:sortIdsForTable()
+
+        if sortedIds[index] then
+            if sortedIds[index] == self.controller.selectedElement then
+                self.controller:select(nil)
+            else
+                self.controller:select(sortedIds[index])
+            end
+            modified = true
+        end
+
+    elseif buttonId == _G.hpScreenController.BUTTON_STRETCH_CLOUD then
         self.stretchCloud = not self.stretchCloud
         if self.databank then
             if self.stretchCloud then
@@ -627,7 +694,7 @@ function _G.hpScreenController:handleButton(buttonId)
             end
         end
         modified = true
-    elseif buttonId == _G.hpScreenController.BUTTON_MAXIMIZE_CLOUD and self.selectedTab > 1 then
+    elseif buttonId == _G.hpScreenController.BUTTON_MAXIMIZE_CLOUD then
         self.maximizeCloud = not self.maximizeCloud
         if self.databank then
             if self.maximizeCloud then
@@ -648,31 +715,61 @@ function _G.hpScreenController:handleButton(buttonId)
         end
     end
 
+    if storeScroll and self.databank then
+        self.databank.setIntValue(SCROLL_INDEX_KEY, self.scrollIndex)
+    end
+
+    if modified then
+        -- misses case where another player interacts with same panel
+        self:updateButtonStates()
+    end
+
     return modified
 end
 
-local TABLE_ROW_BASE_OFFSET = 65 -- height of heading
--- Use nth-child css selector on .tableRow to style row elements
-local TABLE_ROW_TEMPLATE = [[
-<g class="tableRow %s" transform="translate(0,%.0f)">
-<text x="100">%d</text>
-<text x="120">%s</text>
-<text x="796">%s</text>
-<text x="796">%s</text>
-<text x="946">%s</text>
-<text x="946">%s</text>
-<text x="1081">%d</text>
-</g>
-]]
-function _G.buildTable(elementData, index, sortColumn, sortUp, selectedId, showHealthy, showDamaged, showBroken)
-    local table = [[<g id="tableContents">]]
+-- Update the active state of buttons based on if they're visible.
+function _G.hpScreenController:updateButtonStates()
+    local isTable = self.selectedTab == 1
+    local isMaximized = self.maximizeCloud
+
+    -- global elements, only depend on not being maximized
+    self.buttonCoordinates[self.BUTTON_FILTER_HEALTHY].active = not isMaximized
+    self.buttonCoordinates[self.BUTTON_FILTER_DAMAGED].active = not isMaximized
+    self.buttonCoordinates[self.BUTTON_FILTER_BROKEN].active = not isMaximized
+    self.buttonCoordinates[self.BUTTON_TAB_TABLE].active = not isMaximized
+    self.buttonCoordinates[self.BUTTON_TAB_TOP].active = not isMaximized
+    self.buttonCoordinates[self.BUTTON_TAB_SIDE].active = not isMaximized
+    self.buttonCoordinates[self.BUTTON_TAB_FRONT].active = not isMaximized
+
+    -- table elements, only depend on table being set
+    self.buttonCoordinates[self.BUTTON_SORT_ID].active = isTable
+    self.buttonCoordinates[self.BUTTON_SORT_NAME].active = isTable
+    self.buttonCoordinates[self.BUTTON_SORT_DMG].active = isTable
+    self.buttonCoordinates[self.BUTTON_SORT_MAX].active = isTable
+    self.buttonCoordinates[self.BUTTON_SORT_INT].active = isTable
+    self.buttonCoordinates[self.BUTTON_SKIP_UP].active = isTable
+    self.buttonCoordinates[self.BUTTON_SCROLL_UP].active = isTable
+    self.buttonCoordinates[self.BUTTON_SCROLL_DOWN].active = isTable
+    self.buttonCoordinates[self.BUTTON_SKIP_DOWN].active = isTable
+    for row = 1, 20 do
+        buttonCoordinates[self.BUTTON_TABLE_ROW .. row].active = isTable
+    end
+
+    -- cloud elements, only depend on not table
+    self.buttonCoordinates[self.BUTTON_STRETCH_CLOUD].active = not isTable
+    self.buttonCoordinates[self.BUTTON_MAXIMIZE_CLOUD].active = not isTable
+end
+
+function _G.hpScreenController:sortIdsForTable()
+    local elementData = self.controller.elementData
+    local sortColumn = self.sortColumn
 
     local sortFunction
-    if sortColumn == 1 then -- id
+    if self.sortColumn == 1 then -- id
         sortFunction = function(e)
             return 1 -- fallback to id sort
         end
-    elseif sortColumn == 2 then -- name
+    elseif self.sortColumn == 2 then -- name
         sortFunction = function(e)
             return e.n
         end
@@ -689,40 +786,89 @@ function _G.buildTable(elementData, index, sortColumn, sortUp, selectedId, showH
             return e.h / e.m
         end
     end
-    local sortedIds = sortIds(elementData, sortFunction, not sortUp)
+    local sorted = sortIds(elementData, sortFunction, not self.sortUp)
 
-    local rowIndex = 0
-    local data, hp, max, selected, yOffset, hpPrint, hpUnit, maxPrint, maxUnit
+    local filter = function(id)
+        local hp = elementData[id].h
+        local max = elementData[id].m
+        return (self.showBroken and hp == 0) or (self.showDamaged and hp > 0 and hp < max) or (self.showHealthy and hp == max)
+    end
+    return filterIds(sorted, filter)
+end
+
+local TABLE_ROW_BASE_OFFSET = 65 -- height of heading
+local TABLE_SCROLL_BUTTON_SIZE = 54
+local TABLE_SCROLL_BAR_OFFSET = TABLE_ROW_BASE_OFFSET + TABLE_SCROLL_BUTTON_SIZE * 2
+local TABLE_SCROLL_BAR_HEIGHT = TAB_CONTENTS_HEIGHT - TABLE_SCROLL_BAR_OFFSET - TABLE_SCROLL_BUTTON_SIZE * 2
+-- Use nth-child css selector on .tableRow to style row elements
+local TABLE_ROW_TEMPLATE = [[
+<g class="tableRow%d%s" transform="translate(0,%.0f)">]]..[[
+<rect x="2.5" y="-30" width="]] .. TAB_CONTENTS_WIDTH - TABLE_SCROLL_BUTTON_SIZE - 5 .. [[" height="39"/>]] .. [[
+<text x="100">%d</text>]] .. [[
+<text x="120">%s</text>]] .. [[
+<text x="796">%s</text>]] .. [[
+<text x="796">%s</text>]] .. [[
+<text x="946">%s</text>]] .. [[
+<text x="946">%s</text>]] .. [[
+<text x="1081">%d</text>]] .. [[
+</g>]]
+--- Generates the contents of the table.
+-- @tparam table elementData The construct element data.
+-- @tparam int scrollIndex The index of the first element to show in the table, 1-indexed.
+-- @tparam int sortColumn The index of the table column to sort by, 1-indexed.
+-- @tparam boolean sortUp True if the column should sort in ascending order.
+-- @tparam int selectedId The id of the selected element, if any.
+function _G.hpScreenController:buildTable(elementData, scrollIndex, sortColumn, sortUp, selectedId)
+    local table = [[<g id="tableContents">]]
+
+    local sortedIds = self:sortIdsForTable()
+
+    local rowCount = 0
+    local visibleCount = 0
+    local data, hp, max, class, yOffset, hpPrint, hpUnit, maxPrint, maxUnit, integrity
     for _, id in pairs(sortedIds) do
         data = elementData[id]
         hp = data.h
         max = data.m
-        yOffset = TABLE_ROW_BASE_OFFSET + 40 * (rowIndex + 1)
 
-        if yOffset > 891 then
-            break
-        end
+        rowCount = rowCount + 1
 
-        if id == selectedId then
-            selected = "selected"
-        else
-            selected = ""
-        end
+        yOffset = TABLE_ROW_BASE_OFFSET - 5 + 41 * (visibleCount + 1)
+        if rowCount >= scrollIndex and yOffset < TAB_CONTENTS_HEIGHT then
+            visibleCount = visibleCount + 1
 
-        hpPrint, hpUnit = Utilities.printableNumber(math.floor(max - hp + 0.5), "")
-        if hpPrint == "0.0" then
-            hpPrint = "0"
-        end
-        maxPrint, maxUnit = Utilities.printableNumber(max, "")
+            if id == selectedId then
+                class = " selected"
+            else
+                class = ""
+            end
 
-        if (hp == 0 and showBroken) or (hp > 0 and hp < max and showDamaged) or (hp == max and showHealthy) then
-            table = table .. string.format(TABLE_ROW_TEMPLATE, selected, yOffset, id, data.n, hpPrint, hpUnit, maxPrint, maxUnit, math.floor(100 * hp / max + 0.5))
-            rowIndex = rowIndex + 1
+            hpPrint, hpUnit = Utilities.printableNumber(math.floor(max - hp + 0.5), "")
+            if hpPrint == "0.0" then
+                hpPrint = "0"
+            end
+            maxPrint, maxUnit = Utilities.printableNumber(max, "")
+            integrity = math.floor(100 * hp / max)
+
+            if integrity == 0 then
+                class = class .. " broken"
+            elseif integrity < 100 then
+                class = class .. " damaged"
+            end
+
+            table = table .. string.format(TABLE_ROW_TEMPLATE, visibleCount, class, yOffset, id, data.n, hpPrint, hpUnit, maxPrint, maxUnit, integrity)
+
         end
     end
-
     table = table .. [[</g>]]
-    return table
+
+    local scrollBarHeight = TABLE_SCROLL_BAR_HEIGHT * visibleCount / rowCount
+    local scrollBarOffset = TABLE_SCROLL_BAR_HEIGHT * (scrollIndex - 1) / rowCount
+
+    table = table .. string.format([[<rect class="scrollbar" x="%.0f" y="%.0f" width="%.0f" height="%.0f" />]], TAB_CONTENTS_WIDTH - TABLE_SCROLL_BUTTON_SIZE, TABLE_SCROLL_BAR_OFFSET + scrollBarOffset, TABLE_SCROLL_BUTTON_SIZE, scrollBarHeight)
+
+    local maxScrollIndex = rowCount - visibleCount + 1
+    return table, maxScrollIndex
 end
 
 local CLOUD_REPLACE_TARGET = [[<g id="pointCloud"%s*/>]]
@@ -731,7 +877,7 @@ local DEFAULT_OUTLINE = [[
     <style>
     circle {
         stroke: black;
-        stroke-width: 1vmin;
+        stroke-width: %.2f;
     }
     .selected {
         stroke: white;
@@ -763,7 +909,8 @@ function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXF
         local maxY = (metaMaxY + (metaMaxY - metaMinY) * buffer) * scale
         local width = maxX - minX
         local height = maxY - minY
-        outline = string.format(DEFAULT_OUTLINE, minX, minY, width, height, scale)
+        local strokeWidth = math.min(width, height) / 200
+        outline = string.format(DEFAULT_OUTLINE, minX, minY, width, height, scale, strokeWidth)
     end
 
     local minX, minY, width, height = string.match(outline,

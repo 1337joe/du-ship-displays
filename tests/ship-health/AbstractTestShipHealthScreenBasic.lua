@@ -26,13 +26,14 @@ function AbstractTestShipHealthScreenBasic:new()
         self.databankMock.data["HP.screen:SHOW_HEALTHY"] = 0
     end
     o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
-        self.displayConfigurationName = "table sort id down"
+        self.displayConfigurationName = "table sort id down, scrolled"
         self.hpController.elementMetadata = self.generateElementMetadataData()
         self.hpController.elementData = self.generateElementData(pocketScoutElements)
         self.hpController.shipName = "Pocket Scout"
         self.hpController.selectedElement = 1
 
         self.databankMock.data["HP.screen:SORT_UP"] = 0
+        self.databankMock.data["HP.screen:SCROLL_INDEX"] = 10
     end
     o.displayConfigurations[#o.displayConfigurations + 1] = function(self)
         self.displayConfigurationName = "table sort name up"
@@ -184,6 +185,9 @@ function AbstractTestShipHealthScreenBasic:new()
                 self.screenMock.mouseX = (coords.x1 + coords.x2) / 2
             end
     end
+
+    -- TODO mouseover some row in table
+
     -- Cloud display
     buttons = {"Tab: Table", "Cloud: Stretch", "Cloud: Maximize"}
     for _, button in pairs(buttons) do

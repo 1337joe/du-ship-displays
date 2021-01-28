@@ -126,6 +126,9 @@ function _G.TestShipHealthScreen:testInitEmptyDatabank()
     local expectedShowDamaged = true
     local expectedShowBroken = true
     local expectedTab = 1
+    local expectedSortColumn = 5
+    local expectedSortUp = true
+    local expectedScrollIndex = 1
     local expectedStretchCloud = false
     local expectedMaximizeCloud = false
 
@@ -138,6 +141,9 @@ function _G.TestShipHealthScreen:testInitEmptyDatabank()
     lu.assertEquals(_G.hpScreenController.showDamaged, expectedShowDamaged)
     lu.assertEquals(_G.hpScreenController.showBroken, expectedShowBroken)
     lu.assertEquals(_G.hpScreenController.selectedTab, expectedTab)
+    lu.assertEquals(_G.hpScreenController.sortColumn, expectedSortColumn)
+    lu.assertEquals(_G.hpScreenController.sortUp, expectedSortUp)
+    lu.assertEquals(_G.hpScreenController.scrollIndex, expectedScrollIndex)
     lu.assertEquals(_G.hpScreenController.stretchCloud, expectedStretchCloud)
     lu.assertEquals(_G.hpScreenController.maximizeCloud, expectedMaximizeCloud)
 end
@@ -152,6 +158,9 @@ function _G.TestShipHealthScreen:testInitNoDatabank()
     local expectedShowDamaged = true
     local expectedShowBroken = true
     local expectedTab = 1
+    local expectedSortColumn = 5
+    local expectedSortUp = true
+    local expectedScrollIndex = 1
     local expectedStretchCloud = false
     local expectedMaximizeCloud = false
 
@@ -164,6 +173,9 @@ function _G.TestShipHealthScreen:testInitNoDatabank()
     lu.assertEquals(_G.hpScreenController.showDamaged, expectedShowDamaged)
     lu.assertEquals(_G.hpScreenController.showBroken, expectedShowBroken)
     lu.assertEquals(_G.hpScreenController.selectedTab, expectedTab)
+    lu.assertEquals(_G.hpScreenController.sortColumn, expectedSortColumn)
+    lu.assertEquals(_G.hpScreenController.sortUp, expectedSortUp)
+    lu.assertEquals(_G.hpScreenController.scrollIndex, expectedScrollIndex)
     lu.assertEquals(_G.hpScreenController.stretchCloud, expectedStretchCloud)
     lu.assertEquals(_G.hpScreenController.maximizeCloud, expectedMaximizeCloud)
 end
