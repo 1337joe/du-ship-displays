@@ -133,7 +133,7 @@ function _G.TestShipHealthUnit:testInitialize()
     lu.assertAlmostEquals(_G.hpController.elementMetadata.max.z, 1.384995, 0.000001)
     lu.assertEquals(_G.hpController.elementMetadata.min.hp, 50)
     lu.assertEquals(_G.hpController.elementMetadata.max.hp, 1933)
-    lu.assertEquals(_G.hpController.elementMetadata.totalHp, 10650)
+    lu.assertAlmostEquals(_G.hpController.elementMetadata.totalHp, 10416.6502, 0.0001)
     lu.assertEquals(_G.hpController.elementMetadata.totalMaxHp, 10670)
 
     -- verify select called
@@ -164,7 +164,7 @@ function _G.TestShipHealthUnit:testUpdateState()
 
     -- _G.hpController:updateState()
 
-    -- lu.fail("NYI")
+    -- lu.fail("NYI") TODO
 end
 
 --- Verify select.
