@@ -16,7 +16,6 @@ Only the basic screens are linked here. For full galleries of available screens 
 * Snap target altitude to current altitude in one click on the current altitude slider.
 * Lock controls to prevent accidental clicks by clicking on the lock icon.
 * Power on and unlock protected by a drag-to-activate mechanism to prevent accidental disabling.
-* Turn off Anti-Gravity Generator to have base altitude quickly adjust to target for fast resets.
 
 ### Requirements:
 
@@ -50,10 +49,6 @@ Only the basic screens are linked here. For full galleries of available screens 
 
 * Make sure the programming board is turned on: either enable it before you get in the control seat or use a switch or other element to send an on signal to it.
 * If a green lock icon is in the top left corner then the controls are locked. Click on it and drag to the right to unlock.
-
-#### Altitude displays "N/A" over a certain altitude:
-
-The core unit stops reporting altitude in space, even when the default user hud shows an altitude. This is planned to be fixed in the future by importing the atlas and calculating altitude when it's not provided by the core unit. The antigravity generator will continue to raise the ship under this condition, but clicking on the current side of the slider will reset the target altitude to 0.
 
 ## Building from a Template
 
