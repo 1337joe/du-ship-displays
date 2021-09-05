@@ -1,0 +1,24 @@
+<svg viewBox="-662.5 -158.383561 1350 437.450339" scaleMultiplier="100">
+    <style>
+    #outline path {
+        stroke: #777777;
+        stroke-width: 2px; <!-- TODO evaluate width -->
+    }
+    circle {
+        stroke: black;
+        stroke-width: 2.19;
+    }
+    .selected {
+        stroke: white;
+    }
+    </style>
+    <g id="outline" transform="translate(12.5,-12.5)">
+        <!-- full path order (starting from M's): outline, base swoop, centerline notch -->
+        <!--path d="M -625,225 L -600,250 625,250 Q 625,150 550,131.25 L 225,50 -225,50 -250,25 -625,25 Z M 618.75,200 L 75,200 C -25,200 0,125 -200,125 L -625,125 M 525,200 L 525,125" /-->
+        <!-- individual segments with color -->
+        <path fill="#0e1111" d="M -625,225 L -600,250 625,250 Q 625,150 550,131.25 L 225,50 -225,50 -250,25 -625,25 Z" />
+        <path fill="#7f878b" d="M -625,125 L -200,125 C 0,125 -25,200 75,200 L 525,200 525,125 550,131.25 225,50 -225,50 -250,25 -625,25 Z" />
+        <path fill="#1b2b0d" d="M 525,200 L 618.75,200 Q 610,150 550,131.25 L 525,125 Z" />
+    </g>
+    <g id="pointCloud" />
+</svg>

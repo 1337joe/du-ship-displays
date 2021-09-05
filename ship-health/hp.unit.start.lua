@@ -3,7 +3,7 @@
 --   By W3asel (1337joe)  --
 ----------------------------
 -- Bundled: ${date}
--- Latest version always available here: https://github.com/1337joe/du-ship-displays
+-- Latest version always available at: https://github.com/1337joe/du-ship-displays
 
 -- container for shared state for ship health controller
 _G.hpController = {}
@@ -12,8 +12,8 @@ _G.hpController = {}
 -- Begin Configuration --
 -------------------------
 local hpUpdateRate = 0.5 --export: How often (in seconds) to update ship health data and refresh screen. Raise this number if running the script causes lower framerate.
-local SHIP_NAME_DEFAULT = "use_id"
-local hpShipName = "use_id" --export: Ship Name, if left "use_id" will use id.
+local SHIP_NAME_DEFAULT = "use_default"
+local hpShipName = "use_default" --export: Ship Name, if left "use_default" will use ship outline name or id for no outline.
 
 -- slot definitions
 _G.hpController.slots = {}
@@ -47,7 +47,11 @@ local HP_UPDATE_RATE_KEY = "HP.unit:UPDATE_RATE"
 local HP_UPDATE_RATE = _G.Utilities.getPreference(databank, HP_UPDATE_RATE_KEY, hpUpdateRate)
 local SHIP_NAME_KEY = "HP.unit:SHIP_NAME"
 if string.len(hpShipName) == 0 or hpShipName == SHIP_NAME_DEFAULT then
-    hpShipName = string.format("%d", core.getConstructId())
+    if _G.outline and _G.outline.name then
+        hpShipName = _G.outline.name
+    else
+        hpShipName = string.format("%d", core.getConstructId())
+    end
 end
 _G.hpController.shipName = _G.Utilities.getPreference(databank, SHIP_NAME_KEY, hpShipName)
 

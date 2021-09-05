@@ -251,6 +251,12 @@ function _G.hpScreenController:init(controller)
     if not (self.databank and self.databank.hasKey(MAXIMIZE_CLOUD_KEY) == 1) then
         self.maximizeCloud = MAXIMIZE_CLOUD_DEFAULT
     end
+
+    if _G.hpOutline then
+        self.outlineTop = _G.hpOutline.SVG_TOP
+        self.outlineSide = _G.hpOutline.SVG_SIDE
+        self.outlineFront = _G.hpOutline.SVG_FRONT
+    end
 end
 
 --- Handle a mouse down event at the provided coordinates.
@@ -291,8 +297,10 @@ function _G.hpScreenController:setSelectedTab(tabIndex)
         local screenYFunc = function(pos)
             return -pos.y
         end
-        local template, points = _G.buildShipCloudPoints(self.outlineTop, self.controller.elementData,
-                                     self.controller.elementMetadata, screenXFunc, screenYFunc)
+        local screenZFunc = function(pos)
+            return pos.z
+        end
+        local template, points = self:buildShipCloudPoints(self.outlineTop, screenXFunc, screenYFunc, screenZFunc)
         self.tabData.template = template
         self.tabData.points = points
 
@@ -304,8 +312,10 @@ function _G.hpScreenController:setSelectedTab(tabIndex)
         local screenYFunc = function(pos)
             return -pos.z
         end
-        local template, points = _G.buildShipCloudPoints(self.outlineSide, self.controller.elementData,
-                                     self.controller.elementMetadata, screenXFunc, screenYFunc)
+        local screenZFunc = function(pos)
+            return pos.x
+        end
+        local template, points = self:buildShipCloudPoints(self.outlineSide, screenXFunc, screenYFunc, screenZFunc)
         self.tabData.template = template
         self.tabData.points = points
 
@@ -317,8 +327,10 @@ function _G.hpScreenController:setSelectedTab(tabIndex)
         local screenYFunc = function(pos)
             return -pos.z
         end
-        local template, points = _G.buildShipCloudPoints(self.outlineFront, self.controller.elementData,
-                                     self.controller.elementMetadata, screenXFunc, screenYFunc)
+        local screenZFunc = function(pos)
+            return pos.y
+        end
+        local template, points = self:buildShipCloudPoints(self.outlineFront, screenXFunc, screenYFunc, screenZFunc)
         self.tabData.template = template
         self.tabData.points = points
 
@@ -457,7 +469,7 @@ function _G.hpScreenController:refresh()
         -- enable table header
         html = _G.ScreenUtils.replaceClass(html, ELEMENT_HIDDEN_TABLE_INTERFACE, ELEMENT_TABLE_INTERFACE)
 
-        tabContents, self.maxScrollIndex = self:buildTable(self.controller.elementData, self.scrollIndex, self.sortColumn, self.sortUp, self.controller.selectedElement)
+        tabContents, self.maxScrollIndex = self:buildTable()
 
         -- manage header states
         local columnElementClass = nil
@@ -813,12 +825,10 @@ local TABLE_ROW_TEMPLATE = [[
 <text x="1081">%d</text>]] .. [[
 </g>]]
 --- Generates the contents of the table.
--- @tparam table elementData The construct element data.
--- @tparam int scrollIndex The index of the first element to show in the table, 1-indexed.
--- @tparam int sortColumn The index of the table column to sort by, 1-indexed.
--- @tparam boolean sortUp True if the column should sort in ascending order.
--- @tparam int selectedId The id of the selected element, if any.
-function _G.hpScreenController:buildTable(elementData, scrollIndex, sortColumn, sortUp, selectedId)
+function _G.hpScreenController:buildTable()
+    local elementData = self.controller.elementData
+    local scrollIndex = self.scrollIndex
+    local selectedId = self.controller.selectedElement
     local table = [[<g id="tableContents">]]
 
     local sortedIds = self:sortIdsForTable()
@@ -891,7 +901,10 @@ local DEFAULT_OUTLINE = [[
 local HEALTH_GROUP_TEMPLATE = [[<g class="%s">%s</g>]]
 -- TODO make coroutine
 local CLOUD_ELEMENT_TEMPLATE = [[<circle cx="%.2f" cy="%.2f" r="%.2f"/>]]
-function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXFunc, screenYFunc)
+function _G.hpScreenController:buildShipCloudPoints(outline, screenXFunc, screenYFunc, screenZFunc)
+    local elementData = self.controller.elementData
+    local elementMetadata = self.controller.elementMetadata
+
     if not outline then
         local scale = 100
         local buffer = 0.05 -- 5% extra per side
@@ -920,17 +933,15 @@ function _G.buildShipCloudPoints(outline, elementData, elementMetadata, screenXF
     local maxX = minX + width
     local maxY = minY + height
 
-    local minDimension = math.min(maxX - minX, maxY - minY)
-    local minElementSize = minDimension / 50
-    local maxElementSize = minDimension / 25
+    local maxDimension = math.max(maxX - minX, maxY - minY)
+    local minElementSize = maxDimension / 50
+    local maxElementSize = maxDimension / 25
 
     local minHp2 = elementMetadata.min.hp * elementMetadata.min.hp
     local maxHp2 = elementMetadata.max.hp * elementMetadata.max.hp
 
     -- TODO should change for each perspective, not be staticly set to the z axis
-    local sortedIds = sortIds(elementData, function(e)
-        return e.p.z
-    end)
+    local sortedIds = sortIds(elementData, screenZFunc)
 
     local elementList = {}
     local element, hp2, radius
@@ -1022,7 +1033,6 @@ function sortIds(elementData, valueAccessor, reverse)
         local valueB = valueAccessor(eb)
         if valueA == valueB then
             -- fall back to index
-
             return (not reverse and a < b) or (reverse and a > b)
         end
         -- higher value comes later in list

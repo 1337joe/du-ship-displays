@@ -28,7 +28,7 @@
             text-anchor: middle;
         }
         .majorLabel {
-            font-size: 100px;
+            font-size: 80px;
             fill: #777777;
         }
         .label {
@@ -177,17 +177,15 @@
     <g class="header">
         <rect x="0" y="0" fill="url('#titleGradient')" width="1920" height="108" />
         <use xlink:href="#logo" x="4" y="4" width="178" height="100" />
-        <text x="1920" y="108" text-anchor="end">SHIP HEALTH</text>
+        <text x="1920" y="108" text-anchor="end">%s</text>
     </g>
     <g id="sidebar">
-        <text x="384" y="216" class="majorValue">%s</text>
-        <text x="384" y="324" class="label">Element Integrity</text>
-        <text x="384" y="432" text-anchor="middle" class="majorValue">%s <tspan class="units">%</tspan></text>
-        <text x="370" y="513" text-anchor="end" class="minorValue">%.0f</text>
-        <text x="384" y="513" text-anchor="middle" class="minorValue units">/</text>
-        <text x="398" y="513" text-anchor="start" class="minorValue">%.0f</text>
-        <text x="384" y="692" class="majorLabel">Breakdown</text>
-        <text x="10" y="746" text-anchor="start" class="label">Visible</text>
+        <text x="384" y="216" class="majorLabel">Element Integrity</text>
+        <text x="384" y="324" text-anchor="middle" class="majorValue">%s <tspan class="units">%</tspan></text>
+        <text x="370" y="405" text-anchor="end" class="minorValue">%.0f</text>
+        <text x="384" y="405" text-anchor="middle" class="minorValue units">/</text>
+        <text x="398" y="405" text-anchor="start" class="minorValue">%.0f</text>
+        <text x="10" y="746" text-anchor="start" class="label">Filter Visible</text>
         <text x="758" y="746" text-anchor="end" class="label">Count</text>
         <g id="filters">
             <g class="healthyFilterClass">

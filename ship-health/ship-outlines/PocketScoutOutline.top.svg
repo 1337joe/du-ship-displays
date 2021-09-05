@@ -1,0 +1,26 @@
+<svg viewBox="-661.250000 -687.5 1347.500000 1350" scaleMultiplier="100">
+    <style>
+    #outline path {
+        stroke: #777777;
+        stroke-width: 2px;
+    }
+    circle {
+        stroke: black;
+        stroke-width: 6.59;
+    }
+    .selected {
+        stroke: white;
+    }
+    </style>
+    <g id="outline" transform="translate(12.5,-12.5)">
+        <!-- voxel x (voxel vertex) / 4 (meters to voxels) * 100 (scaleMultiplier) = pixel x; invert y -->
+        <!-- full path order (starting from M's): outline, front inset left, right, rear inset left, right, front center strip left, right, cockpit, rear center strip left, right-->
+        <!--path d="M -100,625 L -150,600 -150,131.25 -125,125 -100,75 -100,-150 -125,-250 -125,-425 -25,-625 25,-625 125,-425 125,-250 100,-150 100,75 125,125 150,131.25 150,600 100,625 Z M -100,-150 -100,-225 -25,-525 M 100,-150 100,-225 25,-525 M -100,75 -100,175 -50,375 -50,625 M 100,75 100,175 50,375 50,625 M -25,-625 L -25,0 C -25,25 -50,50 -50,75 M 25,-625 L 25,0 C 25,25 50,50 50,75 M 50,75 L 50,225 25,250 -25,250 -50,225 -50,75 Z M -25,250 L -25,625 M 25,250 L 25,625" /-->
+        <!-- individual segments with color -->
+        <path fill="#0e1111" d="M -100,625 L -150,600 -150,131.25 -125,125 -100,75 -100,-150 -125,-250 -125,-425 -25,-625 25,-625 125,-425 125,-250 100,-150 100,75 125,125 150,131.25 150,600 100,625 Z" />
+        <path fill="#7f878b" d="M -50,625 -50,375 -100,175 -100,-225 -25,-525 25,-525 100,-225 100,175 50,375 50,625 Z" />
+        <path fill="#1b2b0d" d="M -25,-625 L -25,0 C -25,25 -50,50 -50,75 L 50,75 C 50,50 25,25 25,0 L 25,-625 Z M -25,625 L -25,250 25,250 25,625 Z" />
+        <path fill="#000000" d="M 50,75 L 50,225 25,250 -25,250 -50,225 -50,75 Z" />
+    </g>
+    <g id="pointCloud" />
+</svg>

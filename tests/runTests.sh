@@ -14,5 +14,5 @@ mkdir -p tests/results/images
 for test in tests/**/Test*.lua
 do
     testName=`basename $test`
-    lua5.3 -lluacov ${test} $@ -n tests/results/${testName}.xml
+    lua -lluacov ${test} $@ -n tests/results/${testName}.xml
 done

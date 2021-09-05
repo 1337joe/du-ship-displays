@@ -1,0 +1,31 @@
+{
+    "slots":{
+        "0":{"name":"hpScreen","type":{"events":[],"methods":[]}},
+        "1":{"name":"slot2","type":{"events":[],"methods":[]}},
+        "2":{"name":"slot3","type":{"events":[],"methods":[]}},
+        "3":{"name":"slot4","type":{"events":[],"methods":[]}},
+        "4":{"name":"slot5","type":{"events":[],"methods":[]}},
+        "5":{"name":"slot6","type":{"events":[],"methods":[]}},
+        "6":{"name":"slot7","type":{"events":[],"methods":[]}},
+        "7":{"name":"slot8","type":{"events":[],"methods":[]}},
+        "8":{"name":"slot9","type":{"events":[],"methods":[]}},
+        "9":{"name":"slot10","type":{"events":[],"methods":[]}},
+        "-1":{"name":"unit","type":{"events":[],"methods":[]}},
+        "-2":{"name":"system","type":{"events":[],"methods":[]}},
+        "-3":{"name":"library","type":{"events":[],"methods":[]}}
+    },
+    "handlers":[
+        {"code":"${file:ship-outlines/PocketScoutOutline.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
+        {"code":"${file:hp.unit.start.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
+        {"code":"${code:_G.hpController:finishInitialize()}","filter":{"args":[${args: initHp}],"signature":"tick(timerId)","slotKey":"${slotKey:unit}"},"key":"${key}"},
+        {"code":"${code:_G.hpController:updateState()}","filter":{"args":[${args: updateHp}],"signature":"tick(timerId)","slotKey":"${slotKey:unit}"},"key":"${key}"},
+        {"code":"${file:hp.screen.start1.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:hpScreen}"},"key":"${key}"},
+        {"code":"${code:_G.hpScreenController:refresh()}","filter":{"args":[],"signature":"update()","slotKey":"${slotKey:system}"},"key":"${key}"},
+        {"code":"${code:_G.hpScreenController:mouseDown(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseDown(x,y)","slotKey":"${slotKey:hpScreen}"},"key":"${key}"},
+        {"code":"${code:_G.hpScreenController:mouseUp(x, y)}","filter":{"args":[${args:* *}],"signature":"mouseUp(x,y)","slotKey":"${slotKey:hpScreen}"},"key":"${key}"},
+        {"code":"${file:../common/Utilities.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"},
+        {"code":"${file:../common/ScreenUtils.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"}
+    ],
+    "methods":[],
+    "events":[]
+}

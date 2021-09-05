@@ -50,6 +50,34 @@ Only the basic screens are linked here. For full galleries of available screens 
 * Make sure the programming board is turned on: either enable it before you get in the control seat or use a switch or other element to send an on signal to it.
 * If a green lock icon is in the top left corner then the controls are locked. Click on it and drag to the right to unlock.
 
+## Ship Health __WORK IN PROGRESS__
+
+[<img src="https://du.w3asel.com/du-ship-displays/images/ship-health-basic.svg" width="50%" alt="Basic Ship Health Display">](https://du.w3asel.com/du-ship-displays/templates/ship-health-basic.json)
+
+### Features/Controls:
+
+* TODO
+
+### Requirements:
+
+* 1x Programming Board
+* 1x Screen
+* Databank (optional but highly recommended, for remembering controller state between sessions)
+
+### Install/Use Instructions:
+
+[Pre-built lua config](https://du.w3asel.com/du-ship-displays/templates/ship-health-basic.json)
+
+1. Either build a json configuration (see Building from a Template below) or copy the one above and paste it as a Lua configuration into the programming board.
+2. Link the screen to the hpScreen slot.
+3. Add links to the Dynamic Core Unit and the Databank if you have one. Order of these doesn't matter unless you edit the unit start handler to specify what slot is what instead of allowing it to autodetect them.
+4. Activate the programming board, either directly or with a signal.
+5. TODO complete
+
+### Advanced Usage: Custom Ship Outlines
+
+TODO explain process, link to example
+
 ## Building from a Template
 
 This project is designed to be used with my other Dual Universe project: [DU Bundler](https://github.com/1337joe/du-bundler).
