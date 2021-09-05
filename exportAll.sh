@@ -11,5 +11,5 @@ mkdir -p $targetDirectory
 for template in **/*.json
 do
     templateName=`basename $template`
-    ../du-bundler/bundleTemplate.lua $template $targetDirectory/$templateName
+    du-bundler $template $targetDirectory/$templateName
 done
