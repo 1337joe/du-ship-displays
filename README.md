@@ -50,13 +50,18 @@ Only the basic screens are linked here. For full galleries of available screens 
 * Make sure the programming board is turned on: either enable it before you get in the control seat or use a switch or other element to send an on signal to it.
 * If a green lock icon is in the top left corner then the controls are locked. Click on it and drag to the right to unlock.
 
-## Ship Health __WORK IN PROGRESS__
+## _Semi-Abandoned / Work in Progress_ Ship Health
 
 [<img src="https://du.w3asel.com/du-ship-displays/images/ship-health-basic.svg" width="50%" alt="Basic Ship Health Display">](https://du.w3asel.com/du-ship-displays/templates/ship-health-basic.json)
 
 ### Features/Controls:
 
-* TODO
+* View health of elements in tabular or graphical/point cloud views.
+* Filter to only view broken/damaged/healthy elements.
+* Select elements (table only) to highlight them in graphical views and display arrows pointing to them in 3d space.
+* Table view can be sorted by any column.
+* Element loading handles large ships, rendering may or may not. (batching not yet fully implemented)
+* Custom ship outlines possible for drawing under the point cloud representation. (documentation not written)
 
 ### Requirements:
 

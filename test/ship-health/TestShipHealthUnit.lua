@@ -123,7 +123,7 @@ function _G.TestShipHealthUnit:testInitialize()
     end
 
     lu.assertEquals(_G.hpController.arrowOffsetDistance , 1) -- XS core
-    lu.assertStrContains(self.screenMock.html, "Initializing<br>50 of 50 loaded")
+    lu.assertStrContains(self.screenMock.html, "Initializing: 50 of 50 loaded")
 
     -- verify min/max values from init coroutine
     lu.assertEquals(_G.hpController.elementMetadata.min.x, -6)

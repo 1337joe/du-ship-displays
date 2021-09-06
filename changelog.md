@@ -21,3 +21,8 @@
   * Use databank value of targetAltitude if available to allow multiple screens to stay in sync
 * 2020-11-02
   * Basic antigravity display published
+
+# Ship Health
+
+* 2021-09-06
+  * Functional but incomplete ship health display published

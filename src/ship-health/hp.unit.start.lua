@@ -64,7 +64,7 @@ _G.hpController.arrowOffsetDistance = 4
 
 local initializationComplete = false
 local function loadElementData()
-    local INIT_TEMPLATE = [[<span style="font-family:Arial">Initializing<br>%d of %d loaded</span>]]
+    local INIT_TEMPLATE = [[Initializing: %d of %d loaded]]
     local elementKeys = core.getElementIdList()
     local elementsBetweenBreaks = 50
 
