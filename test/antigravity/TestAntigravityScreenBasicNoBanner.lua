@@ -1,24 +1,25 @@
 #!/usr/bin/env lua
 --- Tests for antigravity screen.start3.basic.banner
 
-package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
+package.path = "src/?.lua;" .. package.path -- add src directory
+package.path = package.path .. ";../du-mocks/src/?.lua" -- add fallback to du-mocks project (if not installed on path)
 
 local lu = require("luaunit")
 
 -- load file into a function for efficient calling
-local screenStart1 = loadfile("./antigravity/ag.screen.start1.lua")
-local screenStart2 = loadfile("./antigravity/ag.screen.start2.basic.lua")
-local screenStart3 = loadfile("./antigravity/ag.screen.start3.basic.nobanner.lua")
+local screenStart1 = loadfile("./src/antigravity/ag.screen.start1.lua")
+local screenStart2 = loadfile("./src/antigravity/ag.screen.start2.basic.lua")
+local screenStart3 = loadfile("./src/antigravity/ag.screen.start3.basic.nobanner.lua")
 -- load base SVG
-local inputHandle = io.open("antigravity/ag.screen.nobanner.svg", "rb")
+local inputHandle = io.open("src/antigravity/ag.screen.nobanner.svg", "rb")
 local BASE_SVG = io.input(inputHandle):read("*all")
 inputHandle:close()
 
-local abstractTestScreen = require("tests.antigravity.AbstractTestAntigravityScreenBasic")
+local abstractTestScreen = require("test.antigravity.AbstractTestAntigravityScreenBasic")
 
 _G.TestAntigravityScreenBasicNoBanner = abstractTestScreen:new()
-_G.TestAntigravityScreenBasicNoBanner.SVG_SAMPLE_OUTPUT_FILE = "tests/results/images/antigravity-nobanner.svg"
-_G.TestAntigravityScreenBasicNoBanner.HTML_ALL_OUTPUT_FILE = "tests/results/images/antigravity-nobanner-all.html"
+_G.TestAntigravityScreenBasicNoBanner.SVG_SAMPLE_OUTPUT_FILE = "test/results/images/antigravity-nobanner.svg"
+_G.TestAntigravityScreenBasicNoBanner.HTML_ALL_OUTPUT_FILE = "test/results/images/antigravity-nobanner-all.html"
 
 local displayConfigurations = _G.TestAntigravityScreenBasicNoBanner.displayConfigurations
 

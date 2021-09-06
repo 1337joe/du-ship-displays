@@ -1,8 +1,6 @@
 #!/usr/bin/env lua
 --- Generic display test conditions for running through ship health screens.
 
-package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
-
 local lu = require("luaunit")
 
 require("common.Utilities")
@@ -11,7 +9,7 @@ require("common.ScreenUtils")
 local mockScreenUnit = require("dumocks.ScreenUnit")
 local mockDatabankUnit = require("dumocks.DatabankUnit")
 
-local pocketScoutElements = require("tests.ship-health.PocketScout")
+local pocketScoutElements = require("test.ship-health.PocketScout")
 
 local AbstractTestShipHealthScreen = {}
 

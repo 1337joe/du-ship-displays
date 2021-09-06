@@ -1,7 +1,8 @@
 #!/usr/bin/env lua
-
 --- Tests for antigravity unit.start.
-package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
+
+package.path = "src/?.lua;" .. package.path -- add src directory
+package.path = package.path .. ";../du-mocks/src/?.lua" -- add fallback to du-mocks project (if not installed on path)
 package.path = "../game-data-lua/?.lua;" .. package.path -- add link to Dual Universe/Game/data/lua/ directory
 
 local lu = require("luaunit")
@@ -11,7 +12,7 @@ require("common.atlas")
 require("common.planetref")
 
 -- load file into a function for efficient calling
-local unitStart = loadfile("./antigravity/ag.unit.start.lua")
+local unitStart = loadfile("./src/antigravity/ag.unit.start.lua")
 
 local mockCoreUnit = require("dumocks.CoreUnit")
 local mockScreenUnit = require("dumocks.ScreenUnit")

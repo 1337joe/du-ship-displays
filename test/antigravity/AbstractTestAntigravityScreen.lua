@@ -1,8 +1,6 @@
 #!/usr/bin/env lua
 --- Generic display test conditions for running through antigravity screens.
 
-package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
-
 local lu = require("luaunit")
 
 require("common.Utilities")

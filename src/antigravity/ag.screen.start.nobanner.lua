@@ -43,7 +43,7 @@ _G.agScreenController = {
     locked = false,
     needRefresh = false,
     SVG_TEMPLATE = [[${file:ag.screen.nobanner.svg minify}]],
-    SVG_LOGO = [[${file:../logo.svg minify}]]
+    SVG_LOGO = [[${file:../../logo.svg minify}]]
 }
 
 -- one-time transforms

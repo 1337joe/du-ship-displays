@@ -1,7 +1,8 @@
 #!/usr/bin/env lua
 --- Tests for ship health screen.start1 - functionality tests, not display
 
-package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
+package.path = "src/?.lua;" .. package.path -- add src directory
+package.path = package.path .. ";../du-mocks/src/?.lua" -- add fallback to du-mocks project (if not installed on path)
 
 local lu = require("luaunit")
 
@@ -9,12 +10,12 @@ require("common.Utilities")
 require("common.ScreenUtils")
 
 -- load file into a function for efficient calling
-local screenStart1 = loadfile("./ship-health/hp.screen.start1.lua")
+local screenStart1 = loadfile("./src/ship-health/hp.screen.start1.lua")
 
 local mockScreenUnit = require("dumocks.ScreenUnit")
 local mockDatabankUnit = require("dumocks.DatabankUnit")
 
-local pocketScoutElements = require("tests.ship-health.PocketScout")
+local pocketScoutElements = require("test.ship-health.PocketScout")
 
 local SHOW_HEALTHY_KEY = "HP.screen:SHOW_HEALTHY"
 local SHOW_DAMAGED_KEY = "HP.screen:SHOW_DAMAGED"

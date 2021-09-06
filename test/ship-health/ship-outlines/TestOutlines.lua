@@ -11,7 +11,7 @@ require("common.ScreenUtils")
 local mockScreenUnit = require("dumocks.ScreenUnit")
 local mockDatabankUnit = require("dumocks.DatabankUnit")
 
-local pocketScoutElements = require("tests.ship-health.PocketScout")
+local pocketScoutElements = require("test.ship-health.PocketScout")
 
 local AbstractTestShipHealthScreen = {}
 

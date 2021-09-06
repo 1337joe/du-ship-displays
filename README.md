@@ -80,7 +80,7 @@ TODO explain process, link to example
 
 ## Building from a Template
 
-This project is designed to be used with my other Dual Universe project: [DU Bundler](https://github.com/1337joe/du-bundler).
+This project is designed to be used with my other Dual Universe project [DU Bundler](https://github.com/1337joe/du-bundler), which can be installed by calling `luarocks install du-bundler`.
 
 Documentation of the bundler is at the above link, but to put it simply you need to be able to run Lua scripts and simply call `bundleTemplate.lua template.json` (with appropriate paths for file locations) and it will build a json configuration based on the template. On Linux this can be piped to `xclip -selection c` to put it directly on the clipboard, while on Windows piping to `clip.exe` should do the same thing. Alternately, you can write it to a file and copy from there.
 
@@ -90,15 +90,17 @@ If you don't have a Lua runtime set up the easiest solution is to copy from the 
 
 ## Developer Dependencies
 
-[DU Bundler](https://github.com/1337joe/du-bundler): For exporting to json.
+Luarocks can be used to install all dependencies besides `game-data-lua`: `luarocks install --only-deps du-ship-displays-scm-0.rockspec`
 
-luaunit: For automated testing. Note that this is only available on luarocks for lua 5.3. If your primary lua install is 5.4 you can install against 5.3 but you'll have to modify the `runTests.sh` script to call `lua5.3` instead of `lua`.
+* [luaunit](https://github.com/bluebird75/luaunit): For automated testing.
 
-[DU Mocks](https://github.com/1337joe/du-mocks): For automated testing. Currently assumes that this is located from the project root at `../du-mocks`.
+* [luacov](https://keplerproject.github.io/luacov/): For tracking code coverage when running all tests. Can be removed from `runTests.sh` if not desired. To view results using luacov-html (which is a separate package) simply run `luacov -r html` after running tests and open `luacov-html/index.html`.
 
-luacov: For tracking code coverage when running all tests. Can be removed from `runTests.sh` if not desired.
+* [DU Mocks](https://github.com/1337joe/du-mocks): For automated testing. This will fall back to (from the project root) `../du-mocks` if not installed.
 
-Dual Universe/Game/data/lua: For automated testing, link or copy your C:\ProgramData\Dual Universe\Game\data\lua directory to ../game-data-lua relative to within the root directory of the project.
+* [du-bundler](https://github.com/1337joe/du-bundler): For exporting templates to json to paste into Dual Universe.
+
+* Dual Universe/Game/data/lua: For automated testing, link or copy your C:\ProgramData\Dual Universe\Game\data\lua directory to ../game-data-lua relative to within the root directory of the project.
 
 ## Support
 

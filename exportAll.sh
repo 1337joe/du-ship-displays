@@ -2,13 +2,13 @@
 
 cd "$(dirname "$0")"
 
-targetDirectory=templateExports
+targetDirectory=exportedTemplates
 
 # clear out old exports
 rm -rf $targetDirectory
 mkdir -p $targetDirectory
 
-for template in **/*.json
+for template in src/**/*.json
 do
     templateName=`basename $template`
     du-bundler $template $targetDirectory/$templateName

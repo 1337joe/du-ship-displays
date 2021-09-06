@@ -1,21 +1,22 @@
 #!/usr/bin/env lua
 --- Tests for ship health unit.start.
 
-package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
+package.path = "src/?.lua;" .. package.path -- add src directory
+package.path = package.path .. ";../du-mocks/src/?.lua" -- add fallback to du-mocks project (if not installed on path)
 
 local lu = require("luaunit")
 
 require("common.Utilities")
 
 -- load file into a function for efficient calling
-local unitStart = loadfile("./ship-health/hp.unit.start.lua")
+local unitStart = loadfile("./src/ship-health/hp.unit.start.lua")
 
 local mockCoreUnit = require("dumocks.CoreUnit")
 local mockScreenUnit = require("dumocks.ScreenUnit")
 local mockDatabankUnit = require("dumocks.DatabankUnit")
 local mockControlUnit = require("dumocks.ControlUnit")
 
-local pocketScoutElements = require("tests.ship-health.PocketScout")
+local pocketScoutElements = require("test.ship-health.PocketScout")
 
 local SELECTED_ELEMENT_KEY = "HP.unit:SELECTED_ELEMENT"
 

@@ -1,5 +1,5 @@
 results/
-templateExports/
+exportedTemplates/
 *.luacov
 
 # ---> Lua

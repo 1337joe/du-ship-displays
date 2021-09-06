@@ -9,15 +9,18 @@ exitCode=0
 # code coverage display on jenkins expects files to be referenced from project root
 cd "$(dirname "$0")/.."
 
-# clear out old results
-rm -rf tests/results
-mkdir -p tests/results/
-mkdir -p tests/results/images
+# set lua path to include src directory
+export LUA_PATH="src/?.lua;;"
 
-for test in tests/**/Test*.lua
+# clear out old results
+rm -rf test/results
+mkdir -p test/results/
+mkdir -p test/results/images
+
+for test in test/**/Test*.lua
 do
     testName=`basename $test`
-    lua -lluacov ${test} $@ -n tests/results/${testName}.xml
+    lua -lluacov ${test} $@ -n test/results/${testName}.xml
 
     retVal=$?
     if [ $retVal -ne 0 ]; then

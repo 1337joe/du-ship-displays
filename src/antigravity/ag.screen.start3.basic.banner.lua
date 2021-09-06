@@ -9,7 +9,7 @@ local ALT_SLIDER_BOTTOM = 1026
 
 -- add SVG-specific fields
 _G.agScreenController.SVG_TEMPLATE = [[${file:ag.screen.basic.svg minify}]]
-_G.agScreenController.SVG_LOGO = [[${file:../logo.svg minify}]]
+_G.agScreenController.SVG_LOGO = [[${file:../../logo.svg minify}]]
 
 -- one-time transforms
 _G.agScreenController.SVG_TEMPLATE = string.gsub(_G.agScreenController.SVG_TEMPLATE, '<svg id="logo"/>', _G.agScreenController.SVG_LOGO)

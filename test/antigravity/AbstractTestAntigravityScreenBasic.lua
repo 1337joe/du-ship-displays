@@ -1,11 +1,9 @@
 #!/usr/bin/env lua
 --- Additional generic display test conditions for running through antigravity basic screens.
 
-package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
-
 local lu = require("luaunit")
 
-local abstractTestScreen = require("tests.antigravity.AbstractTestAntigravityScreen")
+local abstractTestScreen = require("test.antigravity.AbstractTestAntigravityScreen")
 
 _G.AbstractTestAntigravityScreenBasic = abstractTestScreen:new()
 

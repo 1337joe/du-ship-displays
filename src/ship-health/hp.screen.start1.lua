@@ -105,7 +105,7 @@ _G.hpScreenController.BUTTON_MAXIMIZE_CLOUD = "Cloud: Maximize"
 
 -- add SVG-specific fields
 _G.hpScreenController.SVG_TEMPLATE = [[${file:hp.screen.basic.svg}]]
-_G.hpScreenController.SVG_LOGO = [[${file:../logo.svg minify}]]
+_G.hpScreenController.SVG_LOGO = [[${file:../../logo.svg minify}]]
 
 -- one-time transforms
 _G.hpScreenController.SVG_TEMPLATE = string.gsub(_G.hpScreenController.SVG_TEMPLATE, '<svg id="logo"/>',
