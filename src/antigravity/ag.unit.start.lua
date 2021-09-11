@@ -61,8 +61,6 @@ local piHalf = math.pi / 2
 -- declare methods
 --- Compute vertical velocity by projecting world velocity onto world vertical vector
 local function calculateVertVel(core)
-    local verticalVelocity
-
     -- compute vertical velocity by projecting world velocity onto world vertical vector
     local vel = vec3.new(core.getWorldVelocity())
     local vert = vec3.new(core.getWorldVertical())
