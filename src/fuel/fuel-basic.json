@@ -17,7 +17,12 @@
     "handlers":[
         {"code":"${file:fuel.unit.start.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:unit}"},"key":"${key}"},
         {"code":"${code:_G.fuelController:updateState()}","filter":{"args":[${args: updateFuel}],"signature":"tick(timerId)","slotKey":"${slotKey:unit}"},"key":"${key}"},
-        {"code":"${code:if _G.fuelController.options.toggleInactive and _G.fuelController.slots.screen then _G.fuelController.slots.screen.deactivate() end}","filter":{"args":[],"signature":"stop()","slotKey":"${slotKey:unit}"},"key":"${key}"},
+        {"code":"${code:
+for id, screen in pairs(_G.fuelController.slots.screens) do
+    if _G.fuelController.options[id].toggleInactive then
+        screen.deactivate()
+    end
+end}","filter":{"args":[],"signature":"stop()","slotKey":"${slotKey:unit}"},"key":"${key}"},
         {"code":"${file:../common/Utilities.lua}","filter":{"args":[],"signature":"start()","slotKey":"${slotKey:library}"},"key":"${key}"}
     ],
     "methods":[],

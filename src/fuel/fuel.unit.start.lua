@@ -20,7 +20,7 @@ local enableDebug = false --export: Show screen debug info.
 -- slot definitions
 _G.fuelController.slots = {}
 -- _G.fuelController.slots.core = core -- if not found by name will autodetect
-_G.fuelController.slots.screen = fuelScreen -- if not found by name will autodetect
+-- _G.fuelController.slots.screen = fuelScreen -- if not found by name will autodetect
 _G.fuelController.slots.databank = databank -- if not found by name will autodetect
 -- _G.fuelController.slots.tankAtm = tankAtm -- if not found by name will autodetect
 -- _G.fuelController.slots.tankSpa = tankSpa -- if not found by name will autodetect
@@ -33,8 +33,23 @@ _G.fuelController.slots.databank = databank -- if not found by name will autodet
 -- link missing slot inputs / validate provided slots
 local slots = _G.fuelController.slots
 local module = "fuel"
-slots.screen = _G.Utilities.loadSlot(slots.screen, "ScreenUnit", nil, module, "screen")
-slots.screen.activate()
+
+local slotNameScreens = _G.Utilities.findAllSlots("ScreenUnit")
+slots.screens = {}
+for name, screen in pairs(slotNameScreens) do
+    local outputString = screen.getScriptOutput()
+    local success, output = pcall(json.decode, outputString)
+    if not (success and type(output) == "table") then
+        local message = string.format("Unexpected screen output, is screen on slot [%s] initialized? (%s)", name, outputString)
+        system.print(message)
+    else
+        slots.screens[screen.getId()] = screen
+        screen.activate()
+        -- todo collect list of accepted types?
+    end
+end
+
+
 -- slots.core = _G.Utilities.loadSlot(slots.core, "CoreUnitDynamic", slots.screen, module, "core")
 slots.databank = _G.Utilities.loadSlot(slots.databank, "DataBankUnit", slots.screen, module, "databank", true,
                      "No databank found, controller state will not persist between sessions.")
@@ -46,25 +61,27 @@ slots.databank = _G.Utilities.loadSlot(slots.databank, "DataBankUnit", slots.scr
 unit.hide()
 
 -- local core = _G.fuelController.slots.core
-local screen = _G.fuelController.slots.screen
+local screens = _G.fuelController.slots.screens
 local databank = _G.fuelController.slots.databank
 
 -- load preferences/defaults
-local FUEL_UPDATE_FREQUENCY_KEY = string.format("screen.%s.updateFrequency", screen.getId())
+local FUEL_UPDATE_FREQUENCY_KEY = "screen.updateFrequency"
 local FUEL_UPDATE_FREQUENCY = _G.Utilities.getPreference(databank, FUEL_UPDATE_FREQUENCY_KEY, fuelUpdateFrequency)
 local GENERAL_OPTIONS_KEY = "screen.%s.options"
 local GENERAL_OPTIONS_NONCE_KEY = "screen.%s.options.nonce"
 local FUEL_OPTIONS_KEY = "screen.%s.fuel.options"
 local FUEL_OPTIONS_NONCE_KEY = "screen.%s.fuel.options.nonce"
 
-_G.fuelController.options = {
+_G.fuelController.options = {}
+_G.fuelController.options[0] = {
     nonce = 1,
     header = true,
     uiSmall = false,
     powerToggle = false,
     toggleInactive = false,
 }
-_G.fuelController.fuelOptions = {
+_G.fuelController.fuelOptions = {}
+_G.fuelController.fuelOptions[0] = {
     groupByPrefix = true,
     showWidget = false,
     showNames = true,
@@ -74,39 +91,46 @@ _G.fuelController.fuelOptions = {
     excludeR = false,
 }
 if databank then
-    local databankOptions, optionsSuccess, options
+    local optionsKey, databankOptions, optionsSuccess, options
 
-    databankOptions = databank.getStringValue(GENERAL_OPTIONS_KEY)
-    optionsSuccess, options = pcall(json.decode, databankOptions)
-    if not (optionsSuccess and type(options) == "table") then
-        options = _G.fuelController.options
-        databank.setStringValue(GENERAL_OPTIONS_KEY, json.encode(options))
-    else
-        _G.fuelController.options = options
-        databank.setStringValue(GENERAL_OPTIONS_KEY, json.encode(options))
-    end
-    databank.setIntValue(GENERAL_OPTIONS_NONCE_KEY,options.nonce)
+    for id, screen in pairs(screens) do
+        optionsKey = string.format(GENERAL_OPTIONS_KEY, id)
+        databankOptions = databank.getStringValue(optionsKey)
+        optionsSuccess, options = pcall(json.decode, databankOptions)
+        if not (optionsSuccess and type(options) == "table") then
+            options = _G.fuelController.options[0]
+            _G.fuelController.options[id] = {table.unpack(options)} -- copy
+            databank.setStringValue(optionsKey, json.encode(options))
+        else
+            _G.fuelController.options[id] = options
+        end
+        databank.setIntValue(GENERAL_OPTIONS_NONCE_KEY,options.nonce)
 
-    databankOptions = databank.getStringValue(FUEL_OPTIONS_KEY)
-    optionsSuccess, options = pcall(json.decode, databankOptions)
-    if not (optionsSuccess and type(options) == "table") then
-        options = _G.fuelController.fuelOptions
-        databank.setStringValue(FUEL_OPTIONS_KEY, json.encode(options))
-    else
-        _G.fuelController.fuelOptions = options
+        -- TODO only on fuel-tagged screens
+        optionsKey = string.format(FUEL_OPTIONS_KEY, id)
+        databankOptions = databank.getStringValue(optionsKey)
+        optionsSuccess, options = pcall(json.decode, databankOptions)
+        if not (optionsSuccess and type(options) == "table") then
+            options = _G.fuelController.fuelOptions[0]
+            _G.fuelController.fuelOptions[id] = {table.unpack(options)} -- copy
+            databank.setStringValue(optionsKey, json.encode(options))
+        else
+            _G.fuelController.fuelOptions[id] = options
+        end
+        databank.setIntValue(FUEL_OPTIONS_NONCE_KEY,options.nonce)
     end
-    databank.setIntValue(FUEL_OPTIONS_NONCE_KEY,options.nonce)
 end
 
 
 -- declare methods
 function _G.fuelController:updateState()
-    local outputString = screen.getScriptOutput()
-    local success, output = pcall(json.decode, outputString)
-    if not (success and type(output) == "table") then
-        screen.setCenteredText(string.format("Unexpected screen output, is it initialized? (%s)", outputString))
-        unit.exit()
+    for id, screen in pairs(screens) do
+        self:updateScreen(id, screen)
     end
+end
+
+function _G.fuelController:updateScreen(screenId, screen)
+    local output = json.decode(screen.getScriptOutput())
 
     local input = {}
 
@@ -121,44 +145,44 @@ function _G.fuelController:updateState()
     -- process updates/build inputs
     if type(output.options) == "table" then
         for k, v in pairs(output.options) do
-            self.options[k] = v
+            self.options[screenId][k] = v
         end
-        local oldNonce = self.options.nonce
-        while self.options.nonce == oldNonce do
-            self.options.nonce = math.random(99)
+        local oldNonce = self.options[screenId].nonce
+        while self.options[screenId].nonce == oldNonce do
+            self.options[screenId].nonce = math.random(99)
         end
 
         if databank then
-            databank.setStringValue(GENERAL_OPTIONS_KEY, json.encode(self.options))
-            databank.setIntValue(GENERAL_OPTIONS_NONCE_KEY,self.options.nonce)
+            databank.setStringValue(string.format(GENERAL_OPTIONS_KEY, screenId), json.encode(self.options[screenId]))
+            databank.setIntValue(string.format(GENERAL_OPTIONS_NONCE_KEY, screenId),self.options[screenId].nonce)
         end
     elseif databank then
-        if databank.getIntValue(GENERAL_OPTIONS_NONCE_KEY) ~= self.options.nonce then
-            self.options = json.decode(databank.getStringValue(GENERAL_OPTIONS_KEY))
+        if databank.getIntValue(string.format(GENERAL_OPTIONS_NONCE_KEY, screenId)) ~= self.options[screenId].nonce then
+            self.options[screenId] = json.decode(databank.getStringValue(string.format(GENERAL_OPTIONS_KEY, screenId)))
         end
     end
-    input.options = self.options
+    input.options = self.options[screenId]
 
     if processFuel then
         if type(output.fuelOptions) == "table" then
             for k, v in pairs(output.fuelOptions) do
-                self.fuelOptions[k] = v
+                self.fuelOptions[screenId][k] = v
             end
-            local oldNonce = self.fuelOptions.nonce
-            while self.fuelOptions.nonce == oldNonce do
-                self.fuelOptions.nonce = math.random(99)
+            local oldNonce = self.fuelOptions[screenId].nonce
+            while self.fuelOptions[screenId].nonce == oldNonce do
+                self.fuelOptions[screenId].nonce = math.random(99)
             end
 
             if databank then
-                databank.setStringValue(FUEL_OPTIONS_KEY, json.encode(self.fuelOptions))
-                databank.setIntValue(FUEL_OPTIONS_NONCE_KEY,self.fuelOptions.nonce)
+                databank.setStringValue(string.format(FUEL_OPTIONS_KEY, screenId), json.encode(self.fuelOptions[screenId]))
+                databank.setIntValue(string.format(FUEL_OPTIONS_NONCE_KEY, screenId),self.fuelOptions[screenId].nonce)
             end
-        elseif databank.getIntValue(FUEL_OPTIONS_NONCE_KEY) ~= self.fuelOptions.nonce then
-            self.fuelOptions = json.decode(databank.getStringValue(FUEL_OPTIONS_KEY))
+        elseif databank and databank.getIntValue(string.format(FUEL_OPTIONS_NONCE_KEY, screenId)) ~= self.fuelOptions[screenId].nonce then
+            self.fuelOptions[screenId] = json.decode(databank.getStringValue(string.format(FUEL_OPTIONS_KEY, screenId)))
         end
 
         input.fuel = {
-            options = self.fuelOptions,
+            options = self.fuelOptions[screenId],
         }
     end
 

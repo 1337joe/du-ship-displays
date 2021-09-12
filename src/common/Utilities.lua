@@ -77,6 +77,40 @@ function _G.Utilities.findFirstSlot(slotClass, exclude)
     return nil, nil
 end
 
+--- Finds the all slots on 'unit' that have element class 'slotClass'.
+-- @tparam string slotClass The element class of the target slot. May instead be a table containing a list of class names.
+-- @tparam table exclude A list of slots to exclude from search.
+-- @return A table mapping slot names to matching elements.
+function _G.Utilities.findAllSlots(slotClass, exclude)
+    if type(slotClass) ~= "table" then
+        slotClass = {slotClass}
+    end
+    exclude = exclude or {}
+
+    local result = {}
+    for key, value in pairs(unit) do
+
+        -- ignore excluded elements
+        for _, exc in pairs(exclude) do
+            if value == exc then
+                goto continueOuter
+            end
+        end
+
+        if value and type(value) == "table" and value.getElementClass then
+            for _, class in pairs(slotClass) do
+                if value.getElementClass() == class then
+                    result[key] = value
+                end
+            end
+        end
+
+        ::continueOuter::
+    end
+
+    return result
+end
+
 -- Verifies the valid argument, if not true then it prints the provided message to the optional screen and to the programming board error log, halting execution.
 -- @param valid The condition to test, typically a boolean.
 -- @tparam string message The message to display on failure.
