@@ -371,6 +371,86 @@ function _G.TestUtilities.testFindFirstSlot()
     lu.assertNil(actualSlot)
 end
 
+--- Returns count of elements in input.
+local function countTable(input)
+    local count = 0
+    for k, _ in pairs(input) do
+        count = count + 1
+    end
+    return count
+end
+
+--- Verify findAllSlots retrieves values appropriately.
+function _G.TestUtilities.testFindSlots()
+
+    -- create and link a few mocks to a control unit
+    local screen1Mock = mockScreenUnit:new(nil, 2)
+    local screen1 = screen1Mock:mockGetClosure()
+
+    local screen2Mock = mockScreenUnit:new(nil, 6)
+    local screen2 = screen2Mock:mockGetClosure()
+
+    local databankMock = mockDatabankUnit:new(nil, 4)
+    local databank = databankMock:mockGetClosure()
+
+    local coreMock = mockCoreUnit:new(nil, 7)
+    local core = coreMock:mockGetClosure()
+
+    local unitMock = mockControlUnit:new(nil, 5, "programming board")
+
+    unitMock.linkedElements["screen1"] = screen1
+    unitMock.linkedElements["screen2"] = screen2
+    unitMock.linkedElements["databank"] = databank
+    unitMock.linkedElements["core"] = core
+
+    _G.unit = unitMock:mockGetClosure()
+
+    local actual, actualSlot
+
+    -- find all
+    actual = _G.Utilities.findAllSlots()
+    lu.assertTrue(countTable(actual) >= 4) -- ignore export and unit
+    lu.assertIs(actual["screen1"], screen1)
+    lu.assertIs(actual["screen2"], screen2)
+    lu.assertIs(actual["databank"], databank)
+    lu.assertIs(actual["core"], core)
+
+    -- find all
+    actual = _G.Utilities.findAllSlots({})
+    lu.assertTrue(countTable(actual) >= 4) -- ignore export and unit
+    lu.assertIs(actual["screen1"], screen1)
+    lu.assertIs(actual["screen2"], screen2)
+    lu.assertIs(actual["databank"], databank)
+    lu.assertIs(actual["core"], core)
+
+    -- exclude built-ins and core
+    actual = _G.Utilities.findAllSlots(nil, {core, _G.unit, _G.unit.export})
+    lu.assertEquals(countTable(actual), 3)
+    lu.assertIs(actual["screen1"], screen1)
+    lu.assertIs(actual["screen2"], screen2)
+    lu.assertIs(actual["databank"], databank)
+    lu.assertNil(actual["core"])
+
+    -- filter to screens only
+    actual = _G.Utilities.findAllSlots(screen1.getElementClass())
+    lu.assertEquals(countTable(actual), 2)
+    lu.assertIs(actual["screen1"], screen1)
+    lu.assertIs(actual["screen2"], screen2)
+
+    -- filter to screens and exclude second screen
+    actual = _G.Utilities.findAllSlots(screen1.getElementClass(), {screen2})
+    lu.assertEquals(countTable(actual), 1)
+    lu.assertIs(actual["screen1"], screen1)
+    lu.assertNil(actual["screen2"])
+
+    -- multiple filter types
+    actual = _G.Utilities.findAllSlots({screen1.getElementClass(), databank.getElementClass()})
+    lu.assertEquals(countTable(actual), 3)
+    lu.assertIs(actual["screen1"], screen1)
+    lu.assertIs(actual["screen2"], screen2)
+    lu.assertIs(actual["databank"], databank)
+end
+
 --- Verify variations on loadSlot function properly with error reporting.
 function _G.TestUtilities.testLoadSlot()
     -- create and link a few mocks to a control unit

@@ -78,10 +78,14 @@ function _G.Utilities.findFirstSlot(slotClass, exclude)
 end
 
 --- Finds the all slots on 'unit' that have element class 'slotClass'.
--- @tparam string slotClass The element class of the target slot. May instead be a table containing a list of class names.
--- @tparam table exclude A list of slots to exclude from search.
+-- @tparam string slotClass The element class of the target slot. May instead be a table containing a list of class
+--   names. Optional: if nil then all non-excluded slots will be returned.
+-- @tparam table exclude A list of slots to exclude from search. Optional: if nil/empty then all slots matching the
+--   slotClass filter will be returned.
 -- @return A table mapping slot names to matching elements.
 function _G.Utilities.findAllSlots(slotClass, exclude)
+    local noFilter = slotClass == nil or #slotClass == 0
+    slotClass = slotClass or {}
     if type(slotClass) ~= "table" then
         slotClass = {slotClass}
     end
@@ -98,9 +102,13 @@ function _G.Utilities.findAllSlots(slotClass, exclude)
         end
 
         if value and type(value) == "table" and value.getElementClass then
-            for _, class in pairs(slotClass) do
-                if value.getElementClass() == class then
-                    result[key] = value
+            if noFilter then
+                result[key] = value
+            else
+                for _, class in pairs(slotClass) do
+                    if value.getElementClass() == class then
+                        result[key] = value
+                    end
                 end
             end
         end
