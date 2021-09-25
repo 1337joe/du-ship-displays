@@ -82,7 +82,7 @@ function _G.storeTankData(tankRoot, slot)
         getVolume = slot.getItemsVolume,
         maxVol = slot.getMaxVolume(),
         getTimeLeft = function()
-            string.match(slot.getData(), [["timeLeft":([0-9%.-])]])
+            return tonumber(string.match(slot.getData(), [["timeLeft":([0-9%.-]+)]]))
         end
     }
 end
@@ -195,7 +195,6 @@ _G.fuelController.fuelOptions[0] = {
     groupByPrefix = true,
     showWidget = false,
     showNames = true,
-    reverseMeters = false,
     excludeA = false,
     excludeS = false,
     excludeR = false,
@@ -357,7 +356,7 @@ function _G.fuelController:updateScreen(screenId, screen, data)
     local output = json.decode(screen.getScriptOutput())
 
     -- support updating accepts list dynamically, will lag by one refresh to actually fetch data
-    -- TODO test equality, show loading message instead of data on change
+    -- TODO monitor for change, show loading message instead of data on change
     screenAccepts[screenId] = output.accept
 
     -- get requested data (specific)
