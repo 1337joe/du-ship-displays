@@ -126,9 +126,9 @@ function _G.TestShipHealthUnit:testInitialize()
     lu.assertStrContains(self.screenMock.html, "Initializing: 50 of 50 loaded")
 
     -- verify min/max values from init coroutine
-    lu.assertEquals(_G.hpController.elementMetadata.min.x, -6)
-    lu.assertEquals(_G.hpController.elementMetadata.max.x, 6.25)
-    lu.assertEquals(_G.hpController.elementMetadata.min.y, -5.625)
+    lu.assertAlmostEquals(_G.hpController.elementMetadata.min.x, -6, 0.001)
+    lu.assertAlmostEquals(_G.hpController.elementMetadata.max.x, 6.25, 0.001)
+    lu.assertAlmostEquals(_G.hpController.elementMetadata.min.y, -5.625, 0.001)
     lu.assertAlmostEquals(_G.hpController.elementMetadata.max.y, 6.348576, 0.000001)
     lu.assertAlmostEquals(_G.hpController.elementMetadata.min.z, -2.591827, 0.000001)
     lu.assertAlmostEquals(_G.hpController.elementMetadata.max.z, 1.384995, 0.000001)

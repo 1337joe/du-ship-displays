@@ -69,15 +69,11 @@ local function loadElementData()
     local elementsBetweenBreaks = 50
 
     local coreMaxHp = core.getMaxHitPoints()
-    local centerOffset = 128
     if coreMaxHp < 150 then
-        centerOffset = 16
         _G.hpController.arrowOffsetDistance = 1
     elseif coreMaxHp < 1100 then
-        centerOffset = 32
         _G.hpController.arrowOffsetDistance = 1.5
     elseif coreMaxHp < 10000 then
-        centerOffset = 64
         _G.hpController.arrowOffsetDistance = 2
     end
 
@@ -90,9 +86,9 @@ local function loadElementData()
     for index, key in pairs(elementKeys) do
         tPos = core.getElementPositionById(key)
         pos = {}
-        pos.x = tPos[1] - centerOffset
-        pos.y = tPos[2] - centerOffset
-        pos.z = tPos[3] - centerOffset
+        pos.x = tPos[1]
+        pos.y = tPos[2]
+        pos.z = tPos[3]
 
         mhp = core.getElementMaxHitPointsById(key)
         hp = core.getElementHitPointsById(key)
@@ -100,7 +96,8 @@ local function loadElementData()
             n = core.getElementNameById(key),
             t = core.getElementTypeById(key),
             p = pos,
-            r = core.getElementRotationById(key),
+            -- f = core.getElementForwardById(key),
+            -- u = core.getElementUpById(key),
             m = mhp,
             h = hp,
         }
