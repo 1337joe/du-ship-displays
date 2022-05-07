@@ -23,7 +23,7 @@ function _G.TestUtilities.testPrintableNumberUnits()
 
     for i=1,30 do
         expected = BIG_PREFIXES[math.min(math.floor(i / 3) + 1, #BIG_PREFIXES)]
-        value = math.pow(10, i)
+        value = 10 ^ i
         _,actual = ut.printableNumber(value, "")
         lu.assertEquals(actual, expected, "Prefix for: "..value)
     end
@@ -35,7 +35,7 @@ function _G.TestUtilities.testPrintableNumberUnitsNegative()
 
     for i=1,30 do
         expected = BIG_PREFIXES[math.min(math.floor(i / 3) + 1, #BIG_PREFIXES)]
-        value = -math.pow(10, i)
+        value = -(10 ^ i)
         _,actual = ut.printableNumber(value, "")
         lu.assertEquals(actual, expected, "Prefix for: "..value)
     end
@@ -340,6 +340,11 @@ function _G.TestUtilities.testFindFirstSlot()
     lu.assertIs(actual, databank)
     lu.assertEquals(actualSlot, "databank")
 
+    -- found by pattern match, single choice
+    actual, actualSlot = _G.Utilities.findFirstSlot("DataBank%a+");
+    lu.assertIs(actual, databank)
+    lu.assertEquals(actualSlot, "databank")
+
     -- found: choice of two - slot order does not matter in-game, don't rely on it here
     actual, actualSlot = _G.Utilities.findFirstSlot(screen1.getElementClass());
     lu.assertNotNil(actual)
@@ -410,6 +415,14 @@ function _G.TestUtilities.testFindSlots()
     -- find all
     actual = _G.Utilities.findAllSlots()
     lu.assertTrue(countTable(actual) >= 4) -- ignore export and unit
+    lu.assertIs(actual["screen1"], screen1)
+    lu.assertIs(actual["screen2"], screen2)
+    lu.assertIs(actual["databank"], databank)
+    lu.assertIs(actual["core"], core)
+
+    -- find all
+    actual = _G.Utilities.findAllSlots("%a+Unit")
+    lu.assertTrue(countTable(actual) == 4)
     lu.assertIs(actual["screen1"], screen1)
     lu.assertIs(actual["screen2"], screen2)
     lu.assertIs(actual["databank"], databank)
