@@ -10,14 +10,15 @@ exitCode=0
 cd "$(dirname "$0")/.."
 
 # set lua path to include src directory
-export LUA_PATH="src/?.lua;;"
+export LUA_PATH="src/?.lua;;$LUA_PATH"
 
 # clear out old results
 rm -rf test/results
 mkdir -p test/results/
 mkdir -p test/results/images
 
-for test in test/**/Test*.lua
+# Note: not whitespace-safe
+for test in $(find . -name Test\*.lua)
 do
     testName=`basename $test`
     lua -lluacov ${test} $@ -n test/results/${testName}.xml

@@ -1,0 +1,93 @@
+name: Tests
+
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: du-ship-displays
+
+    strategy:
+      fail-fast: false
+      matrix:
+#        luaVersion: [ "5.3" ]
+        luaVersion: [ "5.2", "5.3", "5.4" ]
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: du-ship-displays
+
+      - name: Checkout game-data-lua
+        uses: actions/checkout@v3
+        with:
+          repository: 1337joe/game-data-lua
+          token: ${{ secrets.GDL_TOKEN }}
+          path: game-data-lua
+
+      - uses: leafo/gh-actions-lua@v9
+        with:
+          luaVersion: ${{ matrix.luaVersion }}
+
+      - uses: leafo/gh-actions-luarocks@v4
+
+      - name: Setup
+        run: |
+          luarocks install --only-deps du-ship-displays-scm-0.rockspec
+          luarocks install luaunit
+          luarocks install luacov
+          luarocks install luafilesystem
+          luarocks install du-bundler
+
+      - name: Test
+        run: ./test/runTests.sh -o junit
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: "du-ship-displays/test/results/**/*.xml"
+
+      - run: luacov
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        if: ${{ matrix.luaVersion == '5.3' }}
+        with:
+          root_dir: du-ship-displays
+
+      - name: Export All Templates
+        run: ./exportAll.sh
+
+      - name: Upload Test Artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ matrix.luaVersion == '5.3' }}
+        with:
+          name: test_configs
+          path: |
+            du-ship-displays/exportedTemplates
+            du-ship-displays/test/results/images
+
+      - name: Deploy Templates
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        if: ${{ matrix.luaVersion == '5.3' && github.ref_name == 'main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push') }}
+        with:
+          branch: gh-pages
+          folder: du-ship-displays/exportedTemplates
+          target-folder: templates
+
+      - name: Deploy Images
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        if: ${{ matrix.luaVersion == '5.3' && github.ref_name == 'main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push') }}
+        with:
+          branch: gh-pages
+          folder: du-ship-displays/test/results/images
+          target-folder: images

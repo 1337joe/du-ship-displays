@@ -1,5 +1,8 @@
 # DU Ship Displays
 
+![Tests](https://github.com/1337joe/du-ship-displays/actions/workflows/test.yml/badge.svg?branch=main)
+[![Coverage](https://codecov.io/gh/1337joe/du-ship-displays/branch/main/graph/badge.svg)](https://codecov.io/gh/1337joe/du-ship-displays)
+
 Info and control screens for Dual Universe ships.
 
 Only the basic screens are linked here. For full galleries of available screens view my [project web page](https://du.w3asel.com/du-ship-displays).
