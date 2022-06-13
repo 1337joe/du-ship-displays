@@ -1,0 +1,104 @@
+<html>
+
+<head>
+    <title>DU Ship Displays</title>
+    <link rel="icon" href="/favicon.ico"><!-- 32x32 -->
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"><!-- 180x180 -->
+    <link rel="manifest" href="/manifest.webmanifest">
+
+    <link rel="stylesheet" type="text/css" href="default.css">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <header>
+        <div class="title">
+            <h1>DU Ship Displays</h1>
+            <a href="https://github.com/1337joe/du-ship-displays">GitHub</a>
+            <p>Info and control screens for Dual Universe ships.</p>
+        </div>
+    </header>
+
+    <section>
+        <h1>Installation Instructions</h1>
+        <p>The controller code is designed to detect what is linked and configure itself. Unless otherwise noted for a
+            particular screen, simply:
+        <ol>
+            <li>Click on a screen image below to go to the json for that configuration.</li>
+            <li>Copy the raw JSON content of the file.</li>
+            <li>In Dual Universe, right click on a programming board, go to advanced, then select "Paste Lua
+                configuration from clipboard".
+                <br>You should get a "Lua script loaded" confirmation message. If this is not the case try pasting the
+                json in notepad to confirm that the right file is in the clipboard.
+            </li>
+            <li>Go into build mode and link the programming board to a screen, then leave build mode and activate the
+                programming board. The screen will tell you the next element to link, if necessary.
+                <br>The console will print out what slot is linked as what element to help debug connections if needed.
+            </li>
+        </ol>
+        </p>
+    </section>
+
+    <section class="ship-display" id="antigravity">
+        <h1>Antigravity</h1>
+        <hr>
+
+        <div>
+            <h2>Features/Controls</h2>
+            <ul>
+                <li>All anti-gravity measurements and controls on one screen.</li>
+                <li>Set target altitude by dragging the arrow on the left side of the altitude scale or with the up and down arrows. Left/right arrows select the digit to change to step at anywhere from 1 to 10,000 m increments.
+                    <ul><li>The altitude scale is logarithmic for more control at lower altitudes.</li></ul>
+                </li>
+                <li>Snap target altitude to current altitude in one click on the current altitude slider.</li>
+                <li>Lock controls to prevent accidental clicks by clicking on the lock icon.</li>
+                <li>Power on and unlock protected by a drag-to-activate mechanism to prevent accidental disabling.</li>
+            </ul>
+        </div>
+
+        <div>
+            <h2>Requirements</h2>
+            <ul>
+                <li>Anti-Gravity Generator (of appropriate size for ship core and with the appropriate number of pulsors
+                    linked to it)</li>
+                <li>1x Programming Board</li>
+                <li>1x Screen</li>
+                <li>Databank (optional, for remembering controller state between sessions)</li>
+            </ul>
+        </div>
+
+        <ul class="gallery">
+            <li><a href="templates/antigravity-basic.json"><img
+                        src="images/antigravity-basic.svg" alt="Basic Antigravity Controller"></a>
+            </li>
+            <li><a href="templates/antigravity-nobanner.json"><img
+                        src="images/antigravity-nobanner.svg"
+                        alt="Basic Antigravity Controller (Bannerless)"></a></li>
+        </ul>
+
+        <div>
+        <h2>Troubleshooting</h2>
+            <h3>Anti-Gravity Generator doesn't lift ship</h3>
+            <ul>
+                <li>The ship isn't under active control: either sit in the controller seat or activate a remote controller.</li>
+                <li>Make sure it's activated: if the power button on the top right section has a red ring instead of a green bar click on it to turn on the Anti-Gravity Generator element.</li>
+                <li>Make sure you have enough pulsors placed and that they are linked to the Anti-Gravity Generator.</li>
+                <li>Make sure you're at no less than 1,000m altitude.</li>
+                <li>Make sure the current base altitude is within 500m of ship altitude. It may take some time to get there.</li>
+                <li>In some cases it may be necessary to unlink the pulsors from the Anti-Gravity Generator and re-link them if nothing else works.</li>
+            </ul>
+
+            <h3>Can't edit altitude</h3>
+            <ul>
+                <li>Make sure the programming board is turned on: either enable it before you get in the control seat or use a switch or other element to send an on signal to it.</li>
+                <li>If a green lock icon is in the top left corner then the controls are locked. Click on it and drag to the right to unlock.</li>
+            </ul>
+        </div>
+    </section>
+</body>
+
+</html>
