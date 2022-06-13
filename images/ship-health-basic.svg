@@ -1,0 +1,290 @@
+<svg viewBox="0 0 1920 1080" style="width:100%; height:100%" class="bootstrap" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
+    <style>
+        text {
+            text-transform: none;
+            font-family: arial;
+            font-weight: normal;
+        }
+        .header text {
+            font-size:108px;
+            font-weight:bold;
+        }
+        .hidden, .hideInterface, #hiddenCloudButtonBar, #hiddenTableInterface {
+            display: none;
+        }
+        .broken {
+            fill: #ff1300 !important;
+            stop-color: #ff1300;
+        }
+        .damaged {
+            fill: #ffd700 !important;
+            stop-color: #ffd700;
+        }
+        .healthy, .titleColor {
+            fill: #00c322 !important;
+            stop-color: #00c322;
+        }
+        #sidebar, #tabs{
+            text-anchor: middle;
+        }
+        .majorLabel {
+            font-size: 80px;
+            fill: #777777;
+        }
+        .label {
+            font-size: 60px;
+            fill: #777777;
+        }
+        .majorValue {
+            font-size: 125px;
+            fill: #ffffff;
+        }
+        .minorValue {
+            font-size: 75px;
+            fill: #aaaaaa;
+        }
+        #filters use {
+            stroke: #777777;
+            stroke-width: 5px;
+        }
+        #filters text {
+            font-size: 75px;
+            fill: #777777;
+            stroke-width: 2px;
+            stroke: #000000;
+        }
+        #filters .selected use, #tabs .selected use {
+            stroke: #ffffff;
+        }
+        #filters .selected text, #filters text.selected, #tableInterface .selected text, #tabs .selected text {
+            fill: #ffffff;
+        }
+        #tabs text {
+            font-size: 60px;
+            fill: #777777;
+        }
+        #tabs use, #cloudButtonBar use {
+            stroke: #777777;
+            stroke-width: 5px;
+        }
+        #tabs rect {
+            stroke: #ffffff;
+            stroke-width: 5px;
+        }
+        .indicator {
+            stroke: #000000;
+            stroke-width: 3;
+        }
+        .units {
+            fill: #555555;
+        }
+        .mouseOver {
+            stroke: #5dd572 !important;
+            stroke-width: 10px;
+        }
+        #filters .mouseOver use {
+            stroke: #5dd572 !important;
+            stroke-width: 10px;
+        }
+        #tableInterface text {
+            font-size: 50px;
+            fill: #ffffff;
+        }
+        #tableInterface line {
+            stroke: #ffffff;
+            stroke-width: 5;
+        }
+        #tableInterface .tableHeader use {
+            fill: #777777;
+        }
+        #tableInterface .tableHeader use.selected {
+            fill: #ffffff;
+        }
+        #tableInterface .scrollbar use, #tableInterface .scrollbar line, rect.scrollbar {
+            stroke: #ffffff;
+            stroke-width: 5px;
+            fill: #777777;
+        }
+        #tableContents text {
+            font-size: 40px;
+            fill: #ffffff;
+        }
+        #tableContents g.selected text {
+            fill: #77ff00;
+        }
+        #tableContents g rect {
+            fill-opacity: 0.3;
+        }
+        #tableContents g text:nth-child(2) {
+            clip-path: url(#tableIdClip);
+            text-anchor: end;
+        }
+        #tableContents g text:nth-child(3) {
+            clip-path: url(#tableNameClip);
+        }
+        #tableContents g text:nth-child(4) {
+            clip-path: url(#tableDmgClip);
+            text-anchor: end;
+        }
+        #tableContents g text:nth-child(5) {
+            clip-path: url(#tableDmgClip);
+        }
+        #tableContents g text:nth-child(6) {
+            clip-path: url(#tableMaxClip);
+            text-anchor: end;
+        }
+        #tableContents g text:nth-child(7) {
+            clip-path: url(#tableMaxClip);
+        }
+        #tableContents g text:nth-child(8) {
+            clip-path: url(#tableIntClip);
+            text-anchor: end;
+        }
+    </style>
+    <defs>
+        <svg id="logo"/>
+        <rect id="filterButton" x="-182" y="-44" width="364" height="88" rx="20" />
+        <path id="tabSweep" d="m -130,7 c 50,0 20,-59 70,-59 l 120,0 c 50,0 20,59 70,59" />
+        <path id="sortUp" d="m -22,27 l 10,-10 10,10 z" />
+        <path id="sortDown" d="m -22,37 l 10,10 10,-10 z" />
+        <clipPath id="tableIdClip">
+            <rect y="-100" width="100" height="1180" />
+        </clipPath>
+        <clipPath id="tableNameClip">
+            <rect x="120" y="-100" width="561" height="1180" />
+        </clipPath>
+        <clipPath id="tableDmgClip">
+            <rect x="701" y="-100" width="135" height="1180" />
+        </clipPath>
+        <clipPath id="tableMaxClip">
+            <rect x="856" y="-100" width="130" height="1180" />
+        </clipPath>
+        <clipPath id="tableIntClip">
+            <rect x="1006" y="-100" width="82" height="1180" />
+        </clipPath>
+        <path id="skipButton" d="M -20,-15 l 40,0 M 0,-10 l 15,25 -30,0 z" />
+        <path id="scrollButton" d="M 0,-15 l 15,30 -30,0 z" />
+        <path id="maximizeButton" d="M 45,15 l 0,30 -30,0 m -30,0 l -30,0 0,-30 m 0,-30 l 0,-30 30,0 m 30,0 l 30,0 0,30 m 0,30 M 45,45 l -30,-30 m -30,-30 l -30,-30 m 90,0 l -30,30 m -30,30 l -30,30" />
+        <path id="minimizeButton" d="M 45,15 l -30,0 0,30 m -30,0 l 0,-30 -30,0 m 0,-30 l 30,0 0,-30 m 30,0 l 0,30 30,0 m 0,30 M 45,45 l -30,-30 m -30,-30 l -30,-30 m 90,0 l -30,30 m -30,30 l -30,30" />
+        <path id="stretchButton" d="M 0,40 l 0,-80 M 15,0 l 30,0 m -15,-15 l 15,15 -15,15 M -15,0 l -30,0 m 15,-15 l -15,15 15,15" />
+        <path id="preserveButton" d="M 0,40 l 0,-80 M -45,0 l 30,0 m -15,-15 l 15,15 -15,15 M 45,0 l -30,0 m 15,-15 l -15,15 15,15" />
+        <linearGradient id="titleGradient">
+            <stop offset="0%" stop-color="#000000" />
+            <stop offset="100%" class="broken" />
+        </linearGradient>
+    </defs>
+    <rect x="0" y="0" fill="#000000" width="1920" height="1080" />
+    <g class="header">
+        <rect x="0" y="0" fill="url('#titleGradient')" width="1920" height="108" />
+        <use xlink:href="#logo" x="4" y="4" width="178" height="100" />
+        <text x="1920" y="108" text-anchor="end">Pocket Scout</text>
+    </g>
+    <g id="sidebar">
+        <text x="384" y="216" class="majorLabel">Element Integrity</text>
+        <text x="384" y="324" text-anchor="middle" class="majorValue">99 <tspan class="units">%</tspan></text>
+        <text x="370" y="405" text-anchor="end" class="minorValue">10650</text>
+        <text x="384" y="405" text-anchor="middle" class="minorValue units">/</text>
+        <text x="398" y="405" text-anchor="start" class="minorValue">10670</text>
+        <text x="10" y="746" text-anchor="start" class="label">Filter Visible</text>
+        <text x="758" y="746" text-anchor="end" class="label">Count</text>
+        <g id="filters">
+            <g class="healthyFilterClass selected healthy">
+                <use xlink:href="#filterButton" x="192" y="810" />
+                <text x="192" y="833">Healthy</text>
+            </g>
+            <text x="758" y="833" text-anchor="end" class="healthyCountClass selected">43</text>
+            <g class="damagedFilterClass selected damaged">
+                <use xlink:href="#filterButton" x="192" y="918" />
+                <text x="192" y="941">Damaged</text>
+            </g>
+            <text x="758" y="941" text-anchor="end" class="damagedCountClass selected">3</text>
+            <g class="brokenFilterClass selected broken">
+                <use xlink:href="#filterButton" x="192" y="1026" />
+                <text x="192" y="1049">Broken</text>
+            </g>
+            <text x="758" y="1049" text-anchor="end" class="brokenCountClass selected">4</text>
+        </g>
+    </g>
+    <g id="tabs">
+        <g class="tableClass">
+            <use xlink:href="#tabSweep" x="960" y="182" />
+            <text x="960" y="182">Table</text>
+        </g>
+        <g class="selected">
+            <use xlink:href="#tabSweep" x="1216" y="182" />
+            <text x="1216" y="182">Top</text>
+        </g>
+        <g class="sideClass">
+            <use xlink:href="#tabSweep" x="1472" y="182" />
+            <text x="1472" y="182">Side</text>
+        </g>
+        <g class="frontClass">
+            <use xlink:href="#tabSweep" x="1728" y="182" />
+            <text x="1728" y="182">Front</text>
+        </g>
+        <rect x="768" y="189" width="1152" height="891" />
+    </g>
+    <rect class="hideInterface" x="0" y="0" fill="#000000" width="1920" height="1080" />
+    <g transform="translate(768,189)">
+        <g id="hiddenTableInterface">
+            <g class="tableHeader">
+                <g class="sortIdClass">
+                    <use class="sortIdClassUp" xlink:href="#sortUp" x="30" />
+                    <use class="sortIdClassDown" xlink:href="#sortDown" x="30" />
+                    <text x="30" y="50">ID</text>
+                </g>
+                <g class="sortNameClass">
+                    <use class="sortNameClassUp" xlink:href="#sortUp" x="150" />
+                    <use class="sortNameClassDown" xlink:href="#sortDown" x="150" />
+                    <text x="150" y="50">Name</text>
+                </g>
+                <g class="sortDmgClass">
+                    <use class="sortDmgClassUp" xlink:href="#sortUp" x="731" />
+                    <use class="sortDmgClassDown" xlink:href="#sortDown" x="731" />
+                    <text x="731" y="50">Dmg</text>
+                </g>
+                <g class="sortMaxClass">
+                    <use class="sortMaxClassUp" xlink:href="#sortUp" x="886" />
+                    <use class="sortMaxClassDown" xlink:href="#sortDown" x="886" />
+                    <text x="886" y="50">Max</text>
+                </g>
+                <g class="sortIntClass">
+                    <use class="sortIntClassUp" xlink:href="#sortUp" x="1036" />
+                    <use class="sortIntClassDown" xlink:href="#sortDown" x="1036" />
+                    <text x="1036" y="50">%</text>
+                </g>
+                <line x1="0" y1="65" x2="1152" y2="65" />
+            </g>
+           <line x1="1098" y1="65" x2="1098" y2="891" />
+            <g class="scrollbar">
+                <use xlink:href="#skipButton" class="skipUpClass" x="1125" y="92" />
+                <use xlink:href="#scrollButton" class="scrollUpClass" x="1125" y="146" />
+                <use xlink:href="#scrollButton" transform="translate(1125,810) rotate(180)" class="scrollDownClass" />
+                <use xlink:href="#skipButton" transform="translate(1125,864) rotate(180)" class="skipDownClass" />
+                <line x1="1125" y1="173" x2="1125" y2="783" />
+            </g>
+        </g>
+        <svg viewBox="-661.250000 -694.725480 1347.500000 1317.093360" scaleMultiplier="100" width="1152.000000" height="891.000000">
+    <style>
+    circle {
+        stroke: black;
+        stroke-width: 6.59;
+    }
+    .selected {
+        stroke: white;
+    }
+    </style>
+    <g>
+        <g class="healthy"><circle cx="12.50" cy="312.50" r="26.95"/><circle cx="-68.21" cy="555.09" r="27.12"/><circle cx="461.60" cy="325.00" r="45.50"/><circle cx="12.50" cy="537.50" r="27.06"/><circle cx="-25.00" cy="450.00" r="26.95"/><circle cx="-132.54" cy="562.50" r="26.95"/><circle cx="157.55" cy="562.50" r="26.95"/><circle cx="12.50" cy="200.00" r="34.63"/><circle cx="132.54" cy="-287.50" r="26.95"/><circle cx="50.00" cy="-125.00" r="26.95"/><circle cx="-25.01" cy="-550.01" r="26.95"/><circle cx="50.00" cy="-550.01" r="26.95"/><circle cx="112.50" cy="562.49" r="26.95"/><circle cx="-87.50" cy="562.49" r="26.95"/><circle cx="612.50" cy="286.87" r="26.95"/><circle cx="-58.14" cy="147.76" r="26.95"/><circle cx="-56.41" cy="112.50" r="26.95"/><circle cx="75.00" cy="75.00" r="26.95"/><circle cx="93.21" cy="555.09" r="27.12"/><circle cx="13.42" cy="74.94" r="26.95"/><circle cx="-25.02" cy="263.05" r="26.95"/><circle cx="133.54" cy="-337.50" r="26.95"/><circle cx="12.43" cy="-112.50" r="39.41"/><circle cx="-112.50" cy="350.00" r="26.96"/><circle cx="137.50" cy="350.00" r="26.96"/><circle cx="12.50" cy="-600.00" r="26.96"/><circle cx="12.50" cy="-634.86" r="26.95"/><circle cx="75.01" cy="-512.50" r="26.95"/><circle cx="-7.55" cy="-562.28" r="26.95"/><circle cx="32.19" cy="-562.13" r="26.95"/><circle cx="12.50" cy="162.50" r="27.18"/><circle cx="50.00" cy="262.50" r="26.95"/><circle cx="50.00" cy="287.50" r="26.95"/><circle cx="12.50" cy="549.69" r="53.90"/><circle cx="12.50" cy="-327.40" r="26.99"/><circle cx="12.50" cy="-424.53" r="28.47"/><circle cx="62.51" cy="-537.50" r="26.95"/><circle cx="-436.60" cy="325.00" r="45.50"/><circle cx="75.00" cy="137.50" r="26.95"/><circle cx="50.00" cy="450.00" r="26.95"/><circle cx="-600.00" cy="299.39" r="26.95"/><circle cx="-25.00" cy="-125.00" r="26.95"/><circle cx="625.00" cy="299.99" r="26.95"/><circle cx="12.50" cy="312.50" r="26.95" class="selected"/></g><g class="damaged"><circle cx="-587.50" cy="287.49" r="26.95"/><circle cx="-37.50" cy="-537.50" r="26.93"/><circle cx="198.20" cy="-397.28" r="26.95"/></g><g class="broken"><circle cx="-108.54" cy="-337.50" r="26.93"/><circle cx="-173.20" cy="-397.28" r="26.93"/><circle cx="-50.00" cy="-512.50" r="26.93"/><circle cx="-107.54" cy="-287.50" r="26.93"/></g>
+    </g>
+</svg>
+
+    </g>
+    <svg id="maximizedContents"/>
+    <g id="cloudButtonBar">
+        <use xlink:href="#maximizeButton" class="maximizeClass" x="1866" y="1026" />
+        <use xlink:href="#minimizeButton" class="hidden" x="1866" y="1026" />
+        <use xlink:href="#stretchButton" class="stretchClass" x="1758" y="1026" />
+        <use xlink:href="#preserveButton" class="hidden" x="1758" y="1026" />
+    </g>
+</svg>
