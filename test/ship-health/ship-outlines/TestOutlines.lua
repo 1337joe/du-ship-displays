@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 --- Generic display test conditions for running through ship health screens.
 
-package.path = package.path .. ";../du-mocks/?.lua" -- add du-mocks project
+package.path = package.path .. ";../du-mocks/src/?.lua" -- add fallback to du-mocks project (if not installed on path)
 
 local lu = require("luaunit")
 

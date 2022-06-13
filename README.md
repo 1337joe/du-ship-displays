@@ -5,11 +5,11 @@
 
 Info and control screens for Dual Universe ships.
 
-Only the basic screens are linked here. For feature lists, full galleries of available screens, or troubleshooting tips view the [project page](http://1337joe.github.io/du-ship-displays) or click on the screen section headers.
+Only the basic screens are linked here. For feature lists, full galleries of available screens, or troubleshooting tips view the [project page](https://1337joe.github.io/du-ship-displays) or click on the screen section headers.
 
-## [Antigravity Controller](http://1337joe.github.io/du-ship-displays#antigravity)
+## [Antigravity Controller](https://1337joe.github.io/du-ship-displays#antigravity)
 
-[<img src="http://1337joe.github.io/du-ship-displays/images/antigravity-basic.svg" width="50%" alt="Basic Anti-Gravity Display">](http://1337joe.github.io/du-ship-displays/templates/antigravity-basic.json)
+[<img src="https://1337joe.github.io/du-ship-displays/images/antigravity-basic.svg" width="50%" alt="Basic Anti-Gravity Display">](https://1337joe.github.io/du-ship-displays/templates/antigravity-basic.json)
 
 ### Install/Use Instructions
 
@@ -19,9 +19,20 @@ Only the basic screens are linked here. For feature lists, full galleries of ava
 4. Activate the programming board, either directly or with a signal.
 5. Get in the control seat of the ship so the ship is under control, then use the screen to adjust the antigravity.
 
-## [_Semi-Abandoned / Work in Progress_ Ship Health Display](http://1337joe.github.io/du-ship-displays#ship-health)
+## [_Work-in-Progress_ Fuel Display](https://1337joe.github.io/du-ship-displays#fuel)
 
-[<img src="http://1337joe.github.io/du-ship-displays/images/ship-health-basic.svg" width="50%" alt="Basic Ship Health Display">](http://1337joe.github.io/du-ship-displays/templates/ship-health-basic.json)
+[<img src="https://1337joe.github.io/du-ship-displays/images/fuel.svg" width="50%" alt="Fuel Display">](https://1337joe.github.io/du-ship-displays/templates/fuel-basic.json)
+
+### Install/Use Instructions
+
+1. Either build a json configuration (see Building from a Template below) or copy the one linked from the above image and paste it as a Lua configuration into the programming board.
+2. Copy src/fuel/fuel.screen.lua to a screen and set it to Lua mode.
+3. Link the programming board to the screen, Core Unit, Databank if you have one, and (optional) at least one of each type of fuel tank to be monitored.
+4. Activate the programming board, either directly or with a signal.
+
+## [_Semi-Abandoned / Work in Progress_ Ship Health Display](https://1337joe.github.io/du-ship-displays#ship-health)
+
+[<img src="https://1337joe.github.io/du-ship-displays/images/ship-health-basic.svg" width="50%" alt="Basic Ship Health Display">](https://1337joe.github.io/du-ship-displays/templates/ship-health-basic.json)
 
 ### Install/Use Instructions
 

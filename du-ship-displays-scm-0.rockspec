@@ -10,12 +10,12 @@ description = {
    license = "MIT",
 }
 dependencies = {
-   "lua >= 5.2",
+   "lua >= 5.3",
 
    -- build/test dependencies
    "luaunit",
    "luacov",
-   "du-mocks",
+   "du-mocks >= 0.29.1",
    "du-bundler",
 }
 build = {

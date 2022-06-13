@@ -1,4 +1,4 @@
-local rslib = require('rslib')
+local rslib = require("rslib")
 local json = require("dkjson")
 
 -- constants
@@ -35,7 +35,7 @@ local accept = {"fuel"}
 local output = {
     accept = accept
 }
--- set ouptut immediately in case processing is cut short
+-- set output immediately in case processing is cut short
 setOutput(json.encode(output))
 
 -- parse input
@@ -48,6 +48,10 @@ if not success then
     }
 elseif type(result) == "table" then
     input = result
+elseif result == nil then
+    input = {
+        error = "Input missing/empty, is Programming Board running?"
+    }
 else
     input = {
         error = string.format("Unexpected input type: %s (%s)", type(result), result)
@@ -614,13 +618,13 @@ elseif persistent.view == "options" then
     --     table.insert(fuelOptions, 2, {"showWidget", "Show Widget"})
     -- end
     -- only show exclude options for available tanks and when there is another tank type that could be shown
-    if input.fuel.atmo and (input.fuel.space or input.fuel.rocket) then
+    if input.fuel and input.fuel.atmo and (input.fuel.space or input.fuel.rocket) then
         table.insert(fuelOptions, {"excludeA", "Exclude Atmo"})
     end
-    if input.fuel.space and (input.fuel.atmo or input.fuel.rocket) then
+    if input.fuel and input.fuel.space and (input.fuel.atmo or input.fuel.rocket) then
         table.insert(fuelOptions, {"excludeS", "Exclude Space"})
     end
-    if input.fuel.rocket and (input.fuel.atmo or input.fuel.space) then
+    if input.fuel and input.fuel.rocket and (input.fuel.atmo or input.fuel.space) then
         table.insert(fuelOptions, {"excludeR", "Exclude Rocket"})
     end
     addOptions(interfaceLayer, persistent.fuelOptions, fuelOptions, 10, {g1X, g1Y, g1W, g1H})
