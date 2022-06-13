@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"><!-- 180x180 -->
     <link rel="manifest" href="/manifest.webmanifest">
 
-    <link rel="stylesheet" type="text/css" href="default.css">
+    <link rel="stylesheet" type="text/css" href="/du-ship-displays/default.css">
 
     <meta charset="UTF-8">
 
@@ -35,7 +35,7 @@
                 <br>You should get a "Lua script loaded" confirmation message. If this is not the case try pasting the
                 json in notepad to confirm that the right file is in the clipboard.
             </li>
-            <li>Go into build mode and link the programming board to a screen, then leave build mode and activate the
+            <li>Go into build mode and link the programming board to a screen, then leave build mode and (re-)activate the
                 programming board. The screen will tell you the next element to link, if necessary.
                 <br>The console will print out what slot is linked as what element to help debug connections if needed.
             </li>
@@ -44,7 +44,7 @@
     </section>
 
     <section class="ship-display" id="antigravity">
-        <h1>Antigravity</h1>
+        <h1>Antigravity Controller</h1>
         <hr>
 
         <div>
@@ -81,7 +81,7 @@
         </ul>
 
         <div>
-        <h2>Troubleshooting</h2>
+            <h2>Troubleshooting</h2>
             <h3>Anti-Gravity Generator doesn't lift ship</h3>
             <ul>
                 <li>The ship isn't under active control: either sit in the controller seat or activate a remote controller.</li>
@@ -97,6 +97,43 @@
                 <li>Make sure the programming board is turned on: either enable it before you get in the control seat or use a switch or other element to send an on signal to it.</li>
                 <li>If a green lock icon is in the top left corner then the controls are locked. Click on it and drag to the right to unlock.</li>
             </ul>
+        </div>
+    </section>
+
+    <section class="ship-display" id="ship-health">
+        <h1>Ship Health Display <em>(Semi-Abandoned/Work-In-Progress)</em></h1>
+        <hr>
+
+        <div>
+            <h2>Features/Controls</h2>
+            <ul>
+                <li>View health of elements in tabular or graphical/point cloud views.</li>
+                <li>Filter to only view broken/damaged/healthy elements.</li>
+                <li>Select elements (table only) to highlight them in graphical views and display arrows pointing to them in 3d space.</li>
+                <li>Table view can be sorted by any column.</li>
+                <li>Element loading handles large ships, rendering may or may not. (batching not yet fully implemented)</li>
+                <li>Custom ship outlines possible for drawing under the point cloud representation. (documentation not written)</li>
+            </ul>
+        </div>
+
+        <div>
+            <h2>Requirements</h2>
+            <ul>
+                <li>1x Programming Board</li>
+                <li>1x Screen</li>
+                <li>Databank (optional but highly recommended, for remembering controller state between sessions)</li>
+            </ul>
+        </div>
+
+        <ul class="gallery">
+            <li><a href="templates/ship-health-basic.json"><img
+                        src="images/ship-health-basic.svg" alt="Basic Ship Health Display"></a>
+            </li>
+        </ul>
+
+        <div>
+            <h2>Custom Ship Outlines</h2>
+            <b>TODO, see the <a href="https://github.com/1337joe/du-ship-displays/blob/main/src/ship-health/ship-health-basic.PocketScout.json">Pocket Scout template</a> for an example.</b>
         </div>
     </section>
 </body>
