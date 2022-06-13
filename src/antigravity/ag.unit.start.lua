@@ -3,7 +3,7 @@
 --   By W3asel (1337joe)  --
 ----------------------------
 -- Bundled: ${date}
--- Latest version always available here: https://github.com/1337joe/du-ship-displays
+-- Latest version always available here: https://1337joe.github.io/du-ship-displays
 
 -- container for shared state for anti-grav controller
 _G.agController = {}

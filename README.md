@@ -1,90 +1,35 @@
 # DU Ship Displays
 
-![Tests](https://github.com/1337joe/du-ship-displays/actions/workflows/test.yml/badge.svg?branch=main)
+[![Tests](https://github.com/1337joe/du-ship-displays/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/1337joe/du-ship-displays/actions/workflows/test.yml)
 [![Coverage](https://codecov.io/gh/1337joe/du-ship-displays/branch/main/graph/badge.svg)](https://codecov.io/gh/1337joe/du-ship-displays)
 
 Info and control screens for Dual Universe ships.
 
-Only the basic screens are linked here. For full galleries of available screens view my [project web page](https://du.w3asel.com/du-ship-displays).
+Only the basic screens are linked here. For feature lists, full galleries of available screens, or troubleshooting tips view the [project page](http://1337joe.github.io/du-ship-displays) or click on the screen section headers.
 
-## Antigravity
+## [Antigravity Controller](http://1337joe.github.io/du-ship-displays#antigravity)
 
-[<img src="https://du.w3asel.com/du-ship-displays/images/antigravity-basic.svg" width="50%" alt="Basic Anti-Gravity Display">](https://du.w3asel.com/du-ship-displays/templates/antigravity-basic.json)
+[<img src="http://1337joe.github.io/du-ship-displays/images/antigravity-basic.svg" width="50%" alt="Basic Anti-Gravity Display">](http://1337joe.github.io/du-ship-displays/templates/antigravity-basic.json)
 
-### Features/Controls:
+### Install/Use Instructions
 
-* All anti-gravity measurements and controls on one screen.
-* Set target altitude by dragging the arrow on the left side of the altitude scale or with the up and down arrows. Left/right arrows select the digit to change to step at anywhere from 1 to 10,000 m increments.
-  * The altitude scale is logarithmic for more control at lower altitudes.
-* Snap target altitude to current altitude in one click on the current altitude slider.
-* Lock controls to prevent accidental clicks by clicking on the lock icon.
-* Power on and unlock protected by a drag-to-activate mechanism to prevent accidental disabling.
-
-### Requirements:
-
-* Anti-Gravity Generator (of appropriate size for ship core and with the appropriate number of pulsors linked to it)
-* 1x Programming Board
-* 1x Screen
-* Databank (optional, for remembering controller state between sessions)
-
-### Install/Use Instructions:
-
-[Pre-built lua config](https://du.w3asel.com/du-ship-displays/templates/antigravity-basic.json)
-
-1. Either build a json configuration (see Building from a Template below) or copy the one above and paste it as a Lua configuration into the programming board.
+1. Either build a json configuration (see Building from a Template below) or copy the one linked from the above image and paste it as a Lua configuration into the programming board.
 2. Link the screen to the agScreen slot.
 3. Add links to the Anti-Gravity Generator, the Dynamic Core Unit, and the Databank if you have one. Order doesn't matter unless you edit the unit start handler to specify what slot is what instead of allowing it to autodetect them.
 4. Activate the programming board, either directly or with a signal.
 5. Get in the control seat of the ship so the ship is under control, then use the screen to adjust the antigravity.
 
-### Troubleshooting:
+## [_Semi-Abandoned / Work in Progress_ Ship Health Display](http://1337joe.github.io/du-ship-displays#ship-health)
 
-#### Anti-Gravity Generator doesn't lift ship:
+[<img src="http://1337joe.github.io/du-ship-displays/images/ship-health-basic.svg" width="50%" alt="Basic Ship Health Display">](http://1337joe.github.io/du-ship-displays/templates/ship-health-basic.json)
 
-* Make sure it's activated: if the power button on the top right section has a red ring instead of a green bar click on it to turn on the Anti-Gravity Generator element.
-* Make sure you have enough pulsors placed and that they are linked to the Anti-Gravity Generator.
-* Make sure you're at no less than 1,000m altitude.
-* Make sure the current base altitude is within 500m of ship altitude. It may take some time to get there.
-* The ship isn't under active control: either sit in the controller seat or activate a remote controller.
-* In some cases it may be necessary to unlink the pulsors from the Anti-Gravity Generator and re-link them if nothing else works.
+### Install/Use Instructions
 
-#### Can't edit altitude:
-
-* Make sure the programming board is turned on: either enable it before you get in the control seat or use a switch or other element to send an on signal to it.
-* If a green lock icon is in the top left corner then the controls are locked. Click on it and drag to the right to unlock.
-
-## _Semi-Abandoned / Work in Progress_ Ship Health
-
-[<img src="https://du.w3asel.com/du-ship-displays/images/ship-health-basic.svg" width="50%" alt="Basic Ship Health Display">](https://du.w3asel.com/du-ship-displays/templates/ship-health-basic.json)
-
-### Features/Controls:
-
-* View health of elements in tabular or graphical/point cloud views.
-* Filter to only view broken/damaged/healthy elements.
-* Select elements (table only) to highlight them in graphical views and display arrows pointing to them in 3d space.
-* Table view can be sorted by any column.
-* Element loading handles large ships, rendering may or may not. (batching not yet fully implemented)
-* Custom ship outlines possible for drawing under the point cloud representation. (documentation not written)
-
-### Requirements:
-
-* 1x Programming Board
-* 1x Screen
-* Databank (optional but highly recommended, for remembering controller state between sessions)
-
-### Install/Use Instructions:
-
-[Pre-built lua config](https://du.w3asel.com/du-ship-displays/templates/ship-health-basic.json)
-
-1. Either build a json configuration (see Building from a Template below) or copy the one above and paste it as a Lua configuration into the programming board.
+1. Either build a json configuration (see Building from a Template below) or copy the one linked from the above image and paste it as a Lua configuration into the programming board.
 2. Link the screen to the hpScreen slot.
 3. Add links to the Dynamic Core Unit and the Databank if you have one. Order of these doesn't matter unless you edit the unit start handler to specify what slot is what instead of allowing it to autodetect them.
 4. Activate the programming board, either directly or with a signal.
-5. TODO complete
-
-### Advanced Usage: Custom Ship Outlines
-
-TODO explain process, link to example
+5. Interact with the screen to access the data.
 
 ## Building from a Template
 
@@ -92,9 +37,7 @@ This project is designed to be used with my other Dual Universe project [DU Bund
 
 Documentation of the bundler is at the above link, but to put it simply you need to be able to run Lua scripts and simply call `bundleTemplate.lua template.json` (with appropriate paths for file locations) and it will build a json configuration based on the template. On Linux this can be piped to `xclip -selection c` to put it directly on the clipboard, while on Windows piping to `clip.exe` should do the same thing. Alternately, you can write it to a file and copy from there.
 
-If you don't have a Lua runtime set up the easiest solution is to copy from the configurations hosted on the [project page on my website](https://du.w3asel.com/du-ship-displays/). Each template included in the repository is built automatically on update and uploaded there. The alternative is manually replacing the tags (`${tag}`) according to the rules of the templater.
-
-`logo.svg` may be replaced with your organization logo (or any other logo you like) to embed that logo in the screens on build from template. To keep git from tracking changes to this file run `git update-index --assume-unchanged logo.svg`. If you want to update the logo without using the templater simply paste your logo SVG into the value of the LOGO_SVG variable in-game or use find-replace on the exported json.
+If you don't have a Lua runtime set up the easiest solution is to copy from the configurations hosted on the [project page](https://1337joe.github.io/du-ship-displays/). Each template included in the repository is built automatically on update and uploaded there. The alternative is manually replacing the tags (`${tag}`) according to the rules of the templater.
 
 ## Developer Dependencies
 

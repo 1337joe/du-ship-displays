@@ -1,9 +1,9 @@
-----------------------------
--- Ship Health Controller --
---   By W3asel (1337joe)  --
-----------------------------
+---------------------------
+-- Ship Health Display   --
+--   By W3asel (1337joe) --
+---------------------------
 -- Bundled: ${date}
--- Latest version always available at: https://github.com/1337joe/du-ship-displays
+-- Latest version always available at: https://1337joe.github.io/du-ship-displays
 
 -- container for shared state for ship health controller
 _G.hpController = {}
